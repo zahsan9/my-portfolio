@@ -1904,14 +1904,6 @@
         </svg>
         <span class="rail-label">About Me</span>
       </button>
-      <button class="rail-btn" data-route="play" title="Play" aria-label="Play">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 3h6"/>
-          <path d="M10 3v6.2L4.8 18a1.8 1.8 0 0 0 1.55 2.7h11.3A1.8 1.8 0 0 0 19.2 18L14 9.2V3"/>
-          <path d="M7 15.5h10"/>
-        </svg>
-        <span class="rail-label">Play</span>
-      </button>
     </nav>
     <div class="rail-bottom">
       <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">
@@ -1952,6 +1944,7 @@
           <button class="tab" data-filter="swe" aria-pressed="false">SWE</button>
           <button class="tab" data-filter="viz" aria-pressed="false">Data</button>
           <button class="tab" data-filter="studio" aria-pressed="false">WIIRED Studio</button>
+          <button class="tab" data-filter="misc" aria-pressed="false">Misc</button>
         </div>
       </nav>
 
@@ -1997,7 +1990,7 @@
         </article>
 
         <!-- Daily type -->
-        <article class="pin" data-cat="studio" data-page="daily" data-year="Ongoing" data-cursor-label="Coming soon!">
+        <article class="pin" data-cat="misc" data-page="daily" data-year="Ongoing" data-cursor-label="Coming soon!">
           <div class="art art-plum ar-1">
             <h3 style="font-size:28px;">Daily type<br>&amp; motion.</h3>
           </div>
@@ -2019,7 +2012,7 @@
         </article>
 
         <!-- Book — Bird by Bird -->
-        <article class="pin" data-cat="viz" data-page="birdbybird" data-year="1994" data-cursor-label="Coming soon!">
+        <article class="pin" data-cat="misc" data-page="birdbybird" data-year="1994" data-cursor-label="Coming soon!">
           <div class="art art-cream art-book ar-45">
             <div class="title">Bird by Bird<small>Anne Lamott</small></div>
           </div>
@@ -2195,17 +2188,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- ═══ PLAY PAGE ═══ -->
-    <section class="page" id="playView">
-      <div class="page-head">
-        <div class="page-eyebrow">Play</div>
-        <h2>Just for <em>fun</em>.</h2>
-      </div>
-      <div class="page-body">
-        <p>Coming soon.</p>
       </div>
     </section>
 
@@ -2593,7 +2575,7 @@
       facts: [['Stack','React, MDX'],['Size','2.1kb gz'],['Downloads','1.4k/wk']]
     },
     birdbybird: {
-      meta: 'Data Viz · book',
+      meta: 'Misc · book',
       wip: true,
       eyebrow: 'On writing',
       title: 'Bird by Bird',
@@ -2622,7 +2604,8 @@
     ux:      'linear-gradient(135deg, var(--c-clay), oklch(0.50 0.08 25))',
     swe:     'linear-gradient(135deg, var(--c-yellow), oklch(0.78 0.10 80))',
     viz:     'linear-gradient(135deg, var(--c-blue), oklch(0.40 0.08 250))',
-    studio:  'linear-gradient(135deg, oklch(0.22 0.005 60), oklch(0.32 0.01 60))'
+    studio:  'linear-gradient(135deg, oklch(0.22 0.005 60), oklch(0.32 0.01 60))',
+    misc:    'linear-gradient(135deg, var(--c-plum), oklch(0.30 0.08 320))'
   };
 
   // ── Sheet ──
@@ -2752,8 +2735,8 @@
       if (p.lead)    html += `<p class="lead">${p.lead}</p>`;
       if (p.facts)   html += '<dl class="facts">' + p.facts.map(f => `<div><dt>${f[0]}</dt><dd>${f[1]}</dd></div>`).join('') + '</dl>';
       if (!p.body) html += `<div class="cs-wip"><span class="cs-label">Coming soon</span><p class="cs-wip-text">Full writeup in progress.</p></div>`;
-      const cat = srcEl?.dataset?.cat || 'ux';
-      html += `<div class="fig" style="background:${FIG_BG[cat] || FIG_BG.ux};">[ figure / hero ]</div>`;
+      const cat = srcEl?.dataset?.cat || 'misc';
+      html += `<div class="fig" style="background:${FIG_BG[cat] || FIG_BG.misc};">[ figure / hero ]</div>`;
       if (p.body) html += `<div class="body">${p.body}</div>`;
     }
     return html;
@@ -3056,7 +3039,8 @@
     ux: 'Product',
     swe: 'SWE',
     viz: 'Data',
-    studio: 'WIIRED Studio'
+    studio: 'WIIRED Studio',
+    misc: 'Misc'
   };
 
   pins.forEach(pin => {
@@ -3146,7 +3130,6 @@
   const feedView        = document.getElementById('feedView');
   const aboutView       = document.getElementById('aboutView');
   const expView         = document.getElementById('expView');
-  const playView        = document.getElementById('playView');
 const expScroll   = document.getElementById('expScroll');
   const expTrack    = document.getElementById('expTrack');
   let expTravelPx = 0;
@@ -3251,7 +3234,7 @@ function setRoute(name) {
     pendingRouteName = name;
     document.querySelectorAll('.rail-btn[data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === name));
 
-    const viewMap = { feed: feedView, about: aboutView, experience: expView, play: playView };
+    const viewMap = { feed: feedView, about: aboutView, experience: expView };
     const leaving  = viewMap[currentRouteName];
     const arriving = viewMap[name];
 
@@ -3293,7 +3276,7 @@ function setRoute(name) {
   document.getElementById('logoBtn').addEventListener('click', () => setRoute('feed'));
 
   // ── Hash routing ──
-  const VALID_ROUTES = new Set(['feed', 'about', 'experience', 'play']);
+  const VALID_ROUTES = new Set(['feed', 'about', 'experience']);
   const routeFromHash = () => {
     const hash = location.hash.replace('#', '');
     return VALID_ROUTES.has(hash) ? hash : 'feed';
