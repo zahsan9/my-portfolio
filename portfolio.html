@@ -393,7 +393,7 @@
 
   /* ── Banner (profile header) ── */
   .banner {
-    padding: 124px 36px 96px;
+    padding: 156px 48px 120px;
     text-align: center; max-width: 720px; margin: 0 auto;
     overflow: hidden; max-height: 700px;
     transition: opacity var(--motion-fast) ease;
@@ -452,7 +452,7 @@
     font-family: inherit; font-size: 13px; color: var(--control-muted);
   }
   .tabs {
-    width: min(980px, 100% - 72px);
+    width: min(1080px, 100% - 72px);
     margin: 0 auto;
     padding: 20px 0 28px;
     display: flex; flex-wrap: wrap; gap: 28px;
@@ -545,14 +545,14 @@
   /* ── Pin masonry feed ── */
   .feed {
     --card-gap: 36px;
-    width: min(980px, 100% - 72px);
+    width: min(1080px, 100% - 72px);
     margin: 0 auto;
     column-count: 3; column-gap: var(--card-gap);
     padding: 8px 0 88px;
   }
   .app.sheet-open .feed {
     width: calc(25vw - 56px + var(--open-column-gutter));
-    max-width: 327px;
+    max-width: 363px;
     margin: 0;
     column-count: 1;
     padding: calc(var(--chrome-size) + 24px) 0 80px var(--open-column-gutter);
@@ -563,7 +563,7 @@
     .feed { --card-gap: 28px; column-count: 2; }
   }
   @media (max-width: 600px)  { .feed { column-count: 1; } }
-  @media (max-width: 1400px) { .app.sheet-open .feed { width: min(calc(33.333vw - 140px), 327px); } }
+  @media (max-width: 1400px) { .app.sheet-open .feed { width: min(calc(33.333vw - 140px), 363px); } }
   @media (max-width: 1000px) { .app.sheet-open .feed { width: calc(50vw - 78px); } }
   @media (max-width: 600px)  { .app.sheet-open .feed { width: calc(100vw - 16px); } }
 
