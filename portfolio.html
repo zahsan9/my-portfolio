@@ -569,14 +569,9 @@
 
   .pin {
     break-inside: avoid; margin-bottom: var(--card-gap); cursor: pointer;
-    position: relative; padding-top: 0; padding-bottom: 0;
-    transition:
-      padding-top 260ms var(--ease-out),
-      padding-bottom 260ms var(--ease-out),
-      opacity var(--motion-med) ease;
+    position: relative;
+    transition: opacity var(--motion-med) ease;
   }
-  .pin:hover,
-  .pin:focus-visible { padding-bottom: 22px; }
   .pin.is-hidden { display: none; }
   .feed-empty {
     display: none; padding: 60px 140px;
@@ -603,15 +598,14 @@
     transition-duration: 120ms;
   }
   .pin .sub {
-    position: absolute; left: 12px; right: 12px; bottom: 0;
+    display: block; max-height: 0; margin-top: 0; overflow: hidden;
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em;
-    color: var(--ink-mid); opacity: 0; white-space: nowrap; overflow: hidden;
+    color: var(--ink-mid); opacity: 0; white-space: nowrap;
     text-overflow: ellipsis; pointer-events: none;
-    transform: translateY(-3px);
-    transition: opacity 0.18s ease, transform 0.22s var(--ease-out);
+    transition: max-height 0.22s var(--ease-out), margin-top 0.22s var(--ease-out), opacity 0.18s ease;
   }
   .pin:hover .sub,
-  .pin:focus-visible .sub { opacity: 1; transform: translateY(0); }
+  .pin:focus-visible .sub { max-height: 16px; margin-top: 6px; opacity: 1; }
 
   /* Aspect ratios */
   .ar-1  { aspect-ratio: 1; }
@@ -1910,6 +1904,14 @@
         </svg>
         <span class="rail-label">About Me</span>
       </button>
+      <button class="rail-btn" data-route="play" title="Play" aria-label="Play">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 3h6"/>
+          <path d="M10 3v6.2L4.8 18a1.8 1.8 0 0 0 1.55 2.7h11.3A1.8 1.8 0 0 0 19.2 18L14 9.2V3"/>
+          <path d="M7 15.5h10"/>
+        </svg>
+        <span class="rail-label">Play</span>
+      </button>
     </nav>
     <div class="rail-bottom">
       <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">
@@ -1939,18 +1941,17 @@
           <img class="avatar-photo" src="profile.jpg" alt="Portrait of Zainab Ahsan" />
         </div>
         <h1 id="nameTitle">Zainab <em>Ahsan</em></h1>
-        <p class="bio">Co-Founder @ WIIRED Studio · CS + Data Science @ UW<br>I overthink interfaces so you don't have to :)</p>
+        <p class="bio">Co-Founder @ WIIRED Studio  ·  CS + Data Science @ UW<br>I overthink interfaces so you don't have to :)</p>
         <div class="meta">Seattle, WA <span class="meta-sep">·</span> 5 Boards, 9 Pins</div>
       </div>
 
       <nav class="tabs" aria-label="Filter work">
         <div class="tabs-scroll">
           <button class="tab active" data-filter="all" aria-pressed="true">All</button>
-          <button class="tab" data-filter="ux" aria-pressed="false">UI / UX</button>
+          <button class="tab" data-filter="ux" aria-pressed="false">Product</button>
           <button class="tab" data-filter="swe" aria-pressed="false">SWE</button>
-          <button class="tab" data-filter="viz" aria-pressed="false">Data Viz</button>
+          <button class="tab" data-filter="viz" aria-pressed="false">Data</button>
           <button class="tab" data-filter="studio" aria-pressed="false">WIIRED Studio</button>
-          <button class="tab" data-filter="misc" aria-pressed="false">Misc</button>
         </div>
       </nav>
 
@@ -1996,7 +1997,7 @@
         </article>
 
         <!-- Daily type -->
-        <article class="pin" data-cat="misc" data-page="daily" data-year="Ongoing" data-cursor-label="Coming soon!">
+        <article class="pin" data-cat="studio" data-page="daily" data-year="Ongoing" data-cursor-label="Coming soon!">
           <div class="art art-plum ar-1">
             <h3 style="font-size:28px;">Daily type<br>&amp; motion.</h3>
           </div>
@@ -2018,7 +2019,7 @@
         </article>
 
         <!-- Book — Bird by Bird -->
-        <article class="pin" data-cat="misc" data-page="birdbybird" data-year="1994" data-cursor-label="Coming soon!">
+        <article class="pin" data-cat="viz" data-page="birdbybird" data-year="1994" data-cursor-label="Coming soon!">
           <div class="art art-cream art-book ar-45">
             <div class="title">Bird by Bird<small>Anne Lamott</small></div>
           </div>
@@ -2197,6 +2198,16 @@
       </div>
     </section>
 
+    <!-- ═══ PLAY PAGE ═══ -->
+    <section class="page" id="playView">
+      <div class="page-head">
+        <div class="page-eyebrow">Play</div>
+        <h2>Just for <em>fun</em>.</h2>
+      </div>
+      <div class="page-body">
+        <p>Coming soon.</p>
+      </div>
+    </section>
 
   </main>
 
@@ -2582,7 +2593,7 @@
       facts: [['Stack','React, MDX'],['Size','2.1kb gz'],['Downloads','1.4k/wk']]
     },
     birdbybird: {
-      meta: 'Misc · book',
+      meta: 'Data Viz · book',
       wip: true,
       eyebrow: 'On writing',
       title: 'Bird by Bird',
@@ -2611,8 +2622,7 @@
     ux:      'linear-gradient(135deg, var(--c-clay), oklch(0.50 0.08 25))',
     swe:     'linear-gradient(135deg, var(--c-yellow), oklch(0.78 0.10 80))',
     viz:     'linear-gradient(135deg, var(--c-blue), oklch(0.40 0.08 250))',
-    studio:  'linear-gradient(135deg, oklch(0.22 0.005 60), oklch(0.32 0.01 60))',
-    misc:    'linear-gradient(135deg, var(--c-plum), oklch(0.30 0.08 320))'
+    studio:  'linear-gradient(135deg, oklch(0.22 0.005 60), oklch(0.32 0.01 60))'
   };
 
   // ── Sheet ──
@@ -2742,8 +2752,8 @@
       if (p.lead)    html += `<p class="lead">${p.lead}</p>`;
       if (p.facts)   html += '<dl class="facts">' + p.facts.map(f => `<div><dt>${f[0]}</dt><dd>${f[1]}</dd></div>`).join('') + '</dl>';
       if (!p.body) html += `<div class="cs-wip"><span class="cs-label">Coming soon</span><p class="cs-wip-text">Full writeup in progress.</p></div>`;
-      const cat = srcEl?.dataset?.cat || 'misc';
-      html += `<div class="fig" style="background:${FIG_BG[cat] || FIG_BG.misc};">[ figure / hero ]</div>`;
+      const cat = srcEl?.dataset?.cat || 'ux';
+      html += `<div class="fig" style="background:${FIG_BG[cat] || FIG_BG.ux};">[ figure / hero ]</div>`;
       if (p.body) html += `<div class="body">${p.body}</div>`;
     }
     return html;
@@ -3043,11 +3053,10 @@
   const pins = [...feed.querySelectorAll('.pin')];
 
   const CAT_LABELS = {
-    ux: 'UI / UX',
+    ux: 'Product',
     swe: 'SWE',
-    viz: 'Data Viz',
-    studio: 'WIIRED Studio',
-    misc: 'Misc'
+    viz: 'Data',
+    studio: 'WIIRED Studio'
   };
 
   pins.forEach(pin => {
@@ -3137,6 +3146,7 @@
   const feedView        = document.getElementById('feedView');
   const aboutView       = document.getElementById('aboutView');
   const expView         = document.getElementById('expView');
+  const playView        = document.getElementById('playView');
 const expScroll   = document.getElementById('expScroll');
   const expTrack    = document.getElementById('expTrack');
   let expTravelPx = 0;
@@ -3241,7 +3251,7 @@ function setRoute(name) {
     pendingRouteName = name;
     document.querySelectorAll('.rail-btn[data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === name));
 
-    const viewMap = { feed: feedView, about: aboutView, experience: expView };
+    const viewMap = { feed: feedView, about: aboutView, experience: expView, play: playView };
     const leaving  = viewMap[currentRouteName];
     const arriving = viewMap[name];
 
@@ -3283,7 +3293,7 @@ function setRoute(name) {
   document.getElementById('logoBtn').addEventListener('click', () => setRoute('feed'));
 
   // ── Hash routing ──
-  const VALID_ROUTES = new Set(['feed', 'about', 'experience']);
+  const VALID_ROUTES = new Set(['feed', 'about', 'experience', 'play']);
   const routeFromHash = () => {
     const hash = location.hash.replace('#', '');
     return VALID_ROUTES.has(hash) ? hash : 'feed';
