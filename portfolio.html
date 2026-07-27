@@ -1296,6 +1296,19 @@
   .ab-stack-list li::before {
     content: '—'; position: absolute; left: 0; opacity: 0.5;
   }
+  .ab-stack-list.is-lined li::before { content: none; }
+  .ab-stack-list.is-lined li {
+    padding-left: 0; padding-top: 10px; padding-bottom: 10px;
+    border-top: 1px solid color-mix(in oklch, currentColor 22%, transparent);
+  }
+  .ab-stack-list.is-lined li:first-child { padding-top: 0; border-top: none; }
+  .ab-stack-list.is-lined li:last-child { padding-bottom: 0; }
+  .ab-stack-list.is-compact li { font-size: 12px; line-height: 1.4; }
+  .ab-stack-item-label {
+    display: block; font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
   /* Diamond marker to match .exp-card li::before on the Experience timeline */
   .ab-stack-list.is-diamond li::before {
     content: '✦'; font-size: 13px; top: 2px; opacity: 0.6;
@@ -2067,8 +2080,22 @@
 
         <div class="ab-stack-card art-yellow" role="button" tabindex="0">
           <div class="ab-stack-tab" aria-hidden="true"><span>How I Work</span></div>
-          <div class="ab-stack-header"><span class="ab-stack-empty-label">How I Work</span></div>
-          <div class="ab-stack-body"></div>
+          <div class="ab-stack-header">
+            <div class="ab-stack-title">How I <em>work.</em></div>
+            <ul class="ab-stack-list is-lined is-compact" style="margin-top:14px;gap:0;">
+              <li><span class="ab-stack-item-label">Start with pain points</span>I start with the messy parts: where someone might get confused, drop off, or lose trust.</li>
+              <li><span class="ab-stack-item-label">Design for recovery</span>Café app, dashboard, or AI, I plan for what happens when things don't go as planned: people should know what's happening, what they can do next, and how to recover without feeling like they broke something.</li>
+              <li><span class="ab-stack-item-label">Build to learn</span>I move between Figma and code quickly. Figma shapes the experience, but building reveals the timing, the states, the empty cases, and whether it actually feels good, so I ship real products instead of stopping at mockups.</li>
+              <li><span class="ab-stack-item-label">Think in systems</span>I came to design through CS and data, so I think about the system underneath the interface, and what people actually need, not just what we want to build. My best work happens alongside engineering, product, and the people using it.</li>
+            </ul>
+          </div>
+          <div class="ab-stack-body">
+            <div class="ab-stack-tags">
+              <span class="pill">Recovery-First</span>
+              <span class="pill">Figma + Code</span>
+              <span class="pill">Systems Thinking</span>
+            </div>
+          </div>
         </div>
 
         <div class="ab-stack-card art-sage" role="button" tabindex="0">
