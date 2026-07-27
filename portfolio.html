@@ -2309,7 +2309,7 @@
       custom: `
         <div class="cs-hero cs-hero--climate">
           <h2 class="cs-hero-title">Analyzing<br><em>the neutral.</em></h2>
-          <p class="cs-hero-sub">In a school climate survey, 22% neutral sounds like noise. It isn't. Those responses cluster — by topic, by school, by language group. I built four views to find out where.</p>
+          <p class="cs-hero-sub">In a school climate survey, 22% neutral sounds like noise. It isn't. Those responses cluster: by topic, by school, by language group. I built four views to find out where.</p>
           <div class="cs-role-line">
             <span class="cs-role-pill">Solo / Data viz · Analysis</span>
             <span class="cs-role-pill">For / Edmonds School District</span>
@@ -2329,7 +2329,7 @@
               </a>
             </div>
             <!-- TODO: if a comparison-to-average claim is wanted here, specify weighted vs unweighted baseline and recompute. Do not say 'nearly double' against the 22% figure. -->
-            <div class="cs-caption">English-speaking families respond neutrally at 17%. Smaller language groups diverge sharply in both directions — Amharic at 3%, Korean at 21%.</div>
+            <div class="cs-caption">English-speaking families respond neutrally at 17%. Smaller language groups diverge sharply in both directions: Amharic at 3%, Korean at 21%.</div>
           </div>
         </div>
 
@@ -2337,8 +2337,8 @@
           <span class="cs-label">The Question</span>
           <h3 class="cs-question">What does a neutral answer hide?</h3>
           <div class="cs-copy">
-            <p>School climate surveys are built to surface satisfaction. So 22% neutral in a district this size gets filed under residual — the leftover once the real findings are out. But neutral doesn't distribute randomly. It clusters.</p>
-            <p>Edmonds' equity staff needed to know if that 22% meant families were roughly satisfied or if something else was going on — discomfort, unfamiliarity, a survey that didn't quite fit the communities it was asking. ~6,000 respondents, 35+ schools, 38 Likert topics.</p>
+            <p>School climate surveys are built to surface satisfaction. So 22% neutral in a district this size gets filed under residual, the leftover once the real findings are out. But neutral doesn't distribute randomly. It clusters.</p>
+            <p>Edmonds' equity staff needed to know if that 22% meant families were roughly satisfied or if something else was going on: discomfort, unfamiliarity, a survey that didn't quite fit the communities it was asking. ~6,000 respondents, 35+ schools, 38 Likert topics.</p>
           </div>
         </div>
 
@@ -2365,7 +2365,7 @@
           <span class="cs-label">Design Decisions</span>
           <div class="cs-decision-block">
             <h3>01 / Encoding neutral responses</h3>
-            <p>The standard Likert chart — diverging bars — buries neutral in the middle. I switched to a stacked bar sorted descending by neutral rate, which lets the sort be the argument: the cluster at the top (Cultural Identity, Family Connection, Communication Tools) is the finding. It disappears in any other order.</p>
+            <p>The standard Likert chart (diverging bars) buries neutral in the middle. I switched to a stacked bar sorted descending by neutral rate, which lets the sort be the argument: the cluster at the top (Cultural Identity, Family Connection, Communication Tools) is the finding. It disappears in any other order.</p>
             <div class="cs-preview-frame cs-decision-fig">
               <div class="cs-preview-img has-image">
                 <a class="cs-image-link" href="neutral-by-topic.png" aria-label="Open neutral by topic chart at full size">
@@ -2379,12 +2379,12 @@
                   </span>
                 </a>
               </div>
-              <div class="cs-caption">Sorting by neutral % descending: the cluster at the top — Cultural Identity, Family Connection, Communication Tools — is invisible in any other sort order.</div>
+              <div class="cs-caption">Sorting by neutral % descending: the cluster at the top (Cultural Identity, Family Connection, Communication Tools) is invisible in any other sort order.</div>
             </div>
           </div>
           <div class="cs-decision-block">
             <h3>02 / Comparison structure</h3>
-            <p>I tried an interactive filter first. The equity team was reading this off a projected screen in a meeting — they needed something to scan, not explore. Four separate static views instead. The school treemap encodes count as area and neutral rate as color, because schools vary 30× in participation. A bar chart would've made a 30-respondent elementary look equivalent to a 900-student high school.</p>
+            <p>I tried an interactive filter first. The equity team was reading this off a projected screen in a meeting; they needed something to scan, not explore. Four separate static views instead. The school treemap encodes count as area and neutral rate as color, because schools vary 30× in participation. A bar chart would've made a 30-respondent elementary look equivalent to a 900-student high school.</p>
             <div class="cs-preview-frame cs-decision-fig">
               <div class="cs-preview-img has-image">
                 <a class="cs-image-link" href="neutral-by-school.png" aria-label="Open neutral by school chart at full size">
@@ -2403,11 +2403,11 @@
           </div>
           <div class="cs-decision-block">
             <h3>03 / What to de-emphasize</h3>
-            <p>My first three versions were satisfaction dashboards sorted by agreement — technically correct, analytically wrong. Reframing around neutral rate shifted the question from "what do families like" to "where are they withholding judgment." I also cut raw counts: English has 5,086 respondents, some language groups have 15. Counts would've buried the smaller communities entirely.</p>
+            <p>My first three versions were satisfaction dashboards sorted by agreement, technically correct, analytically wrong. Reframing around neutral rate shifted the question from "what do families like" to "where are they withholding judgment." I also cut raw counts: English has 5,086 respondents, some language groups have 15. Counts would've buried the smaller communities entirely.</p>
           </div>
           <div class="cs-decision-block">
             <h3>04 / Annotation and restraint</h3>
-            <p>First draft title: "Neutral Rate by Student Race/Ethnicity." Same data, no finding. The final version names who and what without explaining why — that's the equity team's call. I also cut the error bars. With a non-technical audience, they read as "the data is uncertain" not "the estimate has a range." A footnote handles it.</p>
+            <p>First draft title: "Neutral Rate by Student Race/Ethnicity." Same data, no finding. The final version names who and what without explaining why; that's the equity team's call. I also cut the error bars. With a non-technical audience, they read as "the data is uncertain" not "the estimate has a range." A footnote handles it.</p>
             <div class="cs-preview-frame cs-decision-fig">
               <div class="cs-preview-img has-image">
                 <a class="cs-image-link" href="neutral-by-race.png" aria-label="Open neutral by race chart at full size">
@@ -2421,7 +2421,7 @@
                   </span>
                 </a>
               </div>
-              <div class="cs-caption">The headline names the finding — who and what — without naming the cause.</div>
+              <div class="cs-caption">The headline names the finding, who and what, without naming the cause.</div>
             </div>
           </div>
         </div>
@@ -2435,15 +2435,15 @@
             -->
             <!-- TODO: if the equity team took a specific downstream action, lead with that instead. -->
             <!-- Variant B: one-line outcome. Default when no clean metric exists. -->
-            <span class="cs-impact-line">Turned 22% neutral from a residual into something the equity team could actually use — segmented by topic, school, and language.</span>
+            <span class="cs-impact-line">Turned 22% neutral from a residual into something the equity team could actually use: segmented by topic, school, and language.</span>
           </div>
         </div>
 
         <div class="cs-section">
           <span class="cs-label">What I'd Change</span>
           <div class="cs-learnings">
-            <div class="cs-learning">The language scatter needed minimum-sample callouts. Korean at 21% neutral (n ≈ 30) reads with the same visual weight as English at 17% (n = 5,086) — the log scale handles bubble size correctly but doesn't tell you how much to trust the number. I cut confidence intervals for audience reasons. A simple "n &lt; 50" label would've been the right compromise, and I didn't add it.</div>
-            <div class="cs-learning">The race chart uses gray for neutral; the topic chart uses yellow. That's a Tableau session artifact, not a choice — and it quietly undermines the visual language I'd set up in the first view. Needs a re-export.</div>
+            <div class="cs-learning">The language scatter needed minimum-sample callouts. Korean at 21% neutral (n ≈ 30) reads with the same visual weight as English at 17% (n = 5,086); the log scale handles bubble size correctly but doesn't tell you how much to trust the number. I cut confidence intervals for audience reasons. A simple "n &lt; 50" label would've been the right compromise, and I didn't add it.</div>
+            <div class="cs-learning">The race chart uses gray for neutral; the topic chart uses yellow. That's a Tableau session artifact, not a choice, and it quietly undermines the visual language I'd set up in the first view. Needs a re-export.</div>
           </div>
         </div>
       `
