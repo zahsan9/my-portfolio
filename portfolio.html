@@ -1299,7 +1299,7 @@
   .ab-stack-list.is-lined li::before { content: none; }
   .ab-stack-list.is-lined li {
     padding-left: 0; padding-top: 10px; padding-bottom: 10px;
-    border-top: 1px solid color-mix(in oklch, currentColor 22%, transparent);
+    border-top: 1px solid color-mix(in oklch, currentColor 10%, transparent);
   }
   .ab-stack-list.is-lined li:first-child { padding-top: 0; border-top: none; }
   .ab-stack-list.is-lined li:last-child { padding-bottom: 0; }
@@ -1307,6 +1307,7 @@
   .ab-stack-item-label {
     display: block; font-family: var(--mono); font-size: 10px;
     letter-spacing: 0.08em; text-transform: uppercase;
+    font-weight: 700;
     margin-bottom: 4px;
   }
   /* Diamond marker to match .exp-card li::before on the Experience timeline */
@@ -2084,9 +2085,9 @@
             <div class="ab-stack-title">How I <em>work.</em></div>
             <ul class="ab-stack-list is-lined is-compact" style="margin-top:14px;gap:0;">
               <li><span class="ab-stack-item-label">Start with pain points</span>I start with the messy parts: where someone might get confused, drop off, or lose trust.</li>
-              <li><span class="ab-stack-item-label">Design for recovery</span>Café app, dashboard, or AI, I plan for what happens when things don't go as planned: people should know what's happening, what they can do next, and how to recover without feeling like they broke something.</li>
-              <li><span class="ab-stack-item-label">Build to learn</span>I move between Figma and code quickly. Figma shapes the experience, but building reveals the timing, the states, the empty cases, and whether it actually feels good, so I ship real products instead of stopping at mockups.</li>
-              <li><span class="ab-stack-item-label">Think in systems</span>I came to design through CS and data, so I think about the system underneath the interface, and what people actually need, not just what we want to build. My best work happens alongside engineering, product, and the people using it.</li>
+              <li><span class="ab-stack-item-label">Design for recovery</span>Café app, dashboard, or AI, I plan for what happens when things don't go as planned: know what's happening, know what to do next, recover without feeling like you broke something.</li>
+              <li><span class="ab-stack-item-label">Build to learn</span>I move between Figma and code quickly. Figma shapes the experience, but building reveals the timing, the states, the edge cases, and whether it feels good, so I ship real products instead of mockups.</li>
+              <li><span class="ab-stack-item-label">Think in systems</span>I came to design through CS and data, so I think about the system underneath the interface and what people actually need, not just what we want to build. My best work happens alongside engineering, product, and users.</li>
             </ul>
           </div>
           <div class="ab-stack-body">
@@ -2100,8 +2101,22 @@
 
         <div class="ab-stack-card art-sage" role="button" tabindex="0">
           <div class="ab-stack-tab" aria-hidden="true"><span>How I Use AI</span></div>
-          <div class="ab-stack-header"><span class="ab-stack-empty-label">How I Use AI</span></div>
-          <div class="ab-stack-body"></div>
+          <div class="ab-stack-header">
+            <div class="ab-stack-title">How I use <em>AI.</em></div>
+            <ul class="ab-stack-list is-lined is-compact" style="margin-top:14px;gap:0;">
+              <li><span class="ab-stack-item-label">Start with the idea</span>I use AI once I know what I am trying to make. The concept, product direction, and final decisions stay mine. AI helps me explore more possibilities and reach a working version faster.</li>
+              <li><span class="ab-stack-item-label">Rapid prototype</span>I use Figma Make and Claude Design to turn rough ideas into testable interfaces quickly. This lets me pressure-test flows, interactions, and edge cases before polishing the wrong direction.</li>
+              <li><span class="ab-stack-item-label">Build with AI</span>Claude Code helps me move from mockup to real product, especially when I am scaffolding, debugging, or testing interactions that need actual state. I still review the logic, make the tradeoffs, and shape how the experience feels.</li>
+              <li><span class="ab-stack-item-label">Keep human judgment</span>I treat AI as a collaborator, not an autopilot. I question its output, rewrite anything that feels generic, and keep only what supports the problem I am solving and the people I am designing for.</li>
+            </ul>
+          </div>
+          <div class="ab-stack-body">
+            <div class="ab-stack-tags">
+              <span class="pill">Idea-Led</span>
+              <span class="pill">Rapid Prototyping</span>
+              <span class="pill">Human-in-the-Loop</span>
+            </div>
+          </div>
         </div>
 
         <div class="ab-stack-card art-cream" role="button" tabindex="0">
