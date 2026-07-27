@@ -2833,7 +2833,7 @@
   const aboutStack = document.querySelector('.ab-stack');
   if (aboutStack) {
     const aboutCards = [...aboutStack.querySelectorAll('.ab-stack-card')];
-    let aboutOrder = [1, 0, ...aboutCards.map((_, i) => i).filter(i => i > 1)];
+    let aboutOrder = [1, 2, 3, 0, 4];
     let aboutStackBusy = false;
     let aboutStackMetrics = null;
     let aboutHoverLeaveTimer = null;
