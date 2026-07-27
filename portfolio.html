@@ -2028,7 +2028,7 @@
         <!-- Book — Bird by Bird -->
         <article class="pin" data-cat="misc" data-page="birdbybird" data-year="1994" data-cursor-label="Under construction">
           <div class="art art-cream art-book ar-45">
-            <div class="title">Bird by Bird<small>Anne Lamott</small></div>
+            <div class="title">Bird by Bird</div>
           </div>
         </article>
 
@@ -2880,9 +2880,10 @@
     el.setAttribute('role', 'button');
     const label = el.querySelector('h3, .title')?.textContent?.trim().replace(/\s+/g, ' ');
     if (label) el.setAttribute('aria-label', label);
-    el.addEventListener('click', () => openSheet(el.dataset.page, el));
+    const isUnderConstruction = () => el.dataset.cursorLabel === 'Under construction';
+    el.addEventListener('click', () => { if (!isUnderConstruction()) openSheet(el.dataset.page, el); });
     el.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet(el.dataset.page, el); }
+      if ((e.key === 'Enter' || e.key === ' ') && !isUnderConstruction()) { e.preventDefault(); openSheet(el.dataset.page, el); }
     });
   });
 
