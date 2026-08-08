@@ -30,6 +30,8 @@
     --c-plum:    oklch(0.63 0.09  305);
     --c-sand:    oklch(0.83 0.026 72);
     --c-charcoal:oklch(0.20 0 0);
+    --c-noir:    oklch(0.15 0.006 60);
+    --c-noir-2:  oklch(0.235 0.007 60);
 
     --serif: 'Instrument Serif', Georgia, serif;
     --sans:  'Inter', -apple-system, sans-serif;
@@ -108,7 +110,14 @@
   .app {
     display: grid; grid-template-columns: var(--chrome-size) 1fr; height: 100vh;
   }
-  .main { height: 100vh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+  .main {
+    height: 100vh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
+    /* Without this, Chrome's scroll-anchoring silently nudges scrollTop to
+       compensate whenever a card's hover-expanded .sub changes layout height
+       near the scroll boundary — visible as every card jumping on hover when
+       scrolled to the bottom of the feed. */
+    overflow-anchor: none;
+  }
   .main::-webkit-scrollbar { display: none; }
   .copyright {
     position: fixed;
@@ -542,33 +551,54 @@
     transform: scaleX(1); opacity: 1;
   }
 
-  /* ── Pin masonry feed ── */
+  /* ── Pin masonry feed ──
+     Columns are hand-assigned in HTML (not CSS `column-count` auto-balance) so
+     card sizes can vary while every column still starts and ends flush — see
+     the size-unit comment above the feed markup. */
   .feed {
     --card-gap: 36px;
     width: min(1080px, 100% - 72px);
     margin: 0 auto;
-    column-count: 3; column-gap: var(--card-gap);
-    padding: 8px 0 88px;
+    display: flex; gap: var(--card-gap);
+    /* Extra bottom room absorbs the last row's hover .sub growth (~22px) so
+       hovering a bottom-row card doesn't grow the document height and jolt
+       the scrollbar/scroll position. */
+    padding: 8px 0 120px;
   }
+  .feed-col {
+    /* Fixed basis (no grow) so a column keeps its normal card width even when
+       filtering hides sibling columns entirely — see the :has() rule below. */
+    flex: 0 1 calc((100% - 2 * var(--card-gap)) / 3);
+    min-width: 0;
+    display: flex; flex-direction: column; gap: var(--card-gap);
+  }
+  /* A column with nothing visible in it collapses instead of leaving a dead
+     gap — remaining columns then naturally pack against the left edge. */
+  .feed-col:not(:has(.pin:not(.is-hidden))) { display: none; }
   .app.sheet-open .feed {
     width: calc(25vw - 56px + var(--open-column-gutter));
     max-width: 363px;
     margin: 0;
-    column-count: 1;
+    flex-direction: column;
     padding: calc(var(--chrome-size) + 24px) 0 80px var(--open-column-gutter);
     transform: none;
   }
+  /* Flex-basis is a main-axis size — once .feed stacks to a column, the
+     column's main axis is vertical, so the width-based calc() above must
+     not apply; let each .feed-col size to its natural content height. */
+  .app.sheet-open .feed-col { flex-basis: auto; }
   @media (max-width: 1400px) { .feed { --card-gap: 32px; } }
   @media (max-width: 1000px) {
-    .feed { --card-gap: 28px; column-count: 2; }
+    .feed { --card-gap: 28px; flex-direction: column; }
+    .feed-col { flex-basis: auto; }
   }
-  @media (max-width: 600px)  { .feed { column-count: 1; } }
+  @media (max-width: 600px)  { .feed { flex-direction: column; } }
   @media (max-width: 1400px) { .app.sheet-open .feed { width: min(calc(33.333vw - 140px), 363px); } }
   @media (max-width: 1000px) { .app.sheet-open .feed { width: calc(50vw - 78px); } }
   @media (max-width: 600px)  { .app.sheet-open .feed { width: calc(100vw - 16px); } }
 
   .pin {
-    break-inside: avoid; margin-bottom: var(--card-gap); cursor: pointer;
+    cursor: pointer;
     position: relative;
     transition: opacity var(--motion-med) ease;
   }
@@ -588,29 +618,43 @@
       box-shadow var(--motion-med) var(--ease-out),
       filter var(--motion-med) ease;
   }
-  .pin:hover .art,
-  .pin:focus-visible .art {
+  .pin[data-page]:hover .art,
+  .pin[data-page]:focus-visible .art {
     transform: translateY(-4px);
     box-shadow: 0 12px 32px -8px oklch(0.1 0.005 60 / 0.18);
   }
-  .pin:active .art {
+  .pin[data-page]:active .art {
     transform: translateY(-2px);
     transition-duration: 120ms;
   }
   .pin .sub {
-    display: block; max-height: 0; margin-top: 0; overflow: hidden;
+    display: block; max-height: 0; margin-top: 0; padding-left: 24px; overflow: hidden;
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em;
     color: var(--ink-mid); opacity: 0; white-space: nowrap;
     text-overflow: ellipsis; pointer-events: none;
     transition: max-height 0.22s var(--ease-out), margin-top 0.22s var(--ease-out), opacity 0.18s ease;
   }
   .pin:hover .sub,
-  .pin:focus-visible .sub { max-height: 16px; margin-top: 6px; opacity: 1; }
+  .pin:focus-visible .sub { max-height: 13px; margin-top: 6px; opacity: 1; }
+
+  /* A pin directly above a static component keeps its own hover subtitle,
+     but as an overlay instead of an in-flow block, so revealing it never
+     pushes the component below out of place — components stay fully static
+     regardless of what's hovered around them. */
+  .pin[data-page]:has(+ .pin:not([data-page])) .sub {
+    position: absolute; left: 0; top: 100%; margin-top: 6px;
+    max-height: none; overflow: visible;
+    transform: translateY(-4px);
+    transition: opacity 0.18s ease, transform 0.22s var(--ease-out);
+  }
+  .pin[data-page]:has(+ .pin:not([data-page])):hover .sub,
+  .pin[data-page]:has(+ .pin:not([data-page])):focus-visible .sub {
+    transform: translateY(0);
+  }
 
   /* Aspect ratios */
   .ar-1  { aspect-ratio: 1; }
   .ar-45 { aspect-ratio: 4 / 5; }
-  .ar-54 { aspect-ratio: 5 / 4; }
 
   /* Art backgrounds */
   .art-clay    { background: var(--c-clay);    color: oklch(0.97 0 0); }
@@ -664,6 +708,19 @@
     -webkit-mask: radial-gradient(circle at center, transparent 22%, black 24%);
   }
 
+  /* brew. pin */
+  .art-brew .brew-mark {
+    margin-top: auto; margin-bottom: 8px; align-self: flex-end;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+  }
+  .art-brew .brew-logo { width: 100%; height: auto; display: block; }
+  .art-brew .brew-mark { width: 42%; }
+  .art-brew .brew-caption {
+    font-family: var(--mono); font-size: 9px; line-height: 1.5;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    text-align: right; color: var(--card-ink); opacity: 1;
+  }
+
   /* Book pin */
   .art-book { padding: 22px; display: flex; flex-direction: column; }
   .art-book .title { font-family: var(--serif); font-size: 22px; line-height: 1.1; margin-top: auto; }
@@ -695,6 +752,111 @@
     border-radius: 6px 6px 0 0;
   }
   .art-folder .pill { position: absolute; bottom: 18px; right: 18px; background: var(--c-yellow); color: var(--card-ink); }
+
+  /* ── Noir widget cards (Tools / Elsewhere / Say hello) ── */
+  .art-noir {
+    background: var(--c-noir);
+    color: oklch(0.90 0.006 80);
+    box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.07);
+  }
+  .art-noir.skills-card {
+    padding: 36px;
+  }
+  .art-noir.contact-card { padding: 36px; }
+  .art-noir .pin-meta { opacity: 0.55; }
+
+  .pin .social-intro,
+  .pin .skills-intro {
+    max-width: 9ch;
+    font-family: var(--serif); font-size: clamp(28px, 2.5vw, 36px);
+    font-weight: 400; line-height: 0.98; letter-spacing: -0.015em;
+  }
+  .pin .social-intro { margin: 0; }
+  .contact-content {
+    margin-top: auto; display: flex; align-items: flex-end;
+    justify-content: space-between; gap: 16px;
+  }
+  .contact-content .social-intro { text-align: left; }
+  .pin .skills-intro { margin: 0; }
+  .skill-cloud {
+    width: 100%; margin: auto 0 0 auto;
+    display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: flex-end; gap: 6px 5px;
+  }
+  .skill-pill {
+    min-height: 42px; padding: 11px 17px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 999px;
+    border: 0;
+    font-family: var(--sans); font-size: 16px; line-height: 1; font-weight: 450;
+    letter-spacing: -0.035em; text-transform: uppercase; white-space: nowrap;
+    box-shadow: 0 10px 20px -13px oklch(0 0 0 / 0.9);
+  }
+  .skill-pill:nth-child(1) {
+    background: transparent; color: oklch(0.92 0.005 80);
+    border: 1px solid oklch(0.92 0.005 80); box-shadow: none;
+  }
+  .skill-pill:nth-child(2) {
+    background: var(--c-yellow); color: var(--card-ink);
+  }
+  .skill-pill:nth-child(3) {
+    background: var(--c-clay); color: oklch(0.97 0 0);
+  }
+  .skill-pill:nth-child(4) {
+    background: var(--c-blue); color: oklch(0.97 0 0);
+  }
+  .skill-pill:nth-child(5) {
+    background: var(--c-plum); color: var(--card-ink);
+  }
+  .skill-pill:nth-child(6) {
+    background: var(--c-sage); color: var(--card-ink);
+  }
+  .skill-pill:nth-child(7) {
+    background: var(--c-cream); color: var(--card-ink);
+  }
+
+  .social-tiles {
+    width: 48px; margin: 0;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  }
+  .social-tile {
+    width: 48px; height: 48px; display: grid; place-items: center;
+    border-radius: 14px; color: var(--card-ink); cursor: pointer;
+    box-shadow:
+      0 10px 18px -13px oklch(0 0 0 / 0.8),
+      inset 0 0 0 1px oklch(0 0 0 / 0.1);
+    transition: box-shadow var(--motion-fast) ease;
+  }
+  .social-tile:nth-child(1) {
+    background: var(--c-yellow);
+  }
+  .social-tile:nth-child(2) {
+    background: var(--c-plum);
+  }
+  .social-tile:nth-child(3) {
+    background: var(--c-sage);
+  }
+  .social-tile:nth-child(4) {
+    background: var(--c-cream);
+  }
+  .social-tile:hover {
+    box-shadow:
+      0 8px 18px -12px oklch(0 0 0 / 0.8),
+      inset 0 0 0 1px oklch(1 0 0 / 0.11);
+  }
+  .social-tile:focus-visible {
+    outline: 2px solid oklch(0.9 0.006 80);
+    outline-offset: 3px;
+  }
+  .social-tile svg { width: 23px; height: 23px; }
+  .social-tile .social-glyph {
+    font-family: var(--sans); font-weight: 700; font-size: 21px; letter-spacing: -0.02em;
+  }
+  @media (max-width: 380px) {
+    .pin .social-intro { margin-bottom: 18px; }
+    .skill-cloud { gap: 7px 6px; }
+    .skill-pill { min-height: 38px; padding: 10px 14px; font-size: 14px; }
+  }
 
   /* ── Pages (experience / contact) ── */
   .page { display: none; }
@@ -1377,6 +1539,12 @@
     font-family: var(--sans); font-size: 13px; line-height: 1.5;
     color: oklch(0.52 0.005 70); margin-bottom: 20px;
   }
+  .cs-hero--brew .cs-hero-title {
+    font-family: var(--serif);
+    font-weight: 400;
+    line-height: 0.98;
+    letter-spacing: 0;
+  }
   .cs-hero--climate {
     background:
       linear-gradient(135deg, oklch(0.18 0.012 70), oklch(0.13 0.006 60) 54%),
@@ -1515,6 +1683,7 @@
     padding: 14px;
     background: oklch(0.98 0.004 85);
   }
+  .cs-preview-img.has-image.on-dark { background: oklch(0.09 0 0); }
   .cs-preview-img.has-image::before { display: none; }
   .cs-preview-img.has-image img {
     display: block;
@@ -1618,6 +1787,121 @@
     color: var(--ink);
   }
   .cs-decision-fig { margin-top: 20px; }
+  .cs-decision-row {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 32px;
+    align-items: start;
+    margin-top: 18px;
+  }
+  .cs-decision-copy h3 { margin-bottom: 12px; }
+  .cs-decision-copy p { font-size: 13px; line-height: 1.62; color: var(--ink); }
+  .cs-decision-media-stack { display: grid; gap: 20px; }
+  .cs-filmstrip { display: flex; gap: 12px; }
+  .cs-filmstrip-item { flex: 1; min-width: 0; }
+  .cs-filmstrip-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-low);
+    margin-bottom: 6px;
+  }
+  .cs-filmstrip-caption {
+    padding: 10px 0 0;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--ink-low);
+    margin-top: 12px;
+  }
+  .cs-image-link.cs-crop {
+    display: block;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+  .cs-image-link.cs-crop img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+  }
+  .cs-image-link.cs-crop-top img { object-position: top; }
+  .cs-image-link.cs-crop-bottom img { object-position: bottom; }
+  .cs-preview-schema {
+    min-height: 0;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: oklch(0.98 0.004 85);
+  }
+  @media (max-width: 720px) {
+    .cs-decision-row { grid-template-columns: 1fr; }
+  }
+  .cs-anno-diagram { display: flex; gap: 10px; flex: none; }
+  .cs-anno-schema {
+    width: 96px;
+    height: 190px;
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px var(--line);
+    background: var(--paper-2);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 10px 10px;
+    position: relative;
+  }
+  .cs-anno-schema-tag {
+    position: absolute;
+    top: -7px;
+    left: 8px;
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0 4px;
+    background: var(--paper-2);
+    color: var(--ink-low);
+  }
+  .cs-anno-schema--before .cs-anno-schema-tag { color: var(--ink-low); }
+  .cs-anno-schema--after .cs-anno-schema-tag { color: var(--accent); }
+  .cs-anno-schema-field { height: 9px; border-radius: 3px; background: oklch(0.65 0 0 / 0.18); margin-bottom: 7px; }
+  .cs-anno-schema-btn { height: 15px; border-radius: 999px; background: var(--ink); opacity: 0.82; }
+  .cs-anno-schema--before .cs-anno-schema-btn { margin-top: auto; }
+  .cs-anno-schema--after { justify-content: center; gap: 8px; }
+  .cs-anno-schema--after .cs-anno-schema-btn { background: var(--accent); opacity: 1; }
+  .cs-anno-strip-block { display: grid; gap: 8px; margin-top: 18px; max-width: 320px; }
+  .cs-anno-strip {
+    height: 34px;
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px var(--line);
+    background: var(--paper-2);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 10px;
+    position: relative;
+  }
+  .cs-anno-strip-dot { width: 14px; height: 14px; border-radius: 999px; background: oklch(0.65 0 0 / 0.28); flex: none; }
+  .cs-anno-strip-segs { display: flex; gap: 4px; flex: 1; }
+  .cs-anno-strip-seg { height: 4px; border-radius: 2px; flex: 1; background: oklch(0.65 0 0 / 0.2); }
+  .cs-anno-strip-seg.active { background: var(--ink-low); }
+  .cs-anno-strip-title { height: 8px; width: 55%; border-radius: 2px; background: var(--accent); opacity: 0.55; margin: 0 auto; }
+  .cs-anno-strip-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    width: 46px;
+    flex: none;
+  }
+  .cs-anno-strip--before .cs-anno-strip-tag { color: var(--ink-low); }
+  .cs-anno-strip--after .cs-anno-strip-tag { color: var(--accent); }
+  @media (max-width: 640px) {
+    .cs-anno-frame { width: 100%; }
+    .cs-anno-frame img { width: 100%; }
+  }
   .cs-artifact-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1797,6 +2081,7 @@
     width: 5px; height: 5px; border-radius: 50%;
     background: var(--accent);
   }
+  .cs-learnings--yellow .cs-learning::before { background: var(--c-yellow); }
 
   /* WIP notice */
   .cs-wip { padding: 40px 0 0; }
@@ -1962,75 +2247,127 @@
         </div>
       </nav>
 
+      <!--
+        Each column below is hand-balanced to the same total height so the
+        grid starts AND ends flush without relying on the browser's CSS
+        multi-column auto-balancer (which doesn't guarantee equal columns).
+        Height units (relative to card width): ar-45 = 1.25, ar-1 = 1.00.
+        Every column below sums to 3.5 units.
+          Col 1: brew (1.25) + Adobe (1.25) + Elsewhere (1.00)      = 3.5
+          Col 2: ESD  (1.25) + WIIRED (1.25) + Releases (1.00)     = 3.5
+          Col 3: Tools (1.00) + Bird by Bird (1.25) + Daily (1.25) = 3.5
+      -->
       <div class="feed" id="feed">
 
-        <!-- Metro case study -->
-        <article class="pin" data-cat="viz" data-page="climate" data-year="2026">
-          <div class="art art-yellow ar-45">
-            <div class="pin-meta">Case Study</div>
-            <h3>ESD Family Survey:<br>Neutral Response.</h3>
-          </div>
-        </article>
+        <div class="feed-col">
+          <!-- brew. -->
+          <article class="pin" data-cat="ux" data-page="brew" data-year="2026" data-sub="SWE &amp; Product, Currently" data-cursor-label="Under construction">
+            <div class="art art-cream art-brew ar-45">
+              <div class="pin-meta">Case Study</div>
+              <div class="brew-mark">
+                <img class="brew-logo" src="assets/images/brew-logo.png" alt="brew.">
+                <span class="brew-caption">Cafe Discovery /<br>Design + Code</span>
+              </div>
+            </div>
+          </article>
 
-        <!-- Adobe internship -->
-        <article class="pin" data-cat="swe" data-page="adobe" data-year="2025" data-cursor-label="Under construction">
-          <div class="art art-sage ar-45">
-            <div class="pin-meta">Case Study</div>
-            <h3>Adobe<br>Express.</h3>
-          </div>
-        </article>
+          <!-- Adobe internship -->
+          <article class="pin" data-cat="swe" data-page="adobe" data-year="2025" data-cursor-label="Under construction">
+            <div class="art art-sage ar-45">
+              <div class="pin-meta">Case Study</div>
+              <h3>Adobe<br>Express.</h3>
+            </div>
+          </article>
 
-        <!-- Edmonds survey analysis -->
-        <article class="pin" data-cat="ux" data-page="metro" data-year="2025" data-cursor-label="Under construction">
-          <div class="art art-clay ar-45">
-            <div class="pin-meta">Case Study</div>
-            <h3>Re-routing Metro for blind commuters.</h3>
-          </div>
-        </article>
+          <!-- Elsewhere / social -->
+          <article class="pin" data-cat="misc">
+            <div class="art art-noir contact-card ar-1">
+              <div class="contact-content">
+                <h3 class="social-intro">Let's keep in touch!</h3>
+                <div class="social-tiles">
+                  <div class="social-tile" role="link" tabindex="0" aria-label="Email" data-cursor-link="✉ Email" data-href="mailto:zahsan9@uw.edu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="3" y="5.5" width="18" height="13" rx="2.2"/>
+                      <path d="m3.6 6.4 8.4 6.6 8.4-6.6"/>
+                    </svg>
+                  </div>
+                  <div class="social-tile" role="link" tabindex="0" aria-label="LinkedIn" data-cursor-link="↗ LinkedIn" data-href="https://www.linkedin.com/in/ahsanzainab">
+                    <span class="social-glyph" aria-hidden="true">in</span>
+                  </div>
+                  <div class="social-tile" role="link" tabindex="0" aria-label="GitHub" data-cursor-link="↗ GitHub" data-href="https://github.com/zahsan9">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M9 8 5 12l4 4M15 8l4 4-4 4"/>
+                    </svg>
+                  </div>
+                  <div class="social-tile" role="link" tabindex="0" aria-label="Instagram" data-cursor-link="↗ @wiiredstudio" data-href="https://www.instagram.com/wiiredstudio/">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="3.5" y="3.5" width="17" height="17" rx="5"/>
+                      <circle cx="12" cy="12" r="4"/>
+                      <circle cx="17" cy="7" r="0.6" fill="currentColor" stroke="none"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
 
-        <!-- WIIRED Studio -->
-        <article class="pin" data-cat="studio" data-page="wiired" data-year="2026" data-cursor-label="Under construction">
-          <div class="art art-charcoal ar-45">
-            <div class="pin-meta">Case Study</div>
-            <h3 style="margin-top: auto;">WIIRED<br><em style="font-style:italic; color:var(--c-blue);">Studio.</em></h3>
-          </div>
-        </article>
+        <div class="feed-col">
+          <!-- ESD climate survey case study -->
+          <article class="pin" data-cat="viz" data-page="climate" data-year="2026">
+            <div class="art art-yellow ar-45">
+              <div class="pin-meta">Case Study</div>
+              <h3>ESD Family Survey:<br>The Neutral Response.</h3>
+            </div>
+          </article>
 
-        <!-- Spotify -->
-        <article class="pin" data-cat="viz" data-page="spotify" data-year="2019-26" data-cursor-label="Under construction">
-          <div class="art art-radial ar-45">
-            <h3 style="font-size:22px; line-height:1.1; max-width:12ch; position:relative; z-index:1;">Six years of listening.</h3>
-          </div>
-        </article>
+          <!-- WIIRED Studio -->
+          <article class="pin" data-cat="studio" data-page="wiired" data-year="2026" data-cursor-label="Under construction">
+            <div class="art art-charcoal ar-45">
+              <div class="pin-meta">Case Study</div>
+              <h3 style="margin-top: auto;">WIIRED<br><em style="font-style:italic; color:var(--c-blue);">Studio.</em></h3>
+            </div>
+          </article>
 
-        <!-- Daily type -->
-        <article class="pin" data-cat="misc" data-page="daily" data-year="Ongoing" data-cursor-label="Under construction">
-          <div class="art art-plum ar-1">
-            <h3 style="font-size:28px;">Daily type<br>&amp; motion.</h3>
-          </div>
-        </article>
+          <!-- Side project -->
+          <article class="pin" data-cat="swe" data-page="releases" data-year="2026" data-cursor-label="Under construction">
+            <div class="art art-blue ar-1">
+              <h3 style="font-size:24px;">Linear-style<br>release notes.</h3>
+            </div>
+          </article>
+        </div>
 
-        <!-- Metro stat -->
-        <article class="pin" data-cat="ux" data-page="metro" data-year="2025" data-cursor-label="Under construction">
-          <div class="art art-blue ar-45">
-            <div style="font-family:var(--serif);font-size:80px;line-height:1;margin-top:auto;letter-spacing:-0.03em;">−42<span style="font-size:36px;">%</span></div>
-            <div style="font-size:12px;opacity:0.85;margin-top:4px;">Trip-planning time, blind riders</div>
-          </div>
-        </article>
+        <div class="feed-col">
+          <!-- Tools I use -->
+          <article class="pin" data-cat="misc">
+            <div class="art art-noir skills-card ar-1">
+              <h3 class="skills-intro">In the overlap</h3>
+              <div class="skill-cloud" aria-label="Areas of practice">
+                <span class="skill-pill">Research</span>
+                <span class="skill-pill">Product</span>
+                <span class="skill-pill">Design</span>
+                <span class="skill-pill">Data</span>
+                <span class="skill-pill">Code</span>
+                <span class="skill-pill">Brand</span>
+                <span class="skill-pill">Prototype</span>
+              </div>
+            </div>
+          </article>
 
-        <!-- Side project -->
-        <article class="pin" data-cat="swe" data-page="releases" data-year="2026" data-cursor-label="Under construction">
-          <div class="art art-clay ar-54">
-            <h3 style="font-size:24px;">Linear-style<br>release notes.</h3>
-          </div>
-        </article>
+          <!-- Book — Bird by Bird -->
+          <article class="pin" data-cat="misc" data-page="birdbybird" data-year="1994" data-cursor-label="Under construction">
+            <div class="art art-sand art-book ar-45">
+              <div class="title">Bird by Bird</div>
+            </div>
+          </article>
 
-        <!-- Book — Bird by Bird -->
-        <article class="pin" data-cat="misc" data-page="birdbybird" data-year="1994" data-cursor-label="Under construction">
-          <div class="art art-cream art-book ar-45">
-            <div class="title">Bird by Bird</div>
-          </div>
-        </article>
+          <!-- Daily type -->
+          <article class="pin" data-cat="misc" data-page="daily" data-year="Ongoing" data-cursor-label="Under construction">
+            <div class="art art-plum ar-45">
+              <h3 style="font-size:28px;">Daily type<br>&amp; motion.</h3>
+            </div>
+          </article>
+        </div>
 
       </div>
       <div class="feed-empty" id="feedEmpty" aria-live="polite">Nothing in this board yet.</div>
@@ -2294,14 +2631,146 @@
   }, { passive: true });
 
   const PAGES = {
-    metro: {
-      meta: 'UX · 2025',
+    brew: {
+      meta: 'Product · Design Eng',
+      eyebrow: 'Personal Project',
       wip: true,
-      eyebrow: 'King County Metro',
-      title: 'Re-routing Metro for <em>blind commuters.</em>',
-      lead: 'In 2025 I led a redesign of King County Metro\'s trip-planning flow with the Allen School Accessibility Lab. We shipped an iOS prototype to 800 beta riders.',
-      facts: [['My role','Lead designer + engineer'],['Method','14 interviews · 3 rounds usability'],['Outcome','−42% trip-planning time, n=18'],['Year','2025']],
-      body: '<div class="cs-wip"><span class="cs-label">Coming soon</span><p class="cs-wip-text">Full case study in progress.</p></div><h3>What I made</h3><p>An iOS interface that re-thinks the trip-planning flow around <em>auditory landmarks</em> instead of map glyphs — a TTS-first information architecture, structured around the questions blind riders actually ask.</p>'
+      custom: `
+        <div class="cs-hero cs-hero--brew">
+          <h2 class="cs-hero-title">brew.<br><em>Find your third space.</em></h2>
+          <p class="cs-hero-sub">brew. is a cafe-discovery app I'm designing and building — cafes organized by what you actually need (quiet, work-friendly, social) instead of by star rating, and saved as Want to Go, Been, or Favorite instead of one flat list. Reviews and comments share a feed, a card, and a thread, but not a ruleset.</p>
+          <div class="cs-role-line">
+            <span class="cs-role-pill">Role / Product design + front-end</span>
+            <span class="cs-role-pill">For / Personal project</span>
+            <span class="cs-role-pill">Year / 2026</span>
+          </div>
+          <div class="cs-preview-frame">
+            <div class="cs-preview-img has-image on-dark">
+              <a class="cs-image-link" href="assets/images/brew-fyp.png" aria-label="Open the For You feed at full size">
+                <img src="assets/images/brew-fyp.png" alt="brew. 'For You' feed showing a cafe card for Onyx House with heart, comment, shelf-status, and directions actions along the right edge" loading="eager" />
+                <span class="cs-expand-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="6.5"/>
+                    <path d="m16.5 16.5 3.5 3.5"/>
+                    <path d="M11 8.5v5M8.5 11h5"/>
+                  </svg>
+                </span>
+              </a>
+            </div>
+            <div class="cs-caption">The For You feed — one cafe at a time, with save-state, comment, and directions actions surfaced right on the card instead of behind a tap.</div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">The Question</span>
+          <h3 class="cs-question">How do you make a review feel different from a comment, without making the product feel like two products?</h3>
+          <div class="cs-copy">
+            <p>People already find cafes across Google Maps, Instagram, TikTok, and their own Notes app — none of which let you search by what you actually need, or remember a place the way you actually think about it. brew. starts from that gap: discovery organized around intent instead of distance or rating, and three separate save states instead of one bookmark bucket.</p>
+            <p>Reviews and comments live in the same thread on the same card. A review carries a rating and is capped at one per person per cafe; a comment doesn't and isn't. That difference needed to show up in how it feels to use, not just in the data model.</p>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Stack + Approach</span>
+          <div class="cs-two-col">
+            <div class="cs-feature">
+              <h3>Stack</h3>
+              <p>React 18 + Vite, no framework. One shared state store — a plain Context plus a custom hook, no Redux or Zustand. CSS custom properties for design tokens, no Tailwind or CSS-in-JS. Sheets (bottom panels) stay always-mounted and are gated by a CSS class rather than mounted/unmounted, so their open/close transitions always have a stable node to animate.</p>
+            </div>
+            <div class="cs-feature">
+              <h3>Approach</h3>
+              <p>I ported the app from an earlier vanilla-JS build to React first, pixel- and behavior-identical, then iterated on the comment and review system from there. Every round was tested by walking the actual flow in a browser at real phone proportions, not by eyeballing a static mockup.</p>
+            </div>
+          </div>
+          <div class="cs-link-row">
+            <a class="cs-link-pill" href="https://github.com/zahsan9/brew" target="_blank" rel="noopener noreferrer">repo</a>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Design Decisions</span>
+
+          <div class="cs-decision-block">
+            <div class="cs-decision-row">
+              <div class="cs-decision-copy">
+                <h3>01 / A review isn't a comment, even when it looks like one</h3>
+                <p><strong>One card, two objects.</strong> A review carries a rating and caps at one per person per cafe; a comment does neither. I flattened the cafe name to transparent uniform caps so it stops competing with the review text, aligned the avatar to the name, and cut the dead space and a stray divider around the comment body. Replies inherit the same card but lose the rating control, get a reply tag that's visually distinct from the comment text, and show the replier's real name instead of a leftover "you."</p>
+                <p><strong>A rating step you can't leave blank.</strong> Without a guardrail, someone could open the rating step, get distracted, and silently leave a cafe a 0/5. I split it into two labeled steps — cup rating, then a short list of concrete tags like quiet or has outlets — with the controls turning yellow to mark review mode. Once you've reviewed a cafe the control disables; changing it means deleting the original first, not overwriting it silently.</p>
+              </div>
+              <div class="cs-decision-media-stack">
+                <div class="cs-preview-frame cs-decision-fig">
+                  <div class="cs-preview-img has-image on-dark">
+                    <a class="cs-image-link cs-crop cs-crop-bottom" href="assets/images/brew-comments.png" aria-label="Open an expanded reply thread at full size">
+                      <img src="assets/images/brew-comments.png" alt="brew. comment thread with two replies expanded under a top-level review, each showing the replier's name and no rating" loading="lazy" />
+                      <span class="cs-expand-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="11" cy="11" r="6.5"/>
+                          <path d="m16.5 16.5 3.5 3.5"/>
+                          <path d="M11 8.5v5M8.5 11h5"/>
+                        </svg>
+                      </span>
+                    </a>
+                  </div>
+                  <div class="cs-caption">Comments &amp; replies — one card, two rules: a top-level review carries a rating and a name, a reply carries neither the rating option nor a placeholder "you."</div>
+                </div>
+                <div>
+                  <div class="cs-filmstrip">
+                    <div class="cs-filmstrip-item">
+                      <div class="cs-filmstrip-label">Step 1</div>
+                      <div class="cs-preview-frame cs-decision-fig">
+                        <div class="cs-preview-img has-image on-dark">
+                          <a class="cs-image-link cs-crop cs-crop-bottom" href="assets/images/brew-review-step1.png" aria-label="Open the cup-rating step at full size">
+                            <img src="assets/images/brew-review-step1.png" alt="brew. review flow step 1, 'Rate your experience,' with cup icons, a 3/5 fill with the number shown alongside it, and a '1/2' step indicator" loading="lazy" />
+                            <span class="cs-expand-icon" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="6.5"/>
+                                <path d="m16.5 16.5 3.5 3.5"/>
+                                <path d="M11 8.5v5M8.5 11h5"/>
+                              </svg>
+                            </span>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cs-filmstrip-item">
+                      <div class="cs-filmstrip-label">Step 2</div>
+                      <div class="cs-preview-frame cs-decision-fig">
+                        <div class="cs-preview-img has-image on-dark">
+                          <a class="cs-image-link cs-crop cs-crop-bottom" href="assets/images/brew-review-step2.png" aria-label="Open the cafe-experience step at full size">
+                            <img src="assets/images/brew-review-step2.png" alt="brew. review flow step 2, 'How was the cafe?', showing selectable experience pills like Quiet, Has outlets, and Good WiFi, with two selected" loading="lazy" />
+                            <span class="cs-expand-icon" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="6.5"/>
+                                <path d="m16.5 16.5 3.5 3.5"/>
+                                <path d="M11 8.5v5M8.5 11h5"/>
+                              </svg>
+                            </span>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cs-filmstrip-caption">The rating flow — cup rating, then concrete experience tags instead of a free-text field, so a review adds structured signal the feed's intent filters can actually use.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Impact</span>
+          <div class="cs-impact-callout">
+            <span class="cs-impact-line">Reviews and comments now share a thread but not a ruleset — one rating per person per cafe, no rating on replies, and a two-step flow that stops a distracted tap from silently leaving a cafe a 0/5.</span>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">What I'd Change</span>
+          <div class="cs-learnings">
+            <div class="cs-learning">The review summary bar's cup icon still doesn't match the average score it's showing — a bug that's survived four separate rounds of otherwise-real cleanup on that card. Comments and reviews also still have no delete or report option. Both need to happen before this goes near real users, not after.</div>
+          </div>
+        </div>
+      `
     },
     climate: {
       meta: 'Data Viz · Survey Analysis',
@@ -2441,7 +2910,7 @@
 
         <div class="cs-section">
           <span class="cs-label">What I'd Change</span>
-          <div class="cs-learnings">
+          <div class="cs-learnings cs-learnings--yellow">
             <div class="cs-learning">The language scatter needed minimum-sample callouts. Korean at 21% neutral (n ≈ 30) reads with the same visual weight as English at 17% (n = 5,086); the log scale handles bubble size correctly but doesn't tell you how much to trust the number. I cut confidence intervals for audience reasons. A simple "n &lt; 50" label would've been the right compromise, and I didn't add it.</div>
             <div class="cs-learning">The race chart uses gray for neutral; the topic chart uses yellow. That's a Tableau session artifact, not a choice, and it quietly undermines the visual language I'd set up in the first view. Needs a re-export.</div>
           </div>
@@ -2592,14 +3061,6 @@
       title: 'AI editing &amp; <em>template browser.</em>',
       lead: 'Spent the summer on Adobe Express working on the AI editing surface and a redesigned template browser. Both shipped to GA.',
       facts: [['Role','UX engineering intern'],['Reach','16M MAU'],['Outcome','Two surfaces shipped GA + hackathon win']]
-    },
-    spotify: {
-      meta: 'Personal · Data Viz',
-      wip: true,
-      eyebrow: 'Six years of listening',
-      title: 'A polar plot of <em>my</em> Spotify since \'19.',
-      lead: 'Every dot is a song; angle is hour-of-day, distance is play count.',
-      facts: [['Data','18,400 plays · 6 yrs'],['Tools','D3 + raw Spotify export']]
     },
     essay: {
       meta: 'Misc · Mar 2026',
@@ -3104,10 +3565,11 @@
   };
 
   pins.forEach(pin => {
+    if (!pin.dataset.page) return; // component/widget cards don't link anywhere — skip the hover subtitle
     const sub = document.createElement('div');
     sub.className = 'sub';
     const category = CAT_LABELS[pin.dataset.cat] || pin.dataset.cat || '';
-    sub.textContent = pin.dataset.year ? `${category}, ${pin.dataset.year}` : category;
+    sub.textContent = pin.dataset.sub || (pin.dataset.year ? `${category}, ${pin.dataset.year}` : category);
     pin.appendChild(sub);
   });
 
@@ -3148,10 +3610,14 @@
     const last = new Map();
     first.forEach((_, p) => last.set(p, p.getBoundingClientRect()));
 
-    // INVERT: horizontal only — vertical masonry moves are too jarring
+    // INVERT: both axes — each pin's column is now fixed, so filtering only ever
+    // produces vertical shifts within a column (never horizontal), and those need
+    // to animate just as much as the old cross-column horizontal jumps did.
     first.forEach((r0, p) => {
-      const dx = r0.left - last.get(p).left;
-      if (Math.abs(dx) > 0.5) p.style.transform = `translateX(${dx}px)`;
+      const r1 = last.get(p);
+      const dx = r0.left - r1.left;
+      const dy = r0.top - r1.top;
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) p.style.transform = `translate(${dx}px, ${dy}px)`;
     });
 
     void feed.offsetWidth;
@@ -3417,8 +3883,9 @@ function setRoute(name) {
       });
     });
 
-    // Hover grow on interactive elements (exclude pill/label cards)
-    document.querySelectorAll('button, a, [role="button"], .pin:not([data-cursor-label]), .ab-stack-card, .exp-card:not([data-cursor-link]), .rail-btn, .tab-btn, .em-btn, .sheet-close').forEach(el => {
+    // Hover grow on interactive elements (exclude pill/label cards and
+    // component/widget pins that don't link anywhere, e.g. Tools I use)
+    document.querySelectorAll('button, a, [role="button"], .pin[data-page]:not([data-cursor-label]), .ab-stack-card, .exp-card:not([data-cursor-link]), .rail-btn, .tab-btn, .em-btn, .sheet-close').forEach(el => {
       el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
     });
