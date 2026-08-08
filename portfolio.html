@@ -2286,7 +2286,7 @@
               <div class="contact-content">
                 <h3 class="social-intro">Find me elsewhere</h3>
                 <div class="social-tiles">
-                  <div class="social-tile" role="link" tabindex="0" aria-label="Email" data-cursor-link="✉ Email" data-href="mailto:zahsan9@uw.edu">
+                  <div class="social-tile" role="link" tabindex="0" aria-label="Email" data-cursor-link="↗ Email" data-href="mailto:zahsan9@uw.edu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <rect x="3" y="5.5" width="18" height="13" rx="2.2"/>
                       <path d="m3.6 6.4 8.4 6.6 8.4-6.6"/>
@@ -3934,8 +3934,8 @@ function setRoute(name) {
     const PHYSICS = {
       repelRadius: 100,        // px — how close the cursor must be to push a pill
       maxPush: 30,             // px — furthest a pill gets shoved from its rest spot
-      springK: 0.15,           // pull-back strength toward the current target
-      damping: 0.72,           // velocity decay per frame (lower = snappier stop)
+      springK: 0.09,           // pull-back strength toward the current target
+      damping: 0.85,           // velocity decay per frame (lower = snappier stop)
       collisionIterations: 3,  // separation passes per frame for stable packing
       collisionDamp: 0.6,      // velocity kept after a pill-pill collision
       sleepEps: 0.05,          // px — below this, treat a pill as at rest
