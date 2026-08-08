@@ -824,12 +824,12 @@
   .skill-pill-icon svg { width: 18px; height: 18px; }
 
   .social-tiles {
-    width: 48px; margin: 0;
-    display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    width: 56px; margin: 0;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
   }
   .social-tile {
-    width: 48px; height: 48px; display: grid; place-items: center;
-    border-radius: 14px; color: var(--card-ink); cursor: pointer;
+    width: 56px; height: 56px; display: grid; place-items: center;
+    border-radius: 16px; color: var(--card-ink); cursor: pointer;
   }
   .social-tile:nth-child(1) {
     background: var(--c-yellow);
@@ -847,9 +847,9 @@
     outline: 2px solid oklch(0.9 0.006 80);
     outline-offset: 3px;
   }
-  .social-tile svg { width: 23px; height: 23px; }
+  .social-tile svg { width: 26px; height: 26px; }
   .social-tile .social-glyph {
-    font-family: var(--sans); font-weight: 700; font-size: 21px; letter-spacing: -0.02em;
+    font-family: var(--sans); font-weight: 700; font-size: 24px; letter-spacing: -0.02em;
   }
   @media (max-width: 380px) {
     .pin .social-intro { margin-bottom: 18px; }
@@ -4048,205 +4048,6 @@ function setRoute(name) {
       wake();
     });
   })();
-
-  /* ─────────────────────────────────────────────────────────
-   * SOCIAL TILE STORYBOARD — toppling pile
-   *
-   * Cursor-driven, not clock-driven — read as trigger → response.
-   *
-   *   rest             tower of 4 tiles sits stacked, untouched
-   *   cursor arrives    tower topples sideways (kicked away from entry side)
-   *   falling           tiles steer toward their own landing column
-   *   floor contact      fully inelastic — no bounce, drag kills sliding fast
-   *   settled            free to sit in front of the "Find me elsewhere" text
-   *   cursor nearby       gentle nudge — heavy, still a clickable link
-   * ───────────────────────────────────────────────────────── */
-  (() => {
-    const card = document.querySelector('.contact-card');
-    const tiles = card && Array.from(card.querySelectorAll('.social-tile'));
-    if (!card || !tiles || !tiles.length || window.matchMedia('(pointer: coarse)').matches) return;
-
-    /* Tuned to read "heavy": low bounce, strong air/ground friction, and a
-       weak steering pull so tiles drop, settle almost immediately, and
-       don't keep drifting or wobbling once they've landed. Rotation is
-       coupled to sideways motion so a toppling tile visibly tilts and
-       turns instead of falling perfectly upright, like a real block would. */
-    const PHYSICS = {
-      gravity: 0.9,
-      damping: 0.90,
-      floorFriction: 0.6,      // extra vx drag while resting on the floor
-      collisionIterations: 4,
-      collisionDamp: 0.5,
-      repelRadius: 60,
-      repelForce: 0.55,        // gentle — these tiles are still clickable links
-      steerK: 0.008,           // weak pull toward each tile's assigned landing column
-      sleepVx: 0.06,
-      sleepVy: 0.06,
-      cornerTilt: 7,           // deg — a tile wedged flush against a wall leans away from it
-    };
-
-    // Fall/slide area is inset by the card's own padding, so tiles never
-    // rest flush against the rounded edge the way the static layout wouldn't.
-    let bounds = { left: 0, top: 0, right: 0, bottom: 0 };
-    let bodies = [];
-    let toppled = false;
-    let mouseX = null, mouseY = null;
-    let rafId = 0;
-
-    function topple(kickFromX) {
-      const cardRect = card.getBoundingClientRect();
-      const pad = parseFloat(getComputedStyle(card).paddingLeft) || 0;
-      bounds.left = pad;
-      bounds.top = pad;
-      bounds.right = card.clientWidth - pad;
-      bounds.bottom = card.clientHeight - pad;
-
-      // Each tile is assigned its own landing column ahead of time (left to
-      // right, in original stack order) and steered there every frame — a
-      // weak initial kick alone isn't reliable enough to guarantee they
-      // spread instead of piling on top of each other and blocking a link.
-      const n = tiles.length;
-      const slotW = (bounds.right - bounds.left) / n;
-      bodies = tiles.map((tile, i) => {
-        const r = tile.getBoundingClientRect();
-        const x = r.left - cardRect.left;
-        const y = r.top - cardRect.top;
-        // Anchor left/top once (a single layout pass) — every subsequent
-        // frame moves the tile via `transform`, which the compositor can
-        // animate without re-running layout, so the fall doesn't judder.
-        tile.style.position = 'absolute';
-        tile.style.left = x + 'px';
-        tile.style.top = y + 'px';
-        tile.style.margin = '0';
-        const targetX = bounds.left + slotW * (i + 0.5) - r.width / 2;
-        const kick = (kickFromX !== null && (x + r.width / 2) < kickFromX) ? -1.2 : 1.2;
-        return {
-          el: tile, w: r.width, h: r.height, x, y, anchorX: x, anchorY: y, targetX,
-          vx: kick, vy: -0.6 - i * 0.15, landed: false,
-          angle: 0, // lands straight; only tilts if it ends up wedged against a wall
-        };
-      });
-
-      toppled = true;
-      wake();
-    }
-
-    function resolveCollisions() {
-      for (let iter = 0; iter < PHYSICS.collisionIterations; iter++) {
-        for (let i = 0; i < bodies.length; i++) {
-          for (let j = i + 1; j < bodies.length; j++) {
-            const a = bodies[i], b = bodies[j];
-            const ox = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
-            const oy = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
-            if (ox <= 0 || oy <= 0) continue;
-
-            const aCenterX = a.x + a.w / 2, bCenterX = b.x + b.w / 2;
-            const aCenterY = a.y + a.h / 2, bCenterY = b.y + b.h / 2;
-
-            if (ox < oy) {
-              const push = ox / 2 + 0.05;
-              const dir = aCenterX < bCenterX ? -1 : 1;
-              a.x += dir * push;
-              b.x -= dir * push;
-              a.vx *= PHYSICS.collisionDamp;
-              b.vx *= PHYSICS.collisionDamp;
-            } else {
-              const push = oy / 2 + 0.05;
-              const dir = aCenterY < bCenterY ? -1 : 1;
-              a.y += dir * push;
-              b.y -= dir * push;
-              a.vy *= PHYSICS.collisionDamp;
-              b.vy *= PHYSICS.collisionDamp;
-            }
-          }
-        }
-      }
-    }
-
-    function tick() {
-      rafId = 0;
-      let anyAwake = false;
-
-      bodies.forEach(body => {
-        body.vy += PHYSICS.gravity;
-        // Steering only nudges a tile toward its landing column while it's
-        // still falling — once resting, nothing should be pushing it, or
-        // it would just wobble in place forever instead of truly stopping.
-        if (!body.landed) body.vx += (body.targetX - body.x) * PHYSICS.steerK;
-
-        if (mouseX !== null) {
-          const cx = body.x + body.w / 2, cy = body.y + body.h / 2;
-          const dx = cx - mouseX, dy = cy - mouseY;
-          const dist = Math.hypot(dx, dy) || 0.001;
-          if (dist < PHYSICS.repelRadius) {
-            const push = PHYSICS.repelForce * (1 - dist / PHYSICS.repelRadius);
-            body.vx += (dx / dist) * push;
-            body.vy += (dy / dist) * push;
-          }
-        }
-
-        body.vx *= PHYSICS.damping;
-        body.vy *= PHYSICS.damping;
-        body.x += body.vx;
-        body.y += body.vy;
-      });
-
-      resolveCollisions();
-
-      bodies.forEach(body => {
-        // Fully inelastic contact — heavy tiles thud to a stop instead of
-        // bouncing. (A restitution bounce here previously fought gravity's
-        // per-frame re-acceleration and never fully decayed to rest.)
-        if (body.x < bounds.left) { body.x = bounds.left; body.vx = 0; }
-        if (body.x + body.w > bounds.right) { body.x = bounds.right - body.w; body.vx = 0; }
-        if (body.y < bounds.top) { body.y = bounds.top; body.vy = 0; }
-        const floorY = bounds.bottom - body.h;
-        if (body.y > floorY) {
-          body.y = floorY;
-          body.vy = 0;
-          body.vx *= PHYSICS.floorFriction; // resting weight adds drag, kills sideways sliding fast
-          body.landed = true;
-        }
-        // Everything lands straight. The only exception: a tile resting
-        // flush against a side wall leans away from it a touch, the way a
-        // block wedged into a corner would — not from sliding or bumping.
-        // Checked every frame (not just on contact) so the tilt persists
-        // for as long as the tile actually sits against that wall.
-        const nearLeftWall = body.x <= bounds.left + 0.5;
-        const nearRightWall = body.x + body.w >= bounds.right - 0.5;
-        body.angle = body.landed
-          ? (nearLeftWall && !nearRightWall ? PHYSICS.cornerTilt
-             : nearRightWall && !nearLeftWall ? -PHYSICS.cornerTilt : 0)
-          : 0;
-
-        const awake = Math.abs(body.vx) > PHYSICS.sleepVx || Math.abs(body.vy) > PHYSICS.sleepVy;
-        if (awake) anyAwake = true;
-
-        const dx = body.x - body.anchorX, dy = body.y - body.anchorY;
-        body.el.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) rotate(${body.angle.toFixed(2)}deg)`;
-      });
-
-      if (anyAwake || mouseX !== null) rafId = requestAnimationFrame(tick);
-    }
-
-    function wake() {
-      if (!rafId) rafId = requestAnimationFrame(tick);
-    }
-
-    card.addEventListener('mousemove', e => {
-      const r = card.getBoundingClientRect();
-      mouseX = e.clientX - r.left;
-      mouseY = e.clientY - r.top;
-      if (!toppled) topple(mouseX);
-      wake();
-    });
-    card.addEventListener('mouseleave', () => {
-      mouseX = null;
-      mouseY = null;
-      wake();
-    });
-  })();
-
 
   // ── Theme toggle ──
   (() => {
