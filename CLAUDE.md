@@ -6,11 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project files
 
-The portfolio lives at the home directory root — not inside this folder:
-
 | File | Purpose |
 |---|---|
-| `~/portfolio.html` | Everything: all CSS (inline `<style>`), all JS (inline `<script>`), all HTML |
+| `portfolio.html` | Everything: all CSS (inline `<style>`), all JS (inline `<script>`), all HTML |
+| `assets/images/` | Feed card art, case-study screenshots, icons |
 
 **Do not** introduce npm, a bundler, or a framework. This project is intentionally dependency-free and runs with `python3 -m http.server 8080` or directly as `file://`.
 
@@ -32,7 +31,7 @@ Filter tabs match `data-filter` against `data-cat`. Visibility changes use a FLI
 
 `openSheet(key, srcEl)` reads from the `PAGES` object and writes HTML into `#sheetBody`. If `PAGES[key].custom` exists, that string is used verbatim (full custom layout); otherwise the default template renders `eyebrow`, `title`, `lead`, `facts`, a figure placeholder, and `body`.
 
-The app shell gains `.sheet-open` on open, triggering: rail hides, topbar hides, tabs reflow into a fixed header bar, feed shifts left by `--panel-w: 50vw`. A FLIP animation repositions the active pin.
+The app shell gains `.sheet-open` on open, triggering: rail hides, topbar hides, tabs reflow into a fixed header bar, feed shifts left by `--panel-w` (68vw desktop, 100vw on small screens). A FLIP animation repositions the active pin.
 
 ### Experience timeline
 
@@ -43,6 +42,16 @@ End-of-scroll: `endHold = viewport.clientHeight * 0.55` — a buffer where the c
 ### Theme
 
 `data-theme="dark"` on `<html>` drives all color tokens via CSS custom property overrides in `[data-theme="dark"]`. Toggling adds `.theme-transitioning` for a 520ms crossfade, then removes it.
+
+`:root` holds the values dark mode actually ships with (`--paper`, `--ink`, `--c-cream`, etc. — dark is treated as the source of truth, not light). The `[data-theme="dark"]` block only overrides page-chrome tokens (paper/ink/line/control); it deliberately does **not** redefine the feed-card palette (`--c-*`) — those must render identically in both themes. `--sub-color` (used by `.pin .sub`, the feed-card hover caption) is the one token that's genuinely different per theme: black in light, white in dark, since it sits on the page background rather than a card surface.
+
+### Site cursor
+
+A custom cursor (`#site-cursor`, injected by JS, `pointer: fine` only) replaces the system cursor and morphs into a labeled pill via `.is-pill` when hovering `[data-cursor-link]` elements (external links, mailto) or grows via `.is-hover` over generic interactive elements. Position updates are rAF-batched off `mousemove`.
+
+### Skill pill magnetic repulsion
+
+The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at their normal grid layout and spring away from the cursor when it's within `PHYSICS.repelRadius`, with pairwise AABB collision resolution so pushed pills never overlap each other — search "SKILL PILL STORYBOARD" for the full physics IIFE. All tunable values live in one `PHYSICS` config object at the top of that block.
 
 ## Key globals (in `portfolio.html` inline `<script>`)
 
@@ -59,13 +68,19 @@ End-of-scroll: `endHold = viewport.clientHeight * 0.55` — a buffer where the c
 
 ## Design tokens (CSS custom properties)
 
-**Color:** `--paper`, `--paper-2`, `--ink`, `--ink-mid`, `--ink-low`, `--line`, `--accent`, `--accent-soft`, `--c-clay`, `--c-blue`, `--c-cream`, `--c-yellow`, `--c-sage`, `--c-plum`, `--c-sand`, `--c-charcoal`
+**Page chrome (theme-dependent — flips between `:root` and `[data-theme="dark"]`):** `--paper`, `--paper-2`, `--ink`, `--ink-mid`, `--ink-low`, `--line`, `--control-soft`, `--control-muted`, `--accent-soft`, `--sub-color`
+
+**Feed card palette (theme-independent — defined once in `:root`, never overridden):** `--c-clay`, `--c-blue`, `--c-cream`, `--c-yellow`, `--c-sage`, `--c-plum`, `--c-sand`, `--c-charcoal`, `--c-noir`, `--c-noir-2`, `--accent`
+
+**Card content colors (also theme-independent):** `--card-ink`, `--card-muted`, `--card-paper` — used for text/labels drawn on top of the `--c-*` card backgrounds, regardless of page theme.
 
 **Motion:** `--motion-fast` (180ms), `--motion-med` (420ms), `--motion-slow` (480ms), `--ease-out` (cubic-bezier 0.22,1,0.36,1), `--ease-soft` (cubic-bezier 0.19,1,0.22,1)
 
 **Fonts:** `--serif` (Instrument Serif), `--sans` / `--mono` (Inter)
 
-**Layout:** `--panel-w: 50vw` (sheet panel width)
+**Layout:** `--chrome-size: 80px` (rail width *and* topbar height — kept as one token on purpose, don't split it), `--panel-w: 68vw` (sheet panel width, `100vw` on small screens), `--open-column-gutter: 24px`
+
+**Route transitions (tunable via DialKit if added):** `--rt-fade-out`, `--rt-slide-y`, `--rt-child-dur`, `--rt-stagger-base`, `--rt-stagger-step`
 
 ---
 

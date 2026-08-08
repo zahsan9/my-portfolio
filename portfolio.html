@@ -24,12 +24,12 @@
 
     --c-clay:    oklch(0.70 0.09  34);
     --c-blue:    oklch(0.52 0.12  243);
-    --c-cream:   oklch(0.87 0.035 82);
+    --c-cream:   oklch(0.94 0.028 82);
     --c-yellow:  oklch(0.89 0.085 90);
     --c-sage:    oklch(0.74 0.065 152);
     --c-plum:    oklch(0.63 0.09  305);
-    --c-sand:    oklch(0.83 0.026 72);
-    --c-charcoal:oklch(0.20 0 0);
+    --c-sand:    oklch(0.88 0.022 72);
+    --c-charcoal:oklch(0.27 0.010 60);
     --c-noir:    oklch(0.15 0.006 60);
     --c-noir-2:  oklch(0.235 0.007 60);
 
@@ -53,6 +53,7 @@
     --card-ink: oklch(0.18 0 0);
     --card-muted: oklch(0.45 0 0);
     --card-paper: oklch(0.965 0 0);
+    --sub-color: #000;
   }
   [data-theme="dark"] {
     --paper:       oklch(0.20  0 0);
@@ -64,14 +65,9 @@
     --control-soft:oklch(0.30  0 0);
     --control-muted:oklch(0.58 0 0);
     --accent-soft: oklch(0.24  0.06  262);
-    --c-clay:    oklch(0.70 0.09  34);
-    --c-blue:    oklch(0.52 0.12  243);
-    --c-cream:   oklch(0.94 0.028 82);
-    --c-yellow:  oklch(0.89 0.085 90);
-    --c-sage:    oklch(0.74 0.065 152);
-    --c-plum:    oklch(0.63 0.09  305);
-    --c-sand:    oklch(0.88 0.022 72);
-    --c-charcoal:oklch(0.27 0.010 60);
+    --sub-color: #fff;
+    /* Feed card palette (--c-*) is intentionally NOT overridden here —
+       cards should look identical in light and dark mode. */
   }
 
   /* ── Reset ── */
@@ -630,7 +626,7 @@
   .pin .sub {
     display: block; max-height: 0; margin-top: 0; padding-left: 24px; overflow: hidden;
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em;
-    color: var(--ink-mid); opacity: 0; white-space: nowrap;
+    color: var(--sub-color); opacity: 0; white-space: nowrap;
     text-overflow: ellipsis; pointer-events: none;
     transition: max-height 0.22s var(--ease-out), margin-top 0.22s var(--ease-out), opacity 0.18s ease;
   }
