@@ -583,6 +583,11 @@
      column's main axis is vertical, so the width-based calc() above must
      not apply; let each .feed-col size to its natural content height. */
   .app.sheet-open .feed-col { flex-basis: auto; }
+  /* Component/widget cards (no data-page — "Find me elsewhere", "In the
+     overlap") don't link to a case study, so they don't belong in the
+     mini single-column list shown while browsing case studies. */
+  .app.sheet-open .pin:not([data-page]) { display: none; }
+  .app.sheet-open .feed-col:not(:has(.pin[data-page]:not(.is-hidden))) { display: none; }
   @media (max-width: 1400px) { .feed { --card-gap: 32px; } }
   @media (max-width: 1000px) {
     .feed { --card-gap: 28px; flex-direction: column; }
