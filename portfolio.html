@@ -724,10 +724,12 @@
   }
   .climate-etched-fill { opacity: 1; }
   .climate-fill-reveal { width: 334px; }
+  /* TEMP: Neutral feed-card drawing animation paused.
   .feed:not(.has-open) .pin[data-page="climate"].motion-hovered .climate-fill-reveal,
   .feed:not(.has-open) .pin[data-page="climate"]:focus-visible .climate-fill-reveal {
     animation: climate-etch-reveal 3000ms var(--ease-out) both;
   }
+  */
   @keyframes climate-etch-reveal {
     from { width: 0; }
     to { width: 334px; }
@@ -775,10 +777,12 @@
     transform-origin: 52% 72%;
     transition: transform 620ms var(--ease-soft);
   }
+  /* TEMP: Brew feed-card tilt animation paused.
   .feed:not(.has-open) .pin[data-page="brew"].motion-hovered .brew-illustration,
   .feed:not(.has-open) .pin[data-page="brew"]:focus-visible .brew-illustration {
     transform: translateY(-4px) rotate(-6deg);
   }
+  */
   .art-brew .brew-mark {
     margin-top: auto; margin-bottom: 0; align-self: flex-end;
     display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
@@ -2822,7 +2826,7 @@
       <nav class="tabs" aria-label="Filter work">
         <div class="tabs-scroll">
           <button class="tab active" data-filter="all" aria-pressed="true">All</button>
-          <button class="tab" data-filter="ux" aria-pressed="false">Product</button>
+          <button class="tab" data-filter="ux" aria-pressed="false">Product / UX</button>
           <button class="tab" data-filter="swe" aria-pressed="false">SWE</button>
           <button class="tab" data-filter="viz" aria-pressed="false">Data</button>
           <button class="tab" data-filter="studio" aria-pressed="false">WIIRED Studio</button>
@@ -2844,7 +2848,7 @@
 
         <div class="feed-col">
           <!-- brew. -->
-          <article class="pin" data-cat="ux swe" data-page="brew" data-year="2026" data-sub="SWE &amp; Product, Currently" data-cursor-label="Under construction">
+          <article class="pin" data-cat="ux swe" data-page="brew" data-year="2026" data-sub="SWE &amp; Product / UX, Currently" data-cursor-label="Under construction">
             <div class="art art-cream art-brew ar-45">
               <div class="pin-meta">Case Study</div>
               <img class="brew-illustration" src="assets/images/brew-mug-icon.svg" alt="">
@@ -2950,7 +2954,7 @@
             <div class="art art-noir skills-card ar-1">
               <h3 class="skills-intro">In the overlap</h3>
               <div class="skill-cloud" aria-label="Areas of practice">
-                <span class="skill-pill skill-pill-yellow">Product</span>
+                <span class="skill-pill skill-pill-yellow">Product / UX</span>
                 <span class="skill-pill skill-pill-icon" role="img" aria-label="Code">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg>
                 </span>
@@ -3256,7 +3260,7 @@
 
   const PAGES = {
     brew: {
-      meta: 'Product · Design Eng',
+      meta: 'Product / UX · Design Eng',
       eyebrow: 'Personal Project',
       wip: true,
       custom: `
@@ -4277,7 +4281,7 @@
   const pins = [...feed.querySelectorAll('.pin')];
 
   const CAT_LABELS = {
-    ux: 'Product',
+    ux: 'Product / UX',
     swe: 'SWE',
     viz: 'Data',
     studio: 'WIIRED Studio',
