@@ -99,11 +99,11 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 ## Navigation and shared chrome
 
 - **Compact rail**: the closed desktop rail is exactly `--chrome-size` (`80px`), matching the topbar's explicit height. Do not split those dimensions or widen the compact state independently.
-- **Rail reveal**: on an initial Work/feed page load, the rail expands once after `180ms`, holds, and collapses at `2380ms`. It does not replay after returning from Experience or About. Normal navigation hover expands the rail afterward.
+- **Rail reveal**: the rail stays compact on page entry and expands only when the navigation is hovered. Do not add an automatic entry expansion; Experience is already exposed as the first header link.
 - **Expanded width**: the rail expands only to `168px`, which is the smallest width that gives the Experience pill adequate right padding. Do not restore the older `192px` width without a demonstrated need.
 - **Rail labels**: the primary route is named **Work** in the rail even though its internal route key is `feed`. The other labels are Experience and About Me.
 - **Header utilities**: header order is **Experience / Email / LinkedIn**. Experience is first because it is a high-priority internal destination; GitHub remains in the Elsewhere card. Hovering or keyboard-focusing the header Experience link also previews the Experience rail pill's soft hover state without expanding the rail or overriding its active state.
-- **Return controls**: About and Experience each show a quiet outlined **Back to Feed** button beneath the introductory title. Both call `setRoute('feed')`.
+- **Return controls**: About and Experience each show a quiet outlined **Back to Work** button beneath the introductory title. Both call `setRoute('feed')`.
 - **Footer**: the copyright is a centered, in-flow footer at the bottom of the Feed view, never fixed to the viewport. Current copy is `© 2026 Zainab Ahsan, All Rights Reserved`. Keep it low contrast and ensure card hover states cannot move it.
 - **Mobile**: the desktop rail remains hidden at `800px` and below. Do not introduce rail-only information that becomes unavailable on mobile.
 

@@ -197,6 +197,10 @@
     .rail-btn[data-route="experience"]:not(.active) {
     background: var(--control-soft);
   }
+  .app:has(.page-back:is(:hover, :focus-visible))
+    .rail-btn[data-route="feed"]:not(.active) {
+    background: var(--control-soft);
+  }
   .rail-btn.active {
     background: var(--ink);
     color: var(--paper);
@@ -3469,7 +3473,7 @@
         <div class="ab-intro-panel">
           <div class="page-intro-copy">
             <h3>A little<br><em>about me</em></h3>
-            <button class="page-back" type="button" data-back-to-feed>Back to Feed</button>
+            <button class="page-back" type="button" data-back-to-feed>Back to Work</button>
           </div>
           <div class="ab-arrow" aria-hidden="true">
             <svg viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -3587,7 +3591,7 @@
               <div class="exp-intro-panel">
                 <div class="page-intro-copy">
                   <h3>Experience <em>timeline</em></h3>
-                  <button class="page-back" type="button" data-back-to-feed>Back to Feed</button>
+                  <button class="page-back" type="button" data-back-to-feed>Back to Work</button>
                 </div>
                 <div class="exp-arrow" aria-hidden="true">
                   <svg viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -3713,33 +3717,6 @@
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const prefersReducedMotion = () => reducedMotionQuery.matches;
   const motionDelay = ms => prefersReducedMotion() ? 0 : ms;
-
-  /* ─────────────────────────────────────────────────────────
-   * WORK RAIL ENTRY STORYBOARD
-   *
-   * Runs once per page load, and only when Work is the initial route.
-   *
-   *    0ms   rail rests compact for the first rendered frame
-   *  180ms   rail expands and reveals its navigation labels
-   * 2380ms   rail collapses; normal hover behavior takes over
-   * ───────────────────────────────────────────────────────── */
-  const RAIL_ENTRY_TIMING = {
-    expand:   180,
-    collapse: 2380,
-  };
-
-  function playWorkRailEntry() {
-    if (prefersReducedMotion() || !window.matchMedia('(min-width: 801px)').matches) return;
-    const rail = document.querySelector('.rail');
-    if (!rail) return;
-
-    const expandTimer = setTimeout(() => rail.classList.add('is-intro-expanded'), RAIL_ENTRY_TIMING.expand);
-    const collapseTimer = setTimeout(() => rail.classList.remove('is-intro-expanded'), RAIL_ENTRY_TIMING.collapse);
-    window.addEventListener('pagehide', () => {
-      clearTimeout(expandTimer);
-      clearTimeout(collapseTimer);
-    }, { once: true });
-  }
 
   function updateFeedScrollbar() {
     const scrollable = main.scrollHeight - main.clientHeight;
@@ -5216,7 +5193,6 @@ function setRoute(name) {
   window.addEventListener('hashchange', () => setRoute(routeFromHash()));
   const initialRoute = routeFromHash();
   if (initialRoute !== 'feed') setRoute(initialRoute);
-  else playWorkRailEntry();
 
   // ── Site cursor ──
   (() => {
