@@ -166,6 +166,7 @@
     z-index: 40;
     transition: width 0.32s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease, transform var(--motion-med) var(--ease-out);
   }
+  .rail.is-intro-expanded,
   .rail:has(.rail-nav:hover) { width: 192px; }
   .app.sheet-open .rail {
     opacity: 0;
@@ -203,6 +204,7 @@
     white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0;
     transition: max-width 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.18s ease 0.1s;
   }
+  .rail.is-intro-expanded .rail-label,
   .rail:has(.rail-nav:hover) .rail-label { max-width: 140px; opacity: 1; }
   .rail-bottom {
     margin-top: auto; align-self: stretch; padding: 0 16px 4px;
@@ -540,6 +542,7 @@
     transition: opacity var(--motion-med) ease, transform var(--motion-med) var(--ease-out);
     pointer-events: none;
   }
+
   .app.sheet-open .tabs .scroll-hint { opacity: 0.72; transform: translateX(0); }
   .tab {
     font-family: var(--mono); font-size: 15px; font-weight: 600;
@@ -1013,6 +1016,31 @@
   }
   .page h2 em { font-style: italic; color: var(--accent); }
   .page-body { width: 100%; max-width: 580px; }
+  .page-intro-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .page-back {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 28px;
+    padding: 7px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-mid);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: color var(--motion-fast) ease, border-color var(--motion-fast) ease;
+  }
+  .page-back:hover,
+  .page-back:focus-visible {
+    color: var(--ink);
+    border-color: var(--ink-mid);
+  }
 
   /* Experience board */
   .page.active.exp-page { max-width: none; padding: 0; }
@@ -1259,7 +1287,7 @@
     padding: 0;
     line-height: 26px;
     text-align: center;
-    background: oklch(0.65 0.15 243);
+    background: var(--ink);
     color: transparent;
     font-family: var(--mono);
     font-size: 10px;
@@ -1279,16 +1307,18 @@
   }
   #site-cursor.is-visible { opacity: 1; }
   #site-cursor.is-hover { min-width: 24px; max-width: 24px; height: 24px; }
-  #site-cursor.is-on-blue { background: oklch(0.97 0 0); }
+  #site-cursor.is-on-dark-surface { background: oklch(0.97 0 0); }
+  #site-cursor.is-on-light-surface { background: oklch(0.13 0 0); }
   #site-cursor.is-pill {
     min-width: 0;
     max-width: 200px;
     height: 26px;
     padding: 0 12px;
-    color: oklch(0.97 0 0);
+    color: var(--paper);
     text-transform: uppercase;
   }
-  #site-cursor.is-pill.is-on-blue { color: oklch(0.65 0.15 243); font-weight: 700; }
+  #site-cursor.is-pill.is-on-dark-surface { color: oklch(0.13 0 0); font-weight: 700; }
+  #site-cursor.is-pill.is-on-light-surface { color: oklch(0.97 0 0); font-weight: 700; }
   @media (pointer: coarse) { #site-cursor { display: none; } }
   .exp-card.art-charcoal { color: oklch(0.94 0.005 80); }
 
@@ -3262,7 +3292,7 @@
         </div>
         <h1 id="nameTitle">Zainab <em>Ahsan</em></h1>
         <p class="bio">Co-Founder @ WIIRED Studio  ·  CS + Data Science @ UW<br>I overthink interfaces so you don't have to :)</p>
-        <div class="meta">Seattle, WA <span class="meta-sep">·</span> 5 Boards, 9 Pins</div>
+        <div class="meta">Seattle, WA <span class="meta-sep">·</span> 5 Boards, 7 Pins</div>
       </div>
 
       <nav class="tabs" aria-label="Filter work">
@@ -3444,7 +3474,10 @@
     <section class="page about-page" id="aboutView">
       <div class="ab-page-row">
         <div class="ab-intro-panel">
-          <h3>A little<br><em>about me</em></h3>
+          <div class="page-intro-copy">
+            <h3>A little<br><em>about me</em></h3>
+            <button class="page-back" type="button" data-back-to-feed>Back to Main</button>
+          </div>
           <div class="ab-arrow" aria-hidden="true">
             <svg viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 22H76M58 6l18 16-18 16"/>
@@ -3559,7 +3592,10 @@
           <div class="exp-viewport">
             <div class="exp-track" id="expTrack" aria-label="Experience timeline">
               <div class="exp-intro-panel">
-                <h3>Experience <em>timeline</em></h3>
+                <div class="page-intro-copy">
+                  <h3>Experience <em>timeline</em></h3>
+                  <button class="page-back" type="button" data-back-to-feed>Back to Main</button>
+                </div>
                 <div class="exp-arrow" aria-hidden="true">
                   <svg viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 22H76M58 6l18 16-18 16"/>
@@ -3684,6 +3720,33 @@
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const prefersReducedMotion = () => reducedMotionQuery.matches;
   const motionDelay = ms => prefersReducedMotion() ? 0 : ms;
+
+  /* ─────────────────────────────────────────────────────────
+   * WORK RAIL ENTRY STORYBOARD
+   *
+   * Runs once per page load, and only when Work is the initial route.
+   *
+   *    0ms   rail rests compact for the first rendered frame
+   *  180ms   rail expands and reveals its navigation labels
+   * 2380ms   rail collapses; normal hover behavior takes over
+   * ───────────────────────────────────────────────────────── */
+  const RAIL_ENTRY_TIMING = {
+    expand:   180,
+    collapse: 2380,
+  };
+
+  function playWorkRailEntry() {
+    if (prefersReducedMotion() || !window.matchMedia('(min-width: 801px)').matches) return;
+    const rail = document.querySelector('.rail');
+    if (!rail) return;
+
+    const expandTimer = setTimeout(() => rail.classList.add('is-intro-expanded'), RAIL_ENTRY_TIMING.expand);
+    const collapseTimer = setTimeout(() => rail.classList.remove('is-intro-expanded'), RAIL_ENTRY_TIMING.collapse);
+    window.addEventListener('pagehide', () => {
+      clearTimeout(expandTimer);
+      clearTimeout(collapseTimer);
+    }, { once: true });
+  }
 
   function updateFeedScrollbar() {
     const scrollable = main.scrollHeight - main.clientHeight;
@@ -5146,6 +5209,9 @@ function setRoute(name) {
     }, motionDelay(ROUTE_TIMING.fadeOut));
   }
   document.querySelectorAll('.rail-btn[data-route]').forEach(b => b.addEventListener('click', () => setRoute(b.dataset.route)));
+  document.querySelectorAll('[data-back-to-feed]').forEach(button => {
+    button.addEventListener('click', () => setRoute('feed'));
+  });
   document.getElementById('logoBtn').addEventListener('click', () => setRoute('feed'));
 
   // ── Hash routing ──
@@ -5157,6 +5223,7 @@ function setRoute(name) {
   window.addEventListener('hashchange', () => setRoute(routeFromHash()));
   const initialRoute = routeFromHash();
   if (initialRoute !== 'feed') setRoute(initialRoute);
+  else playWorkRailEntry();
 
   // ── Site cursor ──
   (() => {
@@ -5248,10 +5315,14 @@ function setRoute(name) {
       cursor.classList.remove('is-hover');
     });
 
-    // White on blue backgrounds
-    document.querySelectorAll('.art-blue').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('is-on-blue'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('is-on-blue'));
+    // Keep the neutral cursor legible across the theme-independent card palette.
+    document.querySelectorAll('.art-blue, .art-charcoal, .art-noir').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('is-on-dark-surface'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('is-on-dark-surface'));
+    });
+    document.querySelectorAll('.art-cream, .art-yellow, .art-sage, .art-sand, .art-plum').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('is-on-light-surface'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('is-on-light-surface'));
     });
   })();
 
