@@ -1240,17 +1240,18 @@
      that need to be yellow on dark but dark-on-light instead, since pale
      yellow text has no contrast on a light page. */
   html[data-theme="dark"] .sheet[data-page="climate"] {
-    --paper: oklch(0.26 0 0);
+    --paper: oklch(0.29 0 0);
     --paper-2: oklch(1 0 0 / 0.06);
     --ink: oklch(0.95 0 0);
     --ink-mid: oklch(0.66 0 0);
     --ink-low: oklch(0.46 0 0);
     --line: oklch(1 0 0 / 0.12);
-    --climate-accent-text: var(--c-yellow);
+    --climate-accent-text: oklch(0.98 0 0);
     --climate-card-shadow: none;
+    --climate-decision-fill: oklch(1 0 0 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="climate"] {
-    --paper: oklch(0.93 0 0);
+    --paper: oklch(0.91 0 0);
     --paper-2: oklch(0.995 0 0);
     --ink: oklch(0.16 0 0);
     --ink-mid: oklch(0.45 0 0);
@@ -1258,6 +1259,7 @@
     --line: oklch(0 0 0 / 0.1);
     --climate-accent-text: var(--ink);
     --climate-card-shadow: 0 1px 2px oklch(0 0 0 / 0.04), 0 10px 24px -14px oklch(0 0 0 / 0.16);
+    --climate-decision-fill: oklch(0.975 0 0);
   }
   .sheet[data-page="climate"] .cs-section { padding-top: 66px; }
   .sheet[data-page="climate"] { scroll-behavior: smooth; }
@@ -1377,13 +1379,14 @@
     color: var(--ink-mid);
   }
   .sheet[data-page="climate"] .cs-caption {
-    border-top: none;
-    margin: 10px 12px 12px;
-    padding: 0;
+    background: oklch(0.99 0.002 85);
+    border-top: 1px solid oklch(0 0 0 / 0.08);
+    margin: 0;
+    padding: 13px 16px 15px;
     font-size: 13px;
     font-weight: 500;
     line-height: 1.5;
-    color: var(--ink-mid);
+    color: oklch(0.24 0.01 90);
   }
   .sheet[data-page="climate"] .cs-learning::before { background: var(--c-yellow); }
   /* Solid yellow blocks for What I Found and Impact — a deliberate break in
@@ -1394,7 +1397,7 @@
     background: var(--c-yellow);
     border-radius: 20px;
     padding: 40px 36px;
-    margin: 40px 0 0;
+    margin: 66px 0 0;
     --ink: oklch(0.16 0.02 90);
     --ink-mid: oklch(0.34 0.02 90);
     --ink-low: oklch(0.46 0.02 90);
@@ -1418,9 +1421,12 @@
     color: var(--ink);
   }
   .sheet[data-page="climate"] .cs-section--yellow .cs-copy--after-fig {
-    margin-top: 28px;
-    padding-top: 28px;
-    border-top: 1px solid var(--line);
+    margin-top: 20px;
+    margin-bottom: 28px;
+    padding-top: 0;
+  }
+  .sheet[data-page="climate"] .cs-section--yellow .cs-copy--after-fig:last-child {
+    margin-bottom: 0;
   }
   .sheet[data-page="climate"] .cs-impact-list {
     display: grid;
@@ -1465,7 +1471,7 @@
     border-bottom: none;
   }
   .sheet[data-page="climate"] .cs-decision-block:nth-child(even) {
-    background: oklch(1 0 0 / 0.05);
+    background: var(--climate-decision-fill);
     margin: 0;
     border-radius: 14px;
     border-bottom: none;
@@ -1874,10 +1880,10 @@
   }
   .cs-hstat {
     background: var(--paper-2);
-    border: 1px solid var(--line);
+    border: none;
     border-radius: 14px;
     padding: 20px 18px 18px;
-    box-shadow: var(--climate-card-shadow);
+    box-shadow: none;
   }
   .cs-hstat-n {
     display: block;
@@ -2078,23 +2084,46 @@
     bottom: 10px;
     width: 34px;
     height: 34px;
+    padding: 0 9px;
     border-radius: 999px;
-    display: grid;
-    place-items: center;
-    background: oklch(0.98 0.004 85 / 0.82);
-    color: oklch(0.18 0.005 60);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow: hidden;
+    background: oklch(0.12 0 0 / 0.94);
+    color: oklch(0.98 0 0);
     backdrop-filter: blur(10px) saturate(1.1);
     -webkit-backdrop-filter: blur(10px) saturate(1.1);
-    box-shadow: 0 0 0 1px oklch(0.18 0.005 60 / 0.12), 0 10px 24px -16px oklch(0.08 0.005 60 / 0.48);
-    transition: transform var(--motion-fast) var(--ease-out), background var(--motion-fast) ease;
+    box-shadow: 0 0 0 1px oklch(1 0 0 / 0.14), 0 10px 24px -16px oklch(0.08 0.005 60 / 0.48);
+    transition: width 0.28s var(--ease-out), gap var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
   }
   .cs-expand-icon svg {
     width: 15px;
     height: 15px;
+    flex: 0 0 15px;
   }
-  .cs-image-link:hover .cs-expand-icon {
-    transform: translate(2px, -2px);
-    background: oklch(0.99 0.004 85 / 0.94);
+  .cs-expand-icon::after {
+    content: 'Zoom';
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    transition: max-width 0.28s var(--ease-out), opacity var(--motion-fast) ease;
+  }
+  .cs-expand-icon:hover,
+  .cs-image-link:focus-visible .cs-expand-icon {
+    width: 76px;
+    gap: 7px;
+    box-shadow: 0 0 0 1px oklch(1 0 0 / 0.24), 0 10px 24px -16px oklch(0.08 0.005 60 / 0.48);
+  }
+  .cs-expand-icon:hover::after,
+  .cs-image-link:focus-visible .cs-expand-icon::after {
+    max-width: 36px;
+    opacity: 1;
   }
   .cs-caption {
     padding: 10px 0 0;
@@ -4394,9 +4423,20 @@ function setRoute(name) {
 
     // Hover grow on interactive elements (exclude pill/label cards and
     // component/widget pins that don't link anywhere, e.g. Tools I use)
-    document.querySelectorAll('button, a, [role="button"], .pin[data-page]:not([data-cursor-label]), .ab-stack-card, .exp-card:not([data-cursor-link]), .rail-btn, .tab-btn, .em-btn, .sheet-close').forEach(el => {
+    document.querySelectorAll('button, a:not(.cs-image-link), [role="button"], .pin[data-page]:not([data-cursor-label]), .ab-stack-card, .exp-card:not([data-cursor-link]), .rail-btn, .tab-btn, .em-btn, .sheet-close').forEach(el => {
       el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
+    });
+
+    // Image links are injected when a case study opens. Keep the cursor quiet
+    // over the graph itself and grow it only over the visible Zoom control.
+    document.addEventListener('mouseover', e => {
+      if (e.target.closest('.cs-expand-icon')) cursor.classList.add('is-hover');
+    });
+    document.addEventListener('mouseout', e => {
+      const zoomControl = e.target.closest('.cs-expand-icon');
+      if (!zoomControl || zoomControl.contains(e.relatedTarget)) return;
+      cursor.classList.remove('is-hover');
     });
 
     // White on blue backgrounds
