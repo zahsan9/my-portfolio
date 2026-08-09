@@ -116,12 +116,13 @@
   }
   .main::-webkit-scrollbar { display: none; }
   .copyright {
-    position: fixed;
-    right: 20px; bottom: 14px;
+    width: 100%;
+    margin-top: -40px;
+    padding: 0 24px 28px;
+    text-align: center;
     font-size: 11px; letter-spacing: 0.01em;
-    color: var(--ink-low);
+    color: color-mix(in oklch, var(--ink) 68%, var(--paper));
     pointer-events: none;
-    z-index: 40;
     user-select: none;
   }
   /* Custom feed scrollbar — slides with the sheet */
@@ -167,7 +168,7 @@
     transition: width 0.32s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease, transform var(--motion-med) var(--ease-out);
   }
   .rail.is-intro-expanded,
-  .rail:has(.rail-nav:hover) { width: 192px; }
+  .rail:has(.rail-nav:hover) { width: 168px; }
   .app.sheet-open .rail {
     opacity: 0;
     pointer-events: none;
@@ -653,27 +654,17 @@
     transition-duration: 120ms;
   }
   .pin .sub {
-    display: block; max-height: 0; margin-top: 0; padding-left: 24px; overflow: hidden;
+    position: absolute; left: 0; right: 0; top: 100%;
+    display: block; margin-top: 6px; padding-left: 24px; overflow: hidden;
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em;
     color: var(--sub-color); opacity: 0; white-space: nowrap;
     text-overflow: ellipsis; pointer-events: none;
-    transition: max-height 0.22s var(--ease-out), margin-top 0.22s var(--ease-out), opacity 0.18s ease;
-  }
-  .feed:not(.has-open) .pin:hover .sub,
-  .feed:not(.has-open) .pin:focus-visible .sub { max-height: 13px; margin-top: 6px; opacity: 1; }
-
-  /* A pin directly above a static component keeps its own hover subtitle,
-     but as an overlay instead of an in-flow block, so revealing it never
-     pushes the component below out of place — components stay fully static
-     regardless of what's hovered around them. */
-  .pin[data-page]:has(+ .pin:not([data-page])) .sub {
-    position: absolute; left: 0; top: 100%; margin-top: 6px;
-    max-height: none; overflow: visible;
     transform: translateY(-4px);
     transition: opacity 0.18s ease, transform 0.22s var(--ease-out);
   }
-  .feed:not(.has-open) .pin[data-page]:has(+ .pin:not([data-page])):hover .sub,
-  .feed:not(.has-open) .pin[data-page]:has(+ .pin:not([data-page])):focus-visible .sub {
+  .feed:not(.has-open) .pin:hover .sub,
+  .feed:not(.has-open) .pin:focus-visible .sub {
+    opacity: 1;
     transform: translateY(0);
   }
 
@@ -1024,11 +1015,11 @@
   .page-back {
     display: inline-flex;
     align-items: center;
-    margin-top: 28px;
+    margin-top: 20px;
     padding: 7px 12px;
-    border: 1px solid var(--line);
+    border: 1px solid color-mix(in oklch, var(--ink) 28%, var(--paper));
     border-radius: 999px;
-    color: var(--ink-mid);
+    color: color-mix(in oklch, var(--ink) 68%, var(--paper));
     font-family: var(--sans);
     font-size: 13px;
     font-weight: 400;
@@ -1041,7 +1032,6 @@
     color: var(--ink);
     border-color: var(--ink-mid);
   }
-
   /* Experience board */
   .page.active.exp-page { max-width: none; padding: 0; }
   .exp-page { width: 100%; align-items: center; position: relative; }
@@ -3233,8 +3223,6 @@
 
 <div class="app">
 
-  <div class="copyright" aria-hidden="true">© 2026 Zainab Ahsan</div>
-
   <!-- Left rail -->
   <aside class="rail">
     <button class="logo" id="logoBtn" aria-label="Home"><span style="font-family:var(--serif);font-size:32px;font-weight:600;color:var(--ink);letter-spacing:-0.02em;line-height:1;user-select:none;" aria-hidden="true">ZA</span></button>
@@ -3468,6 +3456,7 @@
 
       </div>
       <div class="feed-empty" id="feedEmpty" aria-live="polite">Nothing in this board yet.</div>
+      <div class="copyright" aria-hidden="true">© 2026 Zainab Ahsan, All Rights Reserved</div>
     </section>
 
     <!-- ═══ ABOUT PAGE ═══ -->
@@ -3476,7 +3465,7 @@
         <div class="ab-intro-panel">
           <div class="page-intro-copy">
             <h3>A little<br><em>about me</em></h3>
-            <button class="page-back" type="button" data-back-to-feed>Back to Main</button>
+            <button class="page-back" type="button" data-back-to-feed>Back to Feed</button>
           </div>
           <div class="ab-arrow" aria-hidden="true">
             <svg viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -3594,7 +3583,7 @@
               <div class="exp-intro-panel">
                 <div class="page-intro-copy">
                   <h3>Experience <em>timeline</em></h3>
-                  <button class="page-back" type="button" data-back-to-feed>Back to Main</button>
+                  <button class="page-back" type="button" data-back-to-feed>Back to Feed</button>
                 </div>
                 <div class="exp-arrow" aria-hidden="true">
                   <svg viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
