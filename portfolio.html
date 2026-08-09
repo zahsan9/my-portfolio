@@ -716,7 +716,12 @@
   }
   .climate-etched-fill { opacity: 1; }
   .climate-fill-reveal { width: 334px; }
-  .feed:not(.has-open) .pin[data-page="climate"]:hover .climate-fill-reveal,
+  .card-motion-zone {
+    position: absolute;
+    inset: 48px;
+    z-index: 3;
+  }
+  .feed:not(.has-open) .pin[data-page="climate"]:has(.card-motion-zone:hover) .climate-fill-reveal,
   .feed:not(.has-open) .pin[data-page="climate"]:focus-visible .climate-fill-reveal {
     animation: climate-etch-reveal 3000ms var(--ease-out) both;
   }
@@ -767,7 +772,7 @@
     transform-origin: 52% 72%;
     transition: transform 620ms var(--ease-soft);
   }
-  .feed:not(.has-open) .pin[data-page="brew"]:hover .brew-illustration,
+  .feed:not(.has-open) .pin[data-page="brew"]:has(.card-motion-zone:hover) .brew-illustration,
   .feed:not(.has-open) .pin[data-page="brew"]:focus-visible .brew-illustration {
     transform: translateY(-4px) rotate(-6deg);
   }
@@ -2800,6 +2805,7 @@
           <article class="pin" data-cat="ux" data-page="brew" data-year="2026" data-sub="SWE &amp; Product, Currently" data-cursor-label="Under construction">
             <div class="art art-cream art-brew ar-45">
               <div class="pin-meta">Case Study</div>
+              <span class="card-motion-zone" aria-hidden="true"></span>
               <img class="brew-illustration" src="assets/images/brew-mug-icon.svg" alt="">
               <div class="brew-mark">
                 <img class="brew-logo" src="assets/images/brew-logo.png" alt="brew.">
@@ -2854,6 +2860,7 @@
           <article class="pin" data-cat="viz" data-page="climate" data-year="2026">
             <div class="art art-yellow ar-45">
               <div class="pin-meta">Case Study</div>
+              <span class="card-motion-zone" aria-hidden="true"></span>
               <div class="climate-mark">
                 <h3>
                   <span class="climate-title">The Neutral Response</span>
