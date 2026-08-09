@@ -1260,6 +1260,17 @@
     --climate-card-shadow: 0 1px 2px oklch(0 0 0 / 0.04), 0 10px 24px -14px oklch(0 0 0 / 0.16);
   }
   .sheet[data-page="climate"] .cs-section { padding-top: 58px; }
+  .sheet[data-page="climate"] { scroll-behavior: smooth; }
+  .sheet[data-page="climate"] .cs-fig[id] { scroll-margin-top: 96px; }
+  .sheet[data-page="climate"] .cs-fig-ref {
+    color: var(--ink-mid);
+    font-style: italic;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color var(--motion-fast) ease;
+  }
+  .sheet[data-page="climate"] .cs-fig-ref:hover { color: var(--ink); }
   .sheet[data-page="climate"] .cs-label {
     display: inline-block;
     background: var(--paper-2);
@@ -3294,7 +3305,7 @@
             <p>Topic made that clearest. Once I sorted all 38 questions by neutral rate, the top wasn't the belonging questions I expected. It was specific communication platforms. Satisfaction with <strong>Seesaw (35.5%), district social media (35.3%), and PeachJar (34.8%)</strong> drew the most neutral responses, well above the cultural-identity and family-connection items clustered just below them near 27–28%.</p>
             <p>The bottom sharpened it: only ~3.6% were neutral about knowing how to contact their child's teacher. Families held firm opinions on concrete logistics and went neutral on tools they may not use and on more abstract questions of belonging.</p>
           </div>
-          <figure class="cs-fig">
+          <figure class="cs-fig" id="climate-fig-01">
             <div class="cs-fig-head">
               <span class="cs-fig-index">Fig. 01</span>
               <h4 class="cs-fig-title">Topics with the highest neutral response rates</h4>
@@ -3318,7 +3329,7 @@
           <div class="cs-copy cs-copy--after-fig">
             <p>School added a second pattern. Neutral rates ran higher in <strong>secondary and alternative programs than in elementary schools</strong>, suggesting that families of older students may have less direct visibility into what the survey asks about. (This view was co-developed with Maximo.)</p>
           </div>
-          <figure class="cs-fig">
+          <figure class="cs-fig" id="climate-fig-02">
             <div class="cs-fig-head">
               <span class="cs-fig-index">Fig. 02</span>
               <h4 class="cs-fig-title">Neutral responses rise in secondary and alternative programs</h4>
@@ -3342,7 +3353,7 @@
           <div class="cs-copy cs-copy--after-fig">
             <p>Race added a third pattern. Sorting by neutral rate put <strong>multiracial families at the top</strong>. Nearly every "White + [another identity]" combination clustered around 20%, above the single-race groups. Single-race, non-white families (Middle Eastern/North African, Native Hawaiian/Pacific Islander, Latino/Hispanic, Black/African American) were the <em>least</em> neutral, near 11–13%. The pattern pointed at intersecting identities specifically, not just "white families."</p>
           </div>
-          <figure class="cs-fig">
+          <figure class="cs-fig" id="climate-fig-03">
             <div class="cs-fig-head">
               <span class="cs-fig-index">Fig. 03</span>
               <h4 class="cs-fig-title">Neutral responses cluster among multiracial families</h4>
@@ -3377,7 +3388,7 @@
           <div class="cs-decision-block">
             <h3>02 / Comparing schools without ignoring size</h3>
             <p>School participation varied a lot. Some had ~30 respondents and others had hundreds, so a bar chart would give both the same visual weight. I used a treemap instead: <strong>area for respondent count, color for neutral rate,</strong> so magnitude and rate read together.</p>
-            <p><em>Fig. 02, referenced above.</em></p>
+            <p><a class="cs-fig-ref" href="#climate-fig-02">Fig. 02, referenced above ↑</a></p>
           </div>
           <div class="cs-decision-block">
             <h3>03 / Changing the question I was answering</h3>
@@ -3386,7 +3397,7 @@
           <div class="cs-decision-block">
             <h3>04 / Designing for the room</h3>
             <p>I cut error bars because a projector audience may read them as "the data is unreliable" rather than "the estimate has a range." I also rewrote chart titles to name the finding instead of the variables: "Neutral Rate by Student Race/Ethnicity" became <strong>"Neutral responses are more common among white and multiracial families."</strong> The data could show <strong>where</strong>; it couldn't tell me <strong>why</strong>, and I left that call to the equity team.</p>
-            <p><em>Fig. 03, referenced above.</em></p>
+            <p><a class="cs-fig-ref" href="#climate-fig-03">Fig. 03, referenced above ↑</a></p>
           </div>
         </div>
 
