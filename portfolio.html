@@ -2797,7 +2797,7 @@
 
         <div class="feed-col">
           <!-- brew. -->
-          <article class="pin" data-cat="ux" data-page="brew" data-year="2026" data-sub="SWE &amp; Product, Currently" data-cursor-label="Under construction">
+          <article class="pin" data-cat="ux swe" data-page="brew" data-year="2026" data-sub="SWE &amp; Product, Currently" data-cursor-label="Under construction">
             <div class="art art-cream art-brew ar-45">
               <div class="pin-meta">Case Study</div>
               <img class="brew-illustration" src="assets/images/brew-mug-icon.svg" alt="">
@@ -4208,7 +4208,9 @@
     if (f === currentFilter) return;
     currentFilter = f;
 
-    const show = new Set(pins.filter(p => f === 'all' || p.dataset.cat === f));
+    const show = new Set(pins.filter(p =>
+      f === 'all' || (p.dataset.cat || '').split(/\s+/).includes(f)
+    ));
 
     // FIRST: only snapshot pins that are visible now AND will stay visible
     const first = new Map();
