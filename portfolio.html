@@ -4624,10 +4624,10 @@ function setRoute(name) {
     const PHYSICS = {
       repelRadius: 100,        // px — how close the cursor must be to push a pill
       maxPush: 30,             // px — furthest a pill gets shoved from its rest spot
-      springK: 0.09,           // pull-back strength toward the current target
-      damping: 0.85,           // velocity decay per frame (lower = snappier stop)
+      springK: 0.05,           // gentler pull gives the pills a slower, weightier response
+      damping: 0.8,            // stronger velocity decay removes excess spring overshoot
       collisionIterations: 3,  // separation passes per frame for stable packing
-      collisionDamp: 0.6,      // velocity kept after a pill-pill collision
+      collisionDamp: 0.45,     // softer collisions keep neighboring pills from bouncing
       sleepEps: 0.05,          // px — below this, treat a pill as at rest
     };
 
