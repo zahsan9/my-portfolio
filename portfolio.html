@@ -798,15 +798,6 @@
 
   /* Charcoal feature card */
   .art-charcoal h3 { font-size: 44px; }
-  .art-charcoal .pulse {
-    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
-    display: inline-block; margin-right: 8px;
-    animation: pulse 2.4s ease-in-out infinite; vertical-align: middle;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.5; transform: scale(1); }
-    50%       { opacity: 1;   transform: scale(1.4); }
-  }
 
   /* Folder card */
   .art-folder { background: var(--c-cream); padding: 0; align-items: stretch; }
@@ -1305,13 +1296,15 @@
     transition: background var(--motion-fast) ease, color var(--motion-fast) ease,
                 box-shadow var(--motion-fast) ease, gap var(--motion-fast) ease;
   }
-  .sheet-close:hover { background: var(--ink); color: var(--paper); box-shadow: 0 0 0 1px var(--ink); gap: 6px; }
+  .sheet-close:hover,
+  .sheet-close:focus-visible { background: var(--ink); color: var(--paper); box-shadow: 0 0 0 1px var(--ink); gap: 6px; }
   .sheet-btn-label {
     font-family: var(--mono); font-size: 12px; letter-spacing: 0.01em;
     white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0;
     transition: max-width 0.28s var(--ease-out), opacity 0.16s ease 0.08s;
   }
-  .sheet-close:hover .sheet-btn-label { max-width: 80px; opacity: 1; }
+  .sheet-close:hover .sheet-btn-label,
+  .sheet-close:focus-visible .sheet-btn-label { max-width: 80px; opacity: 1; }
   .cs-cta-btn {
     display: inline-flex; align-items: center; gap: 6px;
     height: 40px; padding: 0 18px; border-radius: 999px;
@@ -1768,9 +1761,6 @@
   .art-blue.ab-stack-card { box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.1); }
   .ab-stack-card.is-front {
     box-shadow: 0 34px 70px -44px oklch(0.08 0.005 60 / 0.72), inset 0 0 0 1px oklch(0 0 0 / 0.08);
-  }
-  .ab-stack.is-busy .ab-stack-card:not(.is-lifting):not(.is-placing) {
-    pointer-events: none;
   }
   @keyframes cardSpread {
     from { transform: rotate(var(--intro-start, 0deg)); }
@@ -3245,6 +3235,9 @@
   const topbar = document.querySelector('.topbar');
   const main = document.querySelector('.main');
   const feedScrollThumb = document.getElementById('feedScrollThumb');
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const prefersReducedMotion = () => reducedMotionQuery.matches;
+  const motionDelay = ms => prefersReducedMotion() ? 0 : ms;
 
   function updateFeedScrollbar() {
     const scrollable = main.scrollHeight - main.clientHeight;
@@ -3825,9 +3818,18 @@
     const endTop = Math.max(0, Math.min(maxScroll, targetTop));
     const distance = endTop - startTop;
     if (Math.abs(distance) < 1) return;
+    if (prefersReducedMotion()) {
+      main.scrollTop = endTop;
+      return;
+    }
     const start = performance.now();
 
     function tick(now) {
+      if (prefersReducedMotion()) {
+        main.scrollTop = endTop;
+        scrollTweenFrame = null;
+        return;
+      }
       const t = Math.min(1, (now - start) / duration);
       main.scrollTop = startTop + distance * easeOutQuint(t);
       if (t < 1) scrollTweenFrame = requestAnimationFrame(tick);
@@ -3899,7 +3901,7 @@
     });
     setTimeout(() => {
       visiblePins.forEach(p => { p.style.transition = ''; p.style.transform = ''; });
-    }, 560);
+    }, motionDelay(560));
   }
 
   let closeSheetTimer;
@@ -3959,7 +3961,7 @@
         sheetBody.innerHTML = buildSheetHTML(p, srcEl);
         sheet.scrollTop = 0;
         sheetBody.style.opacity = '';
-      }, 160);
+      }, motionDelay(160));
       return;
     }
 
@@ -4004,7 +4006,7 @@
     closeSheetTimer = setTimeout(() => {
       appEl.classList.remove('sheet-closing');
       active?.focus();
-    }, 540);
+    }, motionDelay(540));
   }
   document.getElementById('sheetClose').addEventListener('click', closeSheet);
   document.addEventListener('keydown', e => {
@@ -4031,7 +4033,7 @@
     card.addEventListener('mouseenter', () => {
       if (feedEl.classList.contains('has-open')) return;
       clearTimeout(motionHoverTimer);
-      motionHoverTimer = setTimeout(() => card.classList.add('motion-hovered'), 180);
+      motionHoverTimer = setTimeout(() => card.classList.add('motion-hovered'), motionDelay(180));
     });
     card.addEventListener('mouseleave', () => {
       clearTimeout(motionHoverTimer);
@@ -4052,6 +4054,7 @@
     let aboutHoverSwitchTimer = null;
     let aboutHoveredCard = null;
     let aboutPendingCard = null;
+    let aboutMotionTimers = [];
 
     const ABOUT_HOVER = {
       leaveDelay:  70,  // grace period before a card drops hover once the pointer is fully off the deck
@@ -4127,13 +4130,35 @@
       });
     }
 
+    function finishAboutMotion() {
+      aboutMotionTimers.forEach(clearTimeout);
+      aboutMotionTimers = [];
+      aboutCards.forEach(card => card.classList.remove('is-intro', 'is-lifting', 'is-placing'));
+      aboutStack.classList.remove('is-busy');
+      aboutStackBusy = false;
+      aboutStackMetrics = null;
+      renderAboutStack();
+    }
+
     function selectAboutCard(index) {
-      if (aboutStackBusy) return;
+      // A new choice always wins: finish any intro/selection at its current
+      // logical order, then immediately retarget the deck to the latest card.
+      if (aboutStackBusy) {
+        finishAboutMotion();
+        void aboutStack.offsetWidth;
+      }
       // The front card isn't a control — it's just the current state — so tapping
       // it does nothing, matching its own cursor (only non-front cards get the
       // pointer cursor; see .ab-stack-card:not(.is-front) below).
       if (index === aboutOrder[0]) return;
       const nextOrder = [index, ...aboutOrder.filter(i => i !== index)];
+
+      if (prefersReducedMotion()) {
+        aboutOrder = nextOrder;
+        aboutStackMetrics = null;
+        renderAboutStack();
+        return;
+      }
 
       aboutStackBusy = true;
       aboutStackMetrics = measureAboutStack();
@@ -4146,20 +4171,21 @@
       card.style.setProperty('--stack-r', `${angle * 0.5}deg`);
       card.classList.add('is-lifting');
 
-      setTimeout(() => {
+      aboutMotionTimers.push(setTimeout(() => {
         aboutOrder = nextOrder;
         renderAboutStack({ freezeMetrics: true });
         card.classList.remove('is-lifting');
         card.classList.add('is-placing');
-      }, 250);
+      }, 250));
 
-      setTimeout(() => {
+      aboutMotionTimers.push(setTimeout(() => {
         card.classList.remove('is-placing');
         aboutStackMetrics = null;
         renderAboutStack();
         aboutStack.classList.remove('is-busy');
         aboutStackBusy = false;
-      }, 820);
+        aboutMotionTimers = [];
+      }, 820));
     }
 
     aboutCards.forEach((card, index) => {
@@ -4203,21 +4229,23 @@
     });
 
     renderAboutStack();
+    reducedMotionQuery.addEventListener('change', event => {
+      if (event.matches && aboutStackBusy) finishAboutMotion();
+    });
     refreshAboutStack = () => {
       if (aboutStackBusy) return;
       aboutStackMetrics = null;
       renderAboutStack();
     };
     playAboutStackIntro = () => {
-      if (aboutStackBusy) return;
+      if (aboutStackBusy) finishAboutMotion();
       aboutStackMetrics = null;
       renderAboutStack();
+      if (prefersReducedMotion()) return;
       const { tilt } = aboutStackMetrics;
       const maxAngle = (aboutCards.length - 1) * tilt;
-      // Block clicks for the duration of the unfurl: a click mid-intro would run
-      // the lift/place transition on a card still mid-cardSpread animation, and
-      // animations always win over transitions on the same property — the pick
-      // motion would get silently swallowed, then snap once the keyframe ends.
+      // The intro remains clickable: selecting a card finishes the unfurl at its
+      // stable state and immediately retargets the stack to that latest choice.
       aboutStackBusy = true;
       aboutStack.classList.add('is-busy');
       // cards start bunched at the anchored (rightmost) angle, then unfurl by
@@ -4231,11 +4259,12 @@
       });
       void aboutStack.offsetWidth;
       const totalMs = (0.15 + (aboutCards.length - 1) * 0.045) * 1000 + 950;
-      setTimeout(() => {
+      aboutMotionTimers.push(setTimeout(() => {
         aboutCards.forEach(card => card.classList.remove('is-intro'));
         aboutStack.classList.remove('is-busy');
         aboutStackBusy = false;
-      }, totalMs);
+        aboutMotionTimers = [];
+      }, totalMs));
     };
     window.addEventListener('resize', () => {
       refreshAboutStack();
@@ -4331,7 +4360,7 @@
 
     setTimeout(() => {
       pins.forEach(p => { p.style.transition = ''; p.style.transform = ''; p.style.opacity = ''; });
-    }, 520);
+    }, motionDelay(520));
   }
 
   document.querySelectorAll('.tab').forEach(b => {
@@ -4442,6 +4471,10 @@ const expScroll   = document.getElementById('expScroll');
 
   function playExperienceStoryboard() {
     clearExperienceStoryboard();
+    if (prefersReducedMotion()) {
+      setExperienceStage(3);
+      return;
+    }
     setExperienceStage(0);
     const { staggerBase: b, staggerStep: s } = ROUTE_TIMING;
     expStageTimers.push(setTimeout(() => setExperienceStage(1), b));
@@ -4484,13 +4517,16 @@ function setRoute(name) {
         playAboutStackIntro();
         requestAnimationFrame(() => requestAnimationFrame(refreshAboutStack));
       }
-      main.scrollTo({ top: 0, behavior: name === 'experience' ? 'auto' : 'smooth' });
+      main.scrollTo({
+        top: 0,
+        behavior: prefersReducedMotion() || name === 'experience' ? 'auto' : 'smooth'
+      });
       updateFeedScrollbar();
       requestAnimationFrame(() => {
         updateExperienceTrack();
         requestAnimationFrame(updateExperienceTrack);
       });
-    }, ROUTE_TIMING.fadeOut);
+    }, motionDelay(ROUTE_TIMING.fadeOut));
   }
   document.querySelectorAll('.rail-btn[data-route]').forEach(b => b.addEventListener('click', () => setRoute(b.dataset.route)));
   document.getElementById('logoBtn').addEventListener('click', () => setRoute('feed'));
@@ -4577,9 +4613,9 @@ function setRoute(name) {
       });
     });
 
-    // Hover grow on interactive elements (exclude pill/label cards and
-    // component/widget pins that don't link anywhere, e.g. Tools I use)
-    document.querySelectorAll('button, a:not(.cs-image-link), [role="button"], .pin[data-page]:not([data-cursor-label]), .ab-stack-card, .exp-card:not([data-cursor-link]), .rail-btn, .tab-btn, .em-btn, .sheet-close').forEach(el => {
+    // Hover grow on interactive elements. Within the Overlap widget, only
+    // the pill cloud is active because that region drives the pill physics.
+    document.querySelectorAll('button, a:not(.cs-image-link), [role="button"], .pin[data-page]:not([data-cursor-label]), .skill-cloud, .ab-stack-card, .exp-card:not([data-cursor-link]), .rail-btn, .tab-btn, .em-btn, .sheet-close').forEach(el => {
       el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
     });
@@ -4726,7 +4762,18 @@ function setRoute(name) {
       if (!rafId) rafId = requestAnimationFrame(tick);
     }
 
+    function resetPillMotion() {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+      mouseX = mouseY = null;
+      state.forEach((s, i) => {
+        s.ox = s.oy = s.vx = s.vy = 0;
+        pills[i].style.transform = '';
+      });
+    }
+
     cloud.addEventListener('mousemove', e => {
+      if (prefersReducedMotion()) return;
       const r = cloud.getBoundingClientRect();
       mouseX = e.clientX - r.left;
       mouseY = e.clientY - r.top;
@@ -4736,6 +4783,10 @@ function setRoute(name) {
       mouseX = null;
       mouseY = null;
       wake();
+    });
+    reducedMotionQuery.addEventListener('change', event => {
+      if (event.matches) resetPillMotion();
+      else measureHomes();
     });
   })();
 
@@ -4750,7 +4801,7 @@ function setRoute(name) {
       if (animate) {
         clearTimeout(themeTimer);
         html.classList.add('theme-transitioning');
-        themeTimer = setTimeout(() => html.classList.remove('theme-transitioning'), 560);
+        themeTimer = setTimeout(() => html.classList.remove('theme-transitioning'), motionDelay(560));
       }
       html.setAttribute('data-theme', t);
       localStorage.setItem('theme', t);
