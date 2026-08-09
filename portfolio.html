@@ -1199,6 +1199,16 @@
     transition: max-width 0.28s var(--ease-out), opacity 0.16s ease 0.08s;
   }
   .sheet-close:hover .sheet-btn-label { max-width: 80px; opacity: 1; }
+  .cs-cta-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 40px; padding: 0 18px; border-radius: 999px;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em;
+    background: transparent; color: var(--ink);
+    box-shadow: 0 0 0 1px var(--line);
+    cursor: pointer;
+    transition: background var(--motion-fast) ease, color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+  }
+  .cs-cta-btn:hover { background: var(--ink); color: var(--paper); box-shadow: 0 0 0 1px var(--ink); }
   .sheet {
     position: fixed; right: 0; top: 0; bottom: 0;
     width: var(--panel-w); overflow-y: auto; overscroll-behavior: contain;
@@ -1209,6 +1219,233 @@
     transform: translateX(100%);
     transition: transform var(--motion-slow) var(--ease-soft), opacity var(--motion-med) ease;
     will-change: transform;
+  }
+  /* Climate case study: the sheet's own color tokens are remapped to the
+     card's yellow + its always-dark card-content text colors, so every
+     cs- component downstream (already themed off --paper/--ink/--line)
+     repaints on yellow for free instead of needing per-component overrides. */
+  /* Black case-study theme: near-black paper, white ink, translucent-white
+     "frost" glass for structural chrome (labels, tags, frames, cards), and
+     the brand yellow held in reserve for the handful of moments that should
+     actually pop — hero emphasis, the four hero stats, and Impact's number.
+     Because --paper-2 is defined as translucent white, every component that
+     already uses it as a fill or border automatically becomes a glass panel
+     here — no per-component rewrite needed for that part. */
+  /* Premium-apple theme, following the site's own light/dark split rather
+     than forcing one mode: dark mode gets a page a touch lighter than the
+     site's own dark-mode gray (oklch 0.20) with translucent-white "frost"
+     glass; light mode gets the same relationship in the site's light-mode
+     gray family (page ~ the site's own --paper-2, cards near-white with a
+     soft lift shadow). --climate-accent-text carries the numbers/highlights
+     that need to be yellow on dark but dark-on-light instead, since pale
+     yellow text has no contrast on a light page. */
+  html[data-theme="dark"] .sheet[data-page="climate"] {
+    --paper: oklch(0.26 0 0);
+    --paper-2: oklch(1 0 0 / 0.06);
+    --ink: oklch(0.95 0 0);
+    --ink-mid: oklch(0.66 0 0);
+    --ink-low: oklch(0.46 0 0);
+    --line: oklch(1 0 0 / 0.12);
+    --climate-accent-text: var(--c-yellow);
+    --climate-card-shadow: none;
+  }
+  html[data-theme="light"] .sheet[data-page="climate"] {
+    --paper: oklch(0.93 0 0);
+    --paper-2: oklch(0.995 0 0);
+    --ink: oklch(0.16 0 0);
+    --ink-mid: oklch(0.45 0 0);
+    --ink-low: oklch(0.58 0 0);
+    --line: oklch(0 0 0 / 0.1);
+    --climate-accent-text: var(--ink);
+    --climate-card-shadow: 0 1px 2px oklch(0 0 0 / 0.04), 0 10px 24px -14px oklch(0 0 0 / 0.16);
+  }
+  .sheet[data-page="climate"] .cs-section { padding-top: 58px; }
+  .sheet[data-page="climate"] .cs-label {
+    display: inline-block;
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    box-shadow: var(--climate-card-shadow);
+  }
+  .sheet[data-page="climate"] .cs-copy table {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    box-shadow: var(--climate-card-shadow);
+  }
+  .sheet[data-page="climate"] .cs-copy th,
+  .sheet[data-page="climate"] .cs-copy td {
+    border-bottom: 1px solid var(--line);
+    padding: 16px;
+    vertical-align: top;
+  }
+  .sheet[data-page="climate"] .cs-copy th { width: 160px; }
+  .sheet[data-page="climate"] .cs-copy tr:last-child th,
+  .sheet[data-page="climate"] .cs-copy tr:last-child td { border-bottom: none; }
+  .sheet[data-page="climate"] .cs-table-tag {
+    display: block;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 1px 0 0;
+    font-family: var(--serif);
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink);
+  }
+  .sheet[data-page="climate"] .cs-copy code,
+  .sheet[data-page="climate"] .cs-learning code {
+    background: var(--c-yellow);
+    color: oklch(0.18 0.02 90);
+    border: none;
+    font-weight: 700;
+  }
+  .sheet[data-page="climate"] .cs-preview-frame,
+  .sheet[data-page="climate"] .cs-artifact-frame {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--climate-card-shadow);
+  }
+  .sheet[data-page="climate"] .cs-preview-img.has-image {
+    background: oklch(0.99 0.002 85);
+    padding: 10px;
+  }
+  .sheet[data-page="climate"] .cs-preview-img.has-image img { border-radius: 8px; }
+  .sheet[data-page="climate"] .cs-fig-index {
+    background: var(--c-yellow);
+    color: oklch(0.18 0.02 90);
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 4px;
+  }
+  .sheet[data-page="climate"] .cs-fig-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .sheet[data-page="climate"] .cs-impact-callout {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 34px 30px;
+    margin-top: 4px;
+    box-shadow: var(--climate-card-shadow);
+  }
+  .sheet[data-page="climate"] .cs-impact-n,
+  .sheet[data-page="climate"] .cs-impact-line {
+    color: var(--climate-accent-text);
+  }
+  .sheet[data-page="climate"] .cs-impact-callout p {
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="climate"] .cs-caption {
+    border-top: none;
+    margin: 10px 12px 12px;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="climate"] .cs-learning::before { background: var(--c-yellow); }
+  /* Solid yellow blocks for What I Found and Impact — a deliberate break in
+     the dark/gray rhythm. Overriding the --ink/--ink-mid/--line tokens here
+     (rather than recoloring each child) means every component already
+     reading from them — labels, copy, figs — repaints on yellow automatically. */
+  .sheet[data-page="climate"] .cs-section--yellow {
+    background: var(--c-yellow);
+    border-radius: 20px;
+    padding: 40px 36px;
+    margin: 32px 0 0;
+    --ink: oklch(0.16 0.02 90);
+    --ink-mid: oklch(0.34 0.02 90);
+    --ink-low: oklch(0.46 0.02 90);
+    --line: oklch(0 0 0 / 0.14);
+  }
+  .sheet[data-page="climate"] .cs-section--yellow .cs-label {
+    background: oklch(0.16 0.02 90);
+    color: var(--c-yellow);
+    border: none;
+    box-shadow: none;
+  }
+  .sheet[data-page="climate"] .cs-section--yellow .cs-impact-callout {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin-top: 8px;
+  }
+  .sheet[data-page="climate"] .cs-section--yellow .cs-impact-n,
+  .sheet[data-page="climate"] .cs-section--yellow .cs-impact-line {
+    color: var(--ink);
+  }
+  .sheet[data-page="climate"] .cs-impact-list {
+    display: grid;
+    gap: 12px;
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sheet[data-page="climate"] .cs-impact-list li {
+    position: relative;
+    padding-left: 20px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: oklch(0.16 0.02 90);
+  }
+  .sheet[data-page="climate"] .cs-impact-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: oklch(0.16 0.02 90);
+  }
+  .sheet[data-page="climate"] .cs-section--yellow .cs-learning::before {
+    background: var(--ink);
+  }
+  .sheet[data-page="climate"] .cs-section--yellow .cs-table-tag {
+    background: transparent;
+    color: var(--ink);
+    border: none;
+  }
+  .sheet[data-page="climate"] .cs-section--yellow .cs-fig-index {
+    background: oklch(0.16 0.02 90);
+    color: var(--c-yellow);
+  }
+  /* Decision blocks alternate a faint lighter tint — translucent white reads
+     as "a touch lighter than the page" in both dark and light mode. The fill
+     bleeds by the same amount as its inner padding so filled and unfilled copy
+     share one vertical guide. */
+  .sheet[data-page="climate"] .cs-decision-block {
+    border-bottom: none;
+  }
+  .sheet[data-page="climate"] .cs-decision-block:nth-child(even) {
+    background: oklch(1 0 0 / 0.05);
+    /* Let the fill bleed outward so its inner 24px inset lands the copy on
+       the same vertical guide as the unfilled decision rows. */
+    margin: 0 -24px;
+    padding: 24px;
+    border-radius: 14px;
+    border-bottom: none;
+  }
+  .sheet[data-page="climate"] .cs-section--yellow .cs-copy code,
+  .sheet[data-page="climate"] .cs-section--yellow .cs-learning code {
+    background: oklch(0.16 0.02 90);
+    color: var(--c-yellow);
   }
   .feed.has-open .pin { opacity: 0.55; }
   .feed.has-open .pin:hover { opacity: 1; }
@@ -1457,7 +1694,7 @@
     opacity: 0.86; padding-left: 15px; position: relative;
   }
   .ab-stack-list li::before {
-    content: '—'; position: absolute; left: 0; opacity: 0.5;
+    content: '•'; position: absolute; left: 0; opacity: 0.5;
   }
   .ab-stack-list.is-lined li::before { content: none; }
   .ab-stack-list.is-lined li {
@@ -1546,19 +1783,91 @@
     line-height: 0.98;
     letter-spacing: 0;
   }
+  /* Third pass on this hero. Dropped: the dark card (felt cold), the bubble
+     cluster (felt decorative), the serif italic title, and the underlined
+     pills (read as links). What's left is plainer on purpose: a bold sans
+     headline, one real number set large instead of illustrated shapes, a
+     plain byline instead of button-shaped metadata, and the Tableau link
+     surfaced here instead of buried in Data + Method. */
   .cs-hero--climate {
-    background:
-      linear-gradient(135deg, oklch(0.18 0.012 70), oklch(0.13 0.006 60) 54%),
-      var(--c-charcoal);
-    padding: 34px 30px 30px;
+    background: none;
+    padding: 28px 0 0;
+    overflow: visible;
   }
+  .cs-hero-topline {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+  .cs-hero-topline .cs-cta-btn { flex-shrink: 0; margin-top: 6px; }
   .cs-hero--climate .cs-hero-title {
-    font-family: var(--serif);
-    font-weight: 400;
+    font-family: var(--sans);
+    font-weight: 700;
     line-height: 0.98;
-    letter-spacing: 0;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 0;
   }
-  .cs-hero--climate .cs-hero-title em { color: var(--c-yellow); }
+  .cs-hero--climate .cs-hero-title em {
+    display: inline-block;
+    font-style: normal;
+    color: oklch(0.18 0.02 90);
+    background: var(--c-yellow);
+    padding: 0 8px;
+    margin-top: 8px;
+    border-radius: 6px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .cs-hero--climate .cs-hero-sub { color: var(--ink-mid); }
+  .cs-hero--climate .cs-role-line { display: none; }
+  .cs-hero-byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--ink-mid);
+    margin: 4px 0 22px;
+  }
+  .cs-hero-byline span:not(:last-child)::after { content: '·'; margin-left: 8px; color: var(--ink-low); }
+  /* Four real per-cut numbers as individual frosted-glass callout cards —
+     the premium-apple reference's "gray callout block" pattern, applied to
+     real data instead of decorative shapes. */
+  .cs-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .cs-hstat {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 18px 18px;
+    box-shadow: var(--climate-card-shadow);
+  }
+  .cs-hstat-n {
+    display: block;
+    font-family: var(--serif);
+    font-size: 32px;
+    line-height: 1;
+    color: var(--climate-accent-text);
+    margin-bottom: 8px;
+  }
+  .cs-hstat-l {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    line-height: 1.35;
+  }
   .cs-climate-grid {
     display: grid;
     grid-template-columns: repeat(13, 1fr);
@@ -1575,6 +1884,7 @@
     border-top: 1px solid var(--line);
     padding: 14px 0 0;
     background: transparent;
+    color: var(--ink);
   }
   .cs-feature h3 {
     font-family: var(--mono);
@@ -1586,8 +1896,8 @@
     color: var(--ink);
   }
   .cs-feature p {
-    font-size: 13px;
-    line-height: 1.55;
+    font-size: 14px;
+    line-height: 1.6;
     color: var(--ink-mid);
   }
   .cs-two-col {
@@ -1654,6 +1964,33 @@
     overflow: hidden;
   }
   .cs-preview-frame { margin-top: 0; }
+  /* A figure gets our own type in front of the chart before the eye ever
+     reaches the exported tool's own baked-in title — the image is cropped
+     to drop that title (see cs-crop-* below) so ours reads first. */
+  .cs-fig { margin: 20px 0; }
+  .cs-copy--after-fig { margin-top: 20px; }
+  .cs-fig-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .cs-fig-index {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-low);
+    flex-shrink: 0;
+  }
+  .cs-fig-title {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--ink);
+    margin: 0;
+  }
   .cs-preview-img,
   .cs-artifact-img {
     min-height: 260px;
@@ -1681,8 +2018,8 @@
   }
   .cs-preview-img.has-image {
     min-height: 0;
-    padding: 14px;
-    background: oklch(0.98 0.004 85);
+    padding: 6px;
+    background: oklch(0.13 0.006 60);
   }
   .cs-preview-img.has-image.on-dark { background: oklch(0.09 0 0); }
   .cs-preview-img.has-image::before { display: none; }
@@ -1741,6 +2078,7 @@
   .cs-question {
     font-family: var(--serif);
     font-size: clamp(30px, 4vw, 44px);
+    font-weight: 700;
     line-height: 1;
     letter-spacing: 0;
     color: var(--ink);
@@ -1749,11 +2087,53 @@
   .cs-copy {
     display: grid;
     gap: 12px;
-    font-size: 14px;
-    line-height: 1.62;
+    font-size: 15px;
+    line-height: 1.65;
     color: var(--ink);
   }
   .cs-copy strong { color: var(--ink); }
+  .cs-copy ul, .cs-copy ol,
+  .cs-feature ul, .cs-feature ol,
+  .sheet-body .body ul, .sheet-body .body ol {
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+    list-style: none;
+  }
+  .cs-copy li, .cs-feature li, .sheet-body .body li {
+    line-height: 1.6;
+    position: relative;
+    padding-left: 16px;
+  }
+  .cs-copy li::before, .cs-feature li::before, .sheet-body .body li::before {
+    content: '';
+    position: absolute; left: 0; top: 0.65em;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--ink);
+  }
+  .cs-copy table, .sheet-body .body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 4px 0;
+  }
+  .cs-copy th, .cs-copy td,
+  .sheet-body .body th, .sheet-body .body td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+  .cs-copy td:first-child, .cs-copy th:first-child,
+  .sheet-body .body td:first-child, .sheet-body .body th:first-child { padding-left: 0; }
+  .cs-copy th, .sheet-body .body th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-mid);
+  }
+  .cs-copy td, .sheet-body .body td { color: var(--ink); }
   .cs-link-row {
     display: flex;
     gap: 8px;
@@ -1769,22 +2149,22 @@
     background: transparent;
   }
   .cs-decision-block {
-    padding: 20px 0;
+    padding: 24px 0;
     border-bottom: 1px solid var(--line);
   }
   .cs-decision-block:last-child { border-bottom: none; }
   .cs-decision-block h3 {
     font-family: var(--serif);
     font-size: 22px;
-    font-weight: 400;
+    font-weight: 700;
     line-height: 1.1;
     letter-spacing: 0;
     margin-bottom: 14px;
     color: var(--ink);
   }
   .cs-decision-block p {
-    font-size: 13px;
-    line-height: 1.62;
+    font-size: 14px;
+    line-height: 1.65;
     color: var(--ink);
   }
   .cs-decision-fig { margin-top: 20px; }
@@ -1830,6 +2210,15 @@
   }
   .cs-image-link.cs-crop-top img { object-position: top; }
   .cs-image-link.cs-crop-bottom img { object-position: bottom; }
+  .cs-image-link.cs-crop-wide { aspect-ratio: 3 / 1; }
+  /* Per-chart crop windows for the climate figures: each trims the exported
+     tool's own baked-in title off the top (cs-fig-title stands in for it)
+     while keeping the plot, legend, and — for the topic chart — the row
+     cluster the caption references. Ratios are tuned per source image, not
+     interchangeable. */
+  .cs-image-link.cs-crop-school { aspect-ratio: 7 / 4; }
+  .cs-image-link.cs-crop-race { aspect-ratio: 27 / 10; }
+  .cs-image-link.cs-crop-topic img { object-position: 50% 14%; }
   .cs-preview-schema {
     min-height: 0;
     padding: 20px;
@@ -1840,6 +2229,7 @@
   }
   @media (max-width: 720px) {
     .cs-decision-row { grid-template-columns: 1fr; }
+    .cs-hero-stats { grid-template-columns: repeat(2, 1fr); }
   }
   .cs-anno-diagram { display: flex; gap: 10px; flex: none; }
   .cs-anno-schema {
@@ -1947,8 +2337,26 @@
   .cs-impact-callout p {
     font-size: 13px;
     line-height: 1.55;
-    color: color-mix(in oklch, var(--paper) 72%, transparent);
+    color: var(--ink-low);
   }
+  .cs-impact-points {
+    display: grid;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .cs-impact-point {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .cs-impact-point-n {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .cs-impact-point p { margin: 0; }
   .cs-stat-row {
     display: grid; grid-template-columns: repeat(3, 1fr);
     border-top: 1px solid oklch(0.26 0.005 60);
@@ -1973,7 +2381,7 @@
     padding: 52px 0 0;
   }
   .cs-label {
-    display: block; font-family: var(--mono); font-size: 11px;
+    display: block; font-family: var(--mono); font-size: 11px; font-weight: 700;
     letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--ink); margin-bottom: 16px;
   }
@@ -2071,7 +2479,7 @@
   /* Learnings */
   .cs-learnings { display: flex; flex-direction: column; padding-bottom: 16px; }
   .cs-learning {
-    font-size: 14px; line-height: 1.55; color: var(--ink);
+    font-size: 15px; line-height: 1.6; color: var(--ink);
     padding: 13px 0 13px 20px; border-bottom: 1px solid var(--line);
     position: relative;
   }
@@ -2082,7 +2490,18 @@
     width: 5px; height: 5px; border-radius: 50%;
     background: var(--accent);
   }
-  .cs-learnings--yellow .cs-learning::before { background: var(--c-yellow); }
+  /* On its own sheet the whole background is already yellow, so the dot
+     needs to be the dark card-ink instead to stay visible. */
+  .cs-learnings--yellow .cs-learning::before { background: var(--card-ink); }
+
+  .cs-copy code, .cs-learning code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    background: oklch(0 0 0 / 0.06);
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: inherit;
+  }
 
   /* WIP notice */
   .cs-wip { padding: 40px 0 0; }
@@ -2654,7 +3073,7 @@
       custom: `
         <div class="cs-hero cs-hero--brew">
           <h2 class="cs-hero-title">brew.<br><em>Find your third space.</em></h2>
-          <p class="cs-hero-sub">brew. is a cafe-discovery app I'm designing and building — cafes organized by what you actually need (quiet, work-friendly, social) instead of by star rating, and saved as Want to Go, Been, or Favorite instead of one flat list. Reviews and comments share a feed, a card, and a thread, but not a ruleset.</p>
+          <p class="cs-hero-sub">brew. is a cafe-discovery app I'm designing and building. Cafes are organized by what you actually need (quiet, work-friendly, social) instead of by star rating, and saved as Want to Go, Been, or Favorite instead of one flat list. Reviews and comments share a feed, a card, and a thread, but not a ruleset.</p>
           <div class="cs-role-line">
             <span class="cs-role-pill">Role / Product design + front-end</span>
             <span class="cs-role-pill">For / Personal project</span>
@@ -2673,7 +3092,7 @@
                 </span>
               </a>
             </div>
-            <div class="cs-caption">The For You feed — one cafe at a time, with save-state, comment, and directions actions surfaced right on the card instead of behind a tap.</div>
+            <div class="cs-caption">The For You feed shows one cafe at a time, with save-state, comment, and directions actions surfaced right on the card instead of behind a tap.</div>
           </div>
         </div>
 
@@ -2681,7 +3100,7 @@
           <span class="cs-label">The Question</span>
           <h3 class="cs-question">How do you make a review feel different from a comment, without making the product feel like two products?</h3>
           <div class="cs-copy">
-            <p>People already find cafes across Google Maps, Instagram, TikTok, and their own Notes app — none of which let you search by what you actually need, or remember a place the way you actually think about it. brew. starts from that gap: discovery organized around intent instead of distance or rating, and three separate save states instead of one bookmark bucket.</p>
+            <p>People already find cafes across Google Maps, Instagram, TikTok, and their own Notes app. None of them let you search by what you actually need, or remember a place the way you actually think about it. brew. starts from that gap: discovery organized around intent instead of distance or rating, and three separate save states instead of one bookmark bucket.</p>
             <p>Reviews and comments live in the same thread on the same card. A review carries a rating and is capped at one per person per cafe; a comment doesn't and isn't. That difference needed to show up in how it feels to use, not just in the data model.</p>
           </div>
         </div>
@@ -2691,7 +3110,7 @@
           <div class="cs-two-col">
             <div class="cs-feature">
               <h3>Stack</h3>
-              <p>React 18 + Vite, no framework. One shared state store — a plain Context plus a custom hook, no Redux or Zustand. CSS custom properties for design tokens, no Tailwind or CSS-in-JS. Sheets (bottom panels) stay always-mounted and are gated by a CSS class rather than mounted/unmounted, so their open/close transitions always have a stable node to animate.</p>
+              <p>React 18 + Vite, no framework. One shared state store: a plain Context plus a custom hook, no Redux or Zustand. CSS custom properties for design tokens, no Tailwind or CSS-in-JS. Sheets (bottom panels) stay always-mounted and are gated by a CSS class rather than mounted/unmounted, so their open/close transitions always have a stable node to animate.</p>
             </div>
             <div class="cs-feature">
               <h3>Approach</h3>
@@ -2711,7 +3130,7 @@
               <div class="cs-decision-copy">
                 <h3>01 / A review isn't a comment, even when it looks like one</h3>
                 <p><strong>One card, two objects.</strong> A review carries a rating and caps at one per person per cafe; a comment does neither. I flattened the cafe name to transparent uniform caps so it stops competing with the review text, aligned the avatar to the name, and cut the dead space and a stray divider around the comment body. Replies inherit the same card but lose the rating control, get a reply tag that's visually distinct from the comment text, and show the replier's real name instead of a leftover "you."</p>
-                <p><strong>A rating step you can't leave blank.</strong> Without a guardrail, someone could open the rating step, get distracted, and silently leave a cafe a 0/5. I split it into two labeled steps — cup rating, then a short list of concrete tags like quiet or has outlets — with the controls turning yellow to mark review mode. Once you've reviewed a cafe the control disables; changing it means deleting the original first, not overwriting it silently.</p>
+                <p><strong>A rating step you can't leave blank.</strong> Without a guardrail, someone could open the rating step, get distracted, and silently leave a cafe a 0/5. I split it into two labeled steps: cup rating, then a short list of concrete tags like quiet or has outlets. The controls turn yellow to mark review mode. Once you've reviewed a cafe the control disables; changing it means deleting the original first, not overwriting it silently.</p>
               </div>
               <div class="cs-decision-media-stack">
                 <div class="cs-preview-frame cs-decision-fig">
@@ -2727,7 +3146,7 @@
                       </span>
                     </a>
                   </div>
-                  <div class="cs-caption">Comments &amp; replies — one card, two rules: a top-level review carries a rating and a name, a reply carries neither the rating option nor a placeholder "you."</div>
+                  <div class="cs-caption">Comments &amp; replies use one card with two rules: a top-level review carries a rating and a name, while a reply carries neither the rating option nor a placeholder "you."</div>
                 </div>
                 <div>
                   <div class="cs-filmstrip">
@@ -2766,7 +3185,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="cs-filmstrip-caption">The rating flow — cup rating, then concrete experience tags instead of a free-text field, so a review adds structured signal the feed's intent filters can actually use.</div>
+                  <div class="cs-filmstrip-caption">The rating flow starts with a cup rating, then concrete experience tags instead of a free-text field, so a review adds structured signal the feed's intent filters can actually use.</div>
                 </div>
               </div>
             </div>
@@ -2776,84 +3195,106 @@
         <div class="cs-section">
           <span class="cs-label">Impact</span>
           <div class="cs-impact-callout">
-            <span class="cs-impact-line">Reviews and comments now share a thread but not a ruleset — one rating per person per cafe, no rating on replies, and a two-step flow that stops a distracted tap from silently leaving a cafe a 0/5.</span>
+            <span class="cs-impact-line">Reviews and comments now share a thread but not a ruleset: one rating per person per cafe, no rating on replies, and a two-step flow that stops a distracted tap from silently leaving a cafe a 0/5.</span>
           </div>
         </div>
 
         <div class="cs-section">
           <span class="cs-label">What I'd Change</span>
           <div class="cs-learnings">
-            <div class="cs-learning">The review summary bar's cup icon still doesn't match the average score it's showing — a bug that's survived four separate rounds of otherwise-real cleanup on that card. Comments and reviews also still have no delete or report option. Both need to happen before this goes near real users, not after.</div>
+            <div class="cs-learning">The review summary bar's cup icon still doesn't match the average score it's showing. This bug has survived four separate rounds of otherwise-real cleanup on that card. Comments and reviews also still have no delete or report option. Both need to happen before this goes near real users, not after.</div>
           </div>
         </div>
       `
     },
     climate: {
       meta: 'Data Viz · Survey Analysis',
-      eyebrow: 'Edmonds School District',
       custom: `
         <div class="cs-hero cs-hero--climate">
-          <h2 class="cs-hero-title">Analyzing<br><em>the neutral.</em></h2>
-          <p class="cs-hero-sub">In a school climate survey, 22% neutral sounds like noise. It isn't. Those responses cluster: by topic, by school, by language group. I built four views to find out where.</p>
-          <div class="cs-role-line">
-            <span class="cs-role-pill">Solo / Data viz · Analysis</span>
-            <span class="cs-role-pill">For / Edmonds School District</span>
-            <span class="cs-role-pill">Year / 2026</span>
+          <div class="cs-hero-topline">
+            <h2 class="cs-hero-title">A closer look at<br><em>neutral perspectives.</em></h2>
+            <a class="cs-cta-btn" href="https://public.tableau.com/app/profile/zainab.ahsan/viz/GroupIndividualNeutralResponsesAnalysisESDFamilySurvey/ESDFamilySurveyNeutralResponsesAnalysis" target="_blank" rel="noopener noreferrer">View on Tableau ↗</a>
           </div>
-          <div class="cs-preview-frame">
-            <div class="cs-preview-img has-image">
-              <a class="cs-image-link" href="assets/images/neutral-by-language.png" aria-label="Open language neutral rate chart at full size">
-                <img src="assets/images/neutral-by-language.png" alt="Bubble scatter: neutral response rate by language group, showing English at 17% with 5,086 respondents vs. Spanish at 8% with ~950" loading="eager" />
-                <span class="cs-expand-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="6.5"/>
-                    <path d="m16.5 16.5 3.5 3.5"/>
-                    <path d="M11 8.5v5M8.5 11h5"/>
-                  </svg>
-                </span>
-              </a>
+          <div class="cs-hero-stats">
+            <div class="cs-hstat">
+              <span class="cs-hstat-n">~30×</span>
+              <span class="cs-hstat-l">School participation range</span>
             </div>
-            <!-- TODO: if a comparison-to-average claim is wanted here, specify weighted vs unweighted baseline and recompute. Do not say 'nearly double' against the 22% figure. -->
-            <div class="cs-caption">English-speaking families respond neutrally at 17%. Smaller language groups diverge sharply in both directions: Amharic at 3%, Korean at 21%.</div>
+            <div class="cs-hstat">
+              <span class="cs-hstat-n">9 pts</span>
+              <span class="cs-hstat-l">Race/ethnicity spread</span>
+            </div>
+            <div class="cs-hstat">
+              <span class="cs-hstat-n">35%</span>
+              <span class="cs-hstat-l">Peak topic neutral rate</span>
+            </div>
           </div>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">The Question</span>
-          <h3 class="cs-question">What does a neutral answer hide?</h3>
+          <span class="cs-label">Context</span>
           <div class="cs-copy">
-            <p>School climate surveys are built to surface satisfaction. So 22% neutral in a district this size gets filed under residual, the leftover once the real findings are out. But neutral doesn't distribute randomly. It clusters.</p>
-            <p>Edmonds' equity staff needed to know if that 22% meant families were roughly satisfied or if something else was going on: discomfort, unfamiliarity, a survey that didn't quite fit the communities it was asking. ~6,000 respondents, 35+ schools, 38 Likert topics.</p>
+            <p><strong>22% of ~6,000 family climate survey responses were neutral.</strong> Instead of treating that as a leftover category, I wanted to know whether there was a pattern behind it. There was. Neutral responses varied by topic, school, race/ethnicity, and home language. I built the topic, race, and language views and co-developed the school treemap so Edmonds School District's equity team could see where those differences showed up and decide what was worth investigating.</p>
           </div>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">Data + Approach</span>
-          <div class="cs-two-col">
-            <div class="cs-feature">
-              <h3>Source</h3>
-              <p>Edmonds School District family climate survey. ~6,000 respondents across 35+ schools. 38 Likert-scale topics covering academic satisfaction, cultural belonging, family connection, and district communication. Administered via ParentSquare. Null and VOICE responses excluded from all calculations.</p>
-            </div>
-            <div class="cs-feature">
-              <h3>Transforms</h3>
-              <p>Neutral responses calculated as % of total count per segment, excluding Null and Don't Know from the denominator. Views segmented by topic (38 questions), school (35+), race/ethnicity (district's Student RE New classification), and home language. Sorted descending by neutral rate within each view. Groups under ~20 respondents included but not suppressed.</p>
-            </div>
-          </div>
-          <div class="cs-link-row">
-            <a class="cs-link-pill" href="#" aria-label="Repository placeholder">repo / placeholder</a>
-            <span class="cs-link-pill">data dictionary</span>
-            <span class="cs-link-pill">notebook</span>
+          <span class="cs-label">The Ask</span>
+          <h3 class="cs-question">What was hiding inside that 22%?</h3>
+          <div class="cs-copy">
+            <p>Edmonds' equity team had thousands of family survey responses and a large neutral group.</p>
+            <p>The tricky part was that "neutral" can mean a lot of things. Some families may genuinely feel neutral. Others might not feel informed enough to answer, feel disconnected from the question, or not see their experience reflected in the survey at all.</p>
+            <p>Those lead to very different next steps.</p>
+            <ul>
+              <li>If families are genuinely satisfied or indifferent, there may not be much to address.</li>
+              <li>If certain communities are consistently withholding judgment, the survey itself or the district's outreach may need another look.</li>
+            </ul>
+            <p>The neutral responses hadn't been segmented yet, so the goal was to figure out whether that 22% was actually behaving like one group. It wasn't.</p>
+            <p><strong>One constraint shaped most of my design decisions:</strong> these charts were going to be projected during a working meeting with non-technical stakeholders. Nobody was going to hover over a chart or spend five minutes decoding it, so each view needed to communicate its point quickly.</p>
           </div>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">Design Decisions</span>
-          <div class="cs-decision-block">
-            <h3>01 / Encoding neutral responses</h3>
-            <p>The standard Likert chart (diverging bars) buries neutral in the middle. I switched to a stacked bar sorted descending by neutral rate, which lets the sort be the argument: the cluster at the top (Cultural Identity, Family Connection, Communication Tools) is the finding. It disappears in any other order.</p>
-            <div class="cs-preview-frame cs-decision-fig">
+          <span class="cs-label">Data + Method</span>
+          <div class="cs-copy">
+            <table>
+              <tbody>
+                <tr>
+                  <th scope="row"><span class="cs-table-tag">Source</span></th>
+                  <td>Edmonds School District family climate survey, administered through ParentSquare. ~6,000 respondents across 35+ schools and 38 Likert-scale questions covering academic satisfaction, cultural belonging, family connection, and district communication.</td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="cs-table-tag">Denominator</span></th>
+                  <td>Neutral was calculated as a percentage of responses within each segment, excluding Null and Don't Know. This mattered most across language groups, where including Don't Know could shift the comparison noticeably. VOICE responses were also excluded.</td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="cs-table-tag">Segmentation</span></th>
+                  <td>We looked at neutral responses four ways: survey topic, school, race/ethnicity using the district's Student RE New classification, and home language. Instead of sorting by agreement, each view is sorted by neutral rate so the patterns we were looking for came to the surface. I led the topic, race, and language views; the school view was built jointly.</td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="cs-table-tag">Small-n</span></th>
+                  <td>I kept groups with fewer than ~20 respondents in the analysis. Removing them would also remove some of the smaller communities the equity team specifically wanted visibility into, so I kept them and treated sample size as a limitation instead.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="cs-section cs-section--yellow">
+          <span class="cs-label">What I Found</span>
+          <h3 class="cs-question">The district-wide 22% was averaging together very different groups.</h3>
+          <div class="cs-copy">
+            <p>Topic made that clearest. Once I sorted all 38 questions by neutral rate, the top wasn't the belonging questions I expected. It was specific communication platforms. Satisfaction with <strong>Seesaw (35.5%), district social media (35.3%), and PeachJar (34.8%)</strong> drew the most neutral responses, well above the cultural-identity and family-connection items clustered just below them near 27–28%.</p>
+            <p>The bottom sharpened it: only ~3.6% were neutral about knowing how to contact their child's teacher. Families held firm opinions on concrete logistics and went neutral on tools they may not use and on more abstract questions of belonging.</p>
+          </div>
+          <figure class="cs-fig">
+            <div class="cs-fig-head">
+              <span class="cs-fig-index">Fig. 01</span>
+              <h4 class="cs-fig-title">Topics with the highest neutral response rates</h4>
+            </div>
+            <div class="cs-preview-frame">
               <div class="cs-preview-img has-image">
-                <a class="cs-image-link" href="assets/images/neutral-by-topic.png" aria-label="Open neutral by topic chart at full size">
+                <a class="cs-image-link cs-crop cs-crop-wide cs-crop-topic" href="assets/images/neutral-by-topic.png" aria-label="Open neutral by topic chart at full size">
                   <img src="assets/images/neutral-by-topic.png" alt="Neutral responses by survey topic, sorted by neutral rate descending" loading="lazy" />
                   <span class="cs-expand-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -2864,15 +3305,20 @@
                   </span>
                 </a>
               </div>
-              <div class="cs-caption">Sorting by neutral % descending: the cluster at the top (Cultural Identity, Family Connection, Communication Tools) is invisible in any other sort order.</div>
+              <div class="cs-caption">Communication platforms top the list at ~35%, with cultural identity and family connection just below, while concrete operational questions draw the fewest neutral responses.</div>
             </div>
+          </figure>
+          <div class="cs-copy cs-copy--after-fig">
+            <p>School added a second pattern. Neutral rates ran higher in <strong>secondary and alternative programs than in elementary schools</strong>, suggesting that families of older students may have less direct visibility into what the survey asks about. (This view was co-developed with Maximo.)</p>
           </div>
-          <div class="cs-decision-block">
-            <h3>02 / Comparison structure</h3>
-            <p>I tried an interactive filter first. The equity team was reading this off a projected screen in a meeting; they needed something to scan, not explore. Four separate static views instead. The school treemap encodes count as area and neutral rate as color, because schools vary 30× in participation. A bar chart would've made a 30-respondent elementary look equivalent to a 900-student high school.</p>
-            <div class="cs-preview-frame cs-decision-fig">
+          <figure class="cs-fig">
+            <div class="cs-fig-head">
+              <span class="cs-fig-index">Fig. 02</span>
+              <h4 class="cs-fig-title">Neutral responses rise in secondary and alternative programs</h4>
+            </div>
+            <div class="cs-preview-frame">
               <div class="cs-preview-img has-image">
-                <a class="cs-image-link" href="assets/images/neutral-by-school.png" aria-label="Open neutral by school chart at full size">
+                <a class="cs-image-link cs-crop cs-crop-school cs-crop-bottom" href="assets/images/neutral-by-school.png" aria-label="Open neutral by school chart at full size">
                   <img src="assets/images/neutral-by-school.png" alt="Neutral responses by school, treemap encoding count as area and neutral rate as color" loading="lazy" />
                   <span class="cs-expand-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -2883,19 +3329,20 @@
                   </span>
                 </a>
               </div>
-              <div class="cs-caption">Area encodes respondent count; color encodes neutral rate. A bar chart would imply false equivalence between schools with 800 responses and those with 30.</div>
+              <div class="cs-caption">Area shows the number of respondents while color shows neutral rate, keeping participation size visible alongside the percentage.</div>
             </div>
+          </figure>
+          <div class="cs-copy cs-copy--after-fig">
+            <p>Race added a third pattern. Sorting by neutral rate put <strong>multiracial families at the top</strong>. Nearly every "White + [another identity]" combination clustered around 20%, above the single-race groups. Single-race, non-white families (Middle Eastern/North African, Native Hawaiian/Pacific Islander, Latino/Hispanic, Black/African American) were the <em>least</em> neutral, near 11–13%. The pattern pointed at intersecting identities specifically, not just "white families."</p>
           </div>
-          <div class="cs-decision-block">
-            <h3>03 / What to de-emphasize</h3>
-            <p>My first three versions were satisfaction dashboards sorted by agreement, technically correct, analytically wrong. Reframing around neutral rate shifted the question from "what do families like" to "where are they withholding judgment." I also cut raw counts: English has 5,086 respondents, some language groups have 15. Counts would've buried the smaller communities entirely.</p>
-          </div>
-          <div class="cs-decision-block">
-            <h3>04 / Annotation and restraint</h3>
-            <p>First draft title: "Neutral Rate by Student Race/Ethnicity." Same data, no finding. The final version names who and what without explaining why; that's the equity team's call. I also cut the error bars. With a non-technical audience, they read as "the data is uncertain" not "the estimate has a range." A footnote handles it.</p>
-            <div class="cs-preview-frame cs-decision-fig">
+          <figure class="cs-fig">
+            <div class="cs-fig-head">
+              <span class="cs-fig-index">Fig. 03</span>
+              <h4 class="cs-fig-title">Neutral responses cluster among multiracial families</h4>
+            </div>
+            <div class="cs-preview-frame">
               <div class="cs-preview-img has-image">
-                <a class="cs-image-link" href="assets/images/neutral-by-race.png" aria-label="Open neutral by race chart at full size">
+                <a class="cs-image-link cs-crop cs-crop-race cs-crop-bottom" href="assets/images/neutral-by-race.png" aria-label="Open neutral by race chart at full size">
                   <img src="assets/images/neutral-by-race.png" alt="Neutral responses by race and ethnicity, horizontal bar chart sorted by neutral rate" loading="lazy" />
                   <span class="cs-expand-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -2906,31 +3353,48 @@
                   </span>
                 </a>
               </div>
-              <div class="cs-caption">The headline names the finding, who and what, without naming the cause.</div>
+              <div class="cs-caption">Multiracial "White + [identity]" combinations sit near 20%, above single-race groups. The headline points at intersecting identities without claiming what caused the pattern.</div>
             </div>
+          </figure>
+          <div class="cs-copy cs-copy--after-fig">
+            <p>I couldn't say <em>why</em> any of these clusters existed from this survey alone. But each one gave the equity team a specific place to start asking.</p>
           </div>
         </div>
 
         <div class="cs-section">
+          <span class="cs-label">Analytical + Design Decisions</span>
+          <div class="cs-decision-block">
+            <h3>01 / Making neutral the focus</h3>
+            <p>A typical Likert chart buries neutral in the middle between positive and negative. I reorganized each view around neutral percentage instead, sorted highest to lowest. That simple change exposed patterns that disappeared when the same data was read for agreement.</p>
+          </div>
+          <div class="cs-decision-block">
+            <h3>02 / Comparing schools without ignoring size</h3>
+            <p>School participation varied a lot. Some had ~30 respondents and others had hundreds, so a bar chart would give both the same visual weight. I used a treemap instead: <strong>area for respondent count, color for neutral rate,</strong> so magnitude and rate read together.</p>
+            <p><em>Fig. 02, referenced above.</em></p>
+          </div>
+          <div class="cs-decision-block">
+            <h3>03 / Changing the question I was answering</h3>
+            <p>My first few versions were satisfaction dashboards organized around positive responses. They were technically correct, but not answering the question I cared about. Sorting by neutral rate shifted it from <strong>"What do families like?"</strong> to <strong>"Where are families less willing to take a side?"</strong></p>
+          </div>
+          <div class="cs-decision-block">
+            <h3>04 / Designing for the room</h3>
+            <p>I cut error bars because a projector audience may read them as "the data is unreliable" rather than "the estimate has a range." I also rewrote chart titles to name the finding instead of the variables: "Neutral Rate by Student Race/Ethnicity" became <strong>"Neutral responses are more common among white and multiracial families."</strong> The data could show <strong>where</strong>; it couldn't tell me <strong>why</strong>, and I left that call to the equity team.</p>
+            <p><em>Fig. 03, referenced above.</em></p>
+          </div>
+        </div>
+
+        <div class="cs-section cs-section--yellow">
           <span class="cs-label">Impact</span>
           <div class="cs-impact-callout">
-            <!-- Variant A: big-number treatment. Use only when there is a clean metric.
-            <span class="cs-impact-n">[metric]</span>
-            <p>[What this let someone see, decide, prioritize, or ask next.]</p>
-            -->
-            <!-- TODO: if the equity team took a specific downstream action, lead with that instead. -->
-            <!-- Variant B: one-line outcome. Default when no clean metric exists. -->
-            <span class="cs-impact-line">Turned 22% neutral from a residual into something the equity team could actually use: segmented by topic, school, and language.</span>
+            <span class="cs-impact-n">22%</span>
+            <ul class="cs-impact-list">
+              <li><strong>Turned one district-wide number into something the team could investigate</strong> by breaking neutral responses down by topic, school, race/ethnicity, and home language.</li>
+              <li>Gave the equity team specific patterns they could use in the meeting without an analyst explaining every chart.</li>
+              <li>Reframed “neutral” as information of its own, not just the space between satisfied and dissatisfied.</li>
+            </ul>
           </div>
         </div>
 
-        <div class="cs-section">
-          <span class="cs-label">What I'd Change</span>
-          <div class="cs-learnings cs-learnings--yellow">
-            <div class="cs-learning">The language scatter needed minimum-sample callouts. Korean at 21% neutral (n ≈ 30) reads with the same visual weight as English at 17% (n = 5,086); the log scale handles bubble size correctly but doesn't tell you how much to trust the number. I cut confidence intervals for audience reasons. A simple "n &lt; 50" label would've been the right compromise, and I didn't add it.</div>
-            <div class="cs-learning">The race chart uses gray for neutral; the topic chart uses yellow. That's a Tableau session artifact, not a choice, and it quietly undermines the visual language I'd set up in the first view. Needs a re-export.</div>
-          </div>
-        </div>
       `
     },
     wiired: {
@@ -3099,7 +3563,7 @@
       wip: true,
       eyebrow: 'Daily practice',
       title: 'A <em>practice</em>, not a product.',
-      lead: 'Most weekdays I make one small thing in motion or type — a typographic poster, a CSS animation, a 6-second loop.',
+      lead: 'Most weekdays I make one small thing in motion or type: a typographic poster, a CSS animation, or a 6-second loop.',
       facts: [['Started','Jan 2024'],['Cadence','Most weekdays'],['Where','are.na/zainab']]
     },
     releases: {
