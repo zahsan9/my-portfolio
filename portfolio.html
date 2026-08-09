@@ -1437,16 +1437,15 @@
     background: oklch(0.16 0.02 90);
     color: var(--c-yellow);
   }
-  /* Decision blocks alternate a faint lighter tint. Filled and unfilled rows
-     share the same outer edges and text guide; only the vertical padding
-     changes their rhythm. */
+  /* Decision blocks alternate a faint lighter tint. Every row uses the same
+     inset so all four headings and paragraphs share one text guide. */
   .sheet[data-page="climate"] .cs-decision-block {
+    padding: 24px;
     border-bottom: none;
   }
   .sheet[data-page="climate"] .cs-decision-block:nth-child(even) {
     background: oklch(1 0 0 / 0.05);
     margin: 0;
-    padding: 24px 0;
     border-radius: 14px;
     border-bottom: none;
   }
