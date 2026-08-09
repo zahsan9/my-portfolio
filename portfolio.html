@@ -895,6 +895,24 @@
   .social-tile {
     width: 56px; height: 56px; display: grid; place-items: center;
     border-radius: 16px; color: var(--card-ink); cursor: pointer;
+    transform-origin: 50% 100%;
+    transition: transform 720ms var(--ease-soft);
+  }
+  .contact-card:hover .social-tile:nth-child(1),
+  .contact-card:has(.social-tile:focus-visible) .social-tile:nth-child(1) {
+    transform: translate(-66px, 14px) rotate(-31deg);
+  }
+  .contact-card:hover .social-tile:nth-child(2),
+  .contact-card:has(.social-tile:focus-visible) .social-tile:nth-child(2) {
+    transform: translate(-35px, 7px) rotate(-21deg);
+  }
+  .contact-card:hover .social-tile:nth-child(3),
+  .contact-card:has(.social-tile:focus-visible) .social-tile:nth-child(3) {
+    transform: translate(-10px, 2px) rotate(-9deg);
+  }
+  .contact-card:hover .social-tile:nth-child(4),
+  .contact-card:has(.social-tile:focus-visible) .social-tile:nth-child(4) {
+    transform: translate(-2px, 1px) rotate(-2deg);
   }
   .social-tile:nth-child(1) {
     background: var(--c-yellow);
