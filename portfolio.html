@@ -1962,7 +1962,7 @@
     background: var(--brew-cream);
     color: var(--brew-cream-ink);
     border-radius: 18px;
-    padding: 38px 36px 0;
+    padding: 38px 36px 34px;
   }
   .sheet[data-page="brew"] .cs-brew-kicker {
     display: block;
@@ -2023,57 +2023,13 @@
   }
   .sheet[data-page="brew"] .cs-hero-sub {
     max-width: 760px;
-    margin-bottom: 14px;
+    margin-bottom: 22px;
     font-size: 14px;
     color: oklch(0.34 0.018 70);
   }
-  .sheet[data-page="brew"] .cs-brew-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 26px;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.035em;
-    color: oklch(0.3 0.018 70);
-  }
-  .sheet[data-page="brew"] .cs-brew-status::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    flex: 0 0 7px;
-    border-radius: 50%;
-    background: var(--brew-cream-ink);
-  }
-  .sheet[data-page="brew"] .cs-brew-facts {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    margin: 0 -36px;
-    border-top: 1px solid oklch(0.2 0.018 70 / 0.14);
-    border-bottom: 1px solid oklch(0.2 0.018 70 / 0.14);
-  }
-  .sheet[data-page="brew"] .cs-brew-fact {
-    padding: 17px 22px 19px;
-    border-right: 1px solid oklch(0.2 0.018 70 / 0.14);
-  }
-  .sheet[data-page="brew"] .cs-brew-fact:last-child { border-right: none; }
-  .sheet[data-page="brew"] .cs-brew-fact strong,
-  .sheet[data-page="brew"] .cs-brew-fact span { display: block; }
-  .sheet[data-page="brew"] .cs-brew-fact strong {
-    margin-bottom: 5px;
-    font-family: var(--sans);
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--brew-cream-ink);
-  }
-  .sheet[data-page="brew"] .cs-brew-fact span {
-    font-family: var(--mono);
-    font-size: 9px;
-    line-height: 1.35;
-    letter-spacing: 0.045em;
-    text-transform: uppercase;
-    color: oklch(0.4 0.016 70);
+  .sheet[data-page="brew"] .cs-brew-byline {
+    margin: 0;
+    color: oklch(0.38 0.016 70);
   }
   .sheet[data-page="brew"] .cs-section { padding-top: 66px; }
   .sheet[data-page="brew"] .cs-label {
@@ -2855,12 +2811,6 @@
   @media (max-width: 720px) {
     .cs-decision-row { grid-template-columns: 1fr; }
     .cs-hero-stats { grid-template-columns: repeat(2, 1fr); }
-    .sheet[data-page="brew"] .cs-brew-facts { grid-template-columns: 1fr; }
-    .sheet[data-page="brew"] .cs-brew-fact {
-      border-right: 0;
-      border-bottom: 1px solid oklch(0.2 0.018 70 / 0.14);
-    }
-    .sheet[data-page="brew"] .cs-brew-fact:last-child { border-bottom: 0; }
     .sheet[data-page="brew"] .cs-two-col { grid-template-columns: 1fr; }
     .sheet[data-page="brew"] .cs-product-principles { grid-template-columns: 1fr; }
     .sheet[data-page="brew"] .cs-decision-block { padding: 20px; }
@@ -3744,28 +3694,18 @@
       custom: `
         <div class="cs-hero cs-hero--brew">
           <div class="cs-brew-topline">
-            <span class="cs-brew-kicker">Product case study · Designed and built</span>
+            <span class="cs-brew-kicker">Product case study · Mobile build in progress</span>
             <div class="cs-brew-actions" aria-label="Project links">
               <a class="cs-cta-btn" href="https://github.com/zahsan9/brew" target="_blank" rel="noopener noreferrer">Repo ↗</a>
               <a class="cs-cta-btn" href="https://www.figma.com/design/fRDum7bCiXLQUExZ5Kdqx8/brew.?node-id=76-4&amp;p=f&amp;t=LZwBOvpgaqXkDuEh-0" target="_blank" rel="noopener noreferrer">Figma ↗</a>
             </div>
           </div>
           <h2 class="cs-hero-title"><img class="cs-brew-title-logo" src="assets/images/brew-logo.png" alt="brew."><em>Find your third space.</em></h2>
-          <p class="cs-hero-sub">brew. is a cafe-discovery app I'm designing and building. Cafes are organized by what you actually need (quiet, work-friendly, social) instead of by star rating, and saved as Want to Go, Been, or Favorite instead of one flat list. Reviews and comments share a feed, a card, and a thread, but not a ruleset.</p>
-          <p class="cs-brew-status">Currently brewing. A mobile release is on the way.</p>
-          <div class="cs-brew-facts" aria-label="Project details">
-            <div class="cs-brew-fact">
-              <strong>Product design + front-end</strong>
-              <span>Role</span>
-            </div>
-            <div class="cs-brew-fact">
-              <strong>Partner project</strong>
-              <span>Team</span>
-            </div>
-            <div class="cs-brew-fact">
-              <strong>React + Vite</strong>
-              <span>Build</span>
-            </div>
+          <p class="cs-hero-sub">A cafe-discovery app organized around what someone needs from a space, with meaningful save states and one shared system for comments and reviews.</p>
+          <div class="cs-hero-byline cs-brew-byline" aria-label="Project details">
+            <span>Product design + front-end</span>
+            <span>Partner project</span>
+            <span>React Native + Expo</span>
           </div>
         </div>
 
@@ -3774,11 +3714,11 @@
           <div class="cs-two-col">
             <div class="cs-feature">
               <h3>Stack</h3>
-              <p>React 18 + Vite, no framework. One shared state store: a plain Context plus a custom hook, no Redux or Zustand. CSS custom properties for design tokens, no Tailwind or CSS-in-JS. Sheets (bottom panels) stay always-mounted and are gated by a CSS class rather than mounted/unmounted, so their open/close transitions always have a stable node to animate.</p>
+              <p>The current interaction prototype is built in React 18 + Vite. The iOS app is planned in React Native with Expo and TypeScript, using Google Maps Platform for cafe search, place details, maps, and directions. This keeps the working prototype close to the mobile implementation while giving the shipped app a native framework and navigation model.</p>
             </div>
             <div class="cs-feature">
               <h3>Ownership</h3>
-              <p>Brew is a partner project, and we shape the broader product together. I independently own the flows documented in this case study, including comments and reviews, onboarding, splash and loading states, and directions, along with their interaction design and front-end implementation. I test each flow in the working product at real phone proportions, then refine the states that static mockups do not expose.</p>
+              <p>Brew is a partner project, and we shape the broader product together. I independently own the flows covered here: comments and review-comments, onboarding, splash and loading states, and directions. I design and build each flow in the working prototype, test it at real phone proportions, and refine the states that static mockups do not expose.</p>
             </div>
           </div>
         </div>
@@ -3898,7 +3838,7 @@
               <img class="cs-iteration-slide" data-iteration-slide="3" src="assets/images/brew-review-v4.png" alt="Completed review posted to the thread with the updated cafe average" loading="lazy">
             </div>
             <div class="cs-iteration-copy">
-              <div class="cs-iteration-eyebrow">Reviews + ratings</div>
+              <div class="cs-iteration-eyebrow">Comment Types</div>
               <h3>Preventing accidental 0/5 ratings and duplicate reviews</h3>
               <div class="cs-iteration-controls" role="group" aria-label="Choose a review-flow version">
                 <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show review-flow version 1">V1</button>
