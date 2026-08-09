@@ -19,11 +19,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Routing
 
-`setRoute(name)` shows/hides full-page `.page` sections by their `data-route` attribute. All state is in-memory — there is no URL hash. Nav buttons carry `data-route`; the logo always routes to `feed`.
+`setRoute(name)` shows/hides full-page `.page` sections. Routes are reflected in the URL hash (`#experience`, `#about`); an empty or unrecognized hash resolves to `feed`. Rail buttons carry `data-route`; the ZA logo always routes to `feed`. Header links may use these hashes directly, as with the Experience shortcut.
 
 ### Feed cards
 
-Cards are `.pin` elements with `data-cat` (for filter tabs) and `data-page` (sheet key). Clicking calls `openSheet(key, srcEl)`. A JS snippet at page load moves any `.sub` inside `.art` out to be a direct child of `.pin` so it overlays below the card on hover.
+Cards are `.pin` elements with `data-cat` (for filter tabs) and `data-page` (sheet key). Clicking calls `openSheet(key, srcEl)`. A JS snippet at page load moves any `.sub` inside `.art` out to be a direct child of `.pin`. Every `.sub` is absolutely positioned in the existing inter-card gap so revealing a hover caption never changes masonry height, moves another card, shifts the scrollbar, or makes the footer bounce.
 
 Filter tabs match `data-filter` against `data-cat`. Visibility changes use a FLIP animation (snapshot positions before/after, then transition with `translate`).
 
@@ -93,6 +93,19 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 | `exp-` | Experience timeline components |
 | `art-*` | Feed card color variants (`art-clay`, `art-sage`, `art-charcoal`, etc.) |
 | `pin` | Feed card (`.pin`, `.pin-active`, `.pin-meta`, `.sub`) |
+
+---
+
+## Navigation and shared chrome
+
+- **Compact rail**: the closed desktop rail is exactly `--chrome-size` (`80px`), matching the topbar's explicit height. Do not split those dimensions or widen the compact state independently.
+- **Rail reveal**: on an initial Work/feed page load, the rail expands once after `180ms`, holds, and collapses at `2380ms`. It does not replay after returning from Experience or About. Normal navigation hover expands the rail afterward.
+- **Expanded width**: the rail expands only to `168px`, which is the smallest width that gives the Experience pill adequate right padding. Do not restore the older `192px` width without a demonstrated need.
+- **Rail labels**: the primary route is named **Work** in the rail even though its internal route key is `feed`. The other labels are Experience and About Me.
+- **Header utilities**: header order is **Experience / Email / LinkedIn**. Experience is first because it is a high-priority internal destination; GitHub remains in the Elsewhere card. Hovering or keyboard-focusing the header Experience link also previews the Experience rail pill's soft hover state without expanding the rail or overriding its active state.
+- **Return controls**: About and Experience each show a quiet outlined **Back to Feed** button beneath the introductory title. Both call `setRoute('feed')`.
+- **Footer**: the copyright is a centered, in-flow footer at the bottom of the Feed view, never fixed to the viewport. Current copy is `© 2026 Zainab Ahsan, All Rights Reserved`. Keep it low contrast and ensure card hover states cannot move it.
+- **Mobile**: the desktop rail remains hidden at `800px` and below. Do not introduce rail-only information that becomes unavailable on mobile.
 
 ---
 

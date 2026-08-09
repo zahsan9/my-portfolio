@@ -118,10 +118,10 @@
   .copyright {
     width: 100%;
     margin-top: -40px;
-    padding: 0 24px 28px;
+    padding: 0 24px 44px;
     text-align: center;
-    font-size: 11px; letter-spacing: 0.01em;
-    color: color-mix(in oklch, var(--ink) 68%, var(--paper));
+    font-size: 10px; letter-spacing: 0.02em;
+    color: color-mix(in oklch, var(--ink) 44%, var(--paper));
     pointer-events: none;
     user-select: none;
   }
@@ -193,6 +193,10 @@
     transition: background 0.15s, color 0.15s;
   }
   .rail-btn:hover { background: var(--control-soft); }
+  .app:has(.contact-nav a[href="#experience"]:is(:hover, :focus-visible))
+    .rail-btn[data-route="experience"]:not(.active) {
+    background: var(--control-soft);
+  }
   .rail-btn.active {
     background: var(--ink);
     color: var(--paper);
@@ -356,7 +360,7 @@
   .topbar {
     position: sticky; top: 0; z-index: 30;
     background: transparent;
-    min-height: var(--chrome-size);
+    height: var(--chrome-size);
     padding: 16px 36px;
     display: flex; align-items: center; justify-content: flex-end;
     border-bottom: 1px solid var(--line);
@@ -3262,12 +3266,12 @@
 
     <!-- Top bar -->
     <header class="topbar">
-      <nav class="contact-nav" aria-label="Contact links">
+      <nav class="contact-nav" aria-label="Portfolio and contact links">
+        <a href="#experience">Experience</a>
+        <span class="contact-sep" aria-hidden="true">/</span>
         <a href="mailto:zahsan9@uw.edu">Email</a>
         <span class="contact-sep" aria-hidden="true">/</span>
         <a href="https://www.linkedin.com/in/ahsanzainab" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <span class="contact-sep" aria-hidden="true">/</span>
-        <a href="https://github.com/zahsan9" target="_blank" rel="noopener noreferrer">GitHub</a>
       </nav>
     </header>
 
