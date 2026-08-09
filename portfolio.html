@@ -568,6 +568,13 @@
     min-width: 0;
     display: flex; flex-direction: column; gap: var(--card-gap);
   }
+  /* Filtered results flatten the hand-balanced source columns into one grid,
+     so visible cards always occupy each row from left to right before wrapping. */
+  .app:not(.sheet-open) .feed.is-filtered {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .app:not(.sheet-open) .feed.is-filtered .feed-col { display: contents; }
   /* A column with nothing visible in it collapses instead of leaving a dead
      gap — remaining columns then naturally pack against the left edge. */
   .feed-col:not(:has(.pin:not(.is-hidden))) { display: none; }
@@ -592,6 +599,7 @@
   @media (max-width: 1000px) {
     .feed { --card-gap: 28px; flex-direction: column; }
     .feed-col { flex-basis: auto; }
+    .app:not(.sheet-open) .feed.is-filtered { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px)  { .feed { flex-direction: column; } }
   @media (max-width: 1400px) { .app.sheet-open .feed { width: min(calc(33.333vw - 140px), 363px); } }
@@ -4208,9 +4216,11 @@
     if (f === currentFilter) return;
     currentFilter = f;
 
-    const show = new Set(pins.filter(p =>
-      f === 'all' || (p.dataset.cat || '').split(/\s+/).includes(f)
-    ));
+    const show = new Set(pins.filter(p => {
+      if (f === 'all') return true;
+      if (!p.dataset.page) return false;
+      return (p.dataset.cat || '').split(/\s+/).includes(f);
+    }));
 
     // FIRST: only snapshot pins that are visible now AND will stay visible
     const first = new Map();
@@ -4241,9 +4251,8 @@
     const last = new Map();
     first.forEach((_, p) => last.set(p, p.getBoundingClientRect()));
 
-    // INVERT: both axes — each pin's column is now fixed, so filtering only ever
-    // produces vertical shifts within a column (never horizontal), and those need
-    // to animate just as much as the old cross-column horizontal jumps did.
+    // INVERT both axes: filtered cards repack into a row-first grid, so staying
+    // cards may move horizontally as well as vertically.
     first.forEach((r0, p) => {
       const r1 = last.get(p);
       const dx = r0.left - r1.left;
