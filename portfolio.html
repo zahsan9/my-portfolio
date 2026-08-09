@@ -889,14 +889,37 @@
   .skill-pill-icon svg { width: 18px; height: 18px; }
 
   .social-tiles {
+    position: relative;
     width: 56px; margin: 0;
     display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
   }
   .social-tile {
+    position: relative;
+    z-index: 1;
     width: 56px; height: 56px; display: grid; place-items: center;
     border-radius: 16px; color: var(--card-ink); cursor: pointer;
     transform-origin: 50% 100%;
     transition: transform 720ms var(--ease-soft);
+  }
+  .social-motion-trails {
+    position: absolute;
+    left: -80px; top: 0;
+    width: 136px; height: 239px;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .social-motion-trails path {
+    fill: none;
+    stroke: color-mix(in oklab, var(--ink-mid) 72%, transparent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 720ms var(--ease-soft);
+  }
+  .contact-card:hover .social-motion-trails path,
+  .contact-card:has(.social-tile:focus-visible) .social-motion-trails path {
+    stroke-dashoffset: 0;
   }
   .contact-card:hover .social-tile:nth-child(1),
   .contact-card:has(.social-tile:focus-visible) .social-tile:nth-child(1) {
@@ -2869,6 +2892,11 @@
                       <circle cx="17" cy="7" r="0.6" fill="currentColor" stroke="none"/>
                     </svg>
                   </div>
+                  <svg class="social-motion-trails" viewBox="-80 0 136 239" aria-hidden="true">
+                    <path pathLength="1" d="M56 28 C33 19 11 23 -6 35"/>
+                    <path pathLength="1" d="M56 89 C46 84 35 86 25 92"/>
+                    <path pathLength="1" d="M56 150 C54 149 52 149 51 150"/>
+                  </svg>
                 </div>
               </div>
             </div>
