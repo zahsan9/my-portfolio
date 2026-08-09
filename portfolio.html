@@ -1349,8 +1349,13 @@
      soft lift shadow). --climate-accent-text carries the numbers/highlights
      that need to be yellow on dark but dark-on-light instead, since pale
      yellow text has no contrast on a light page. */
-  html[data-theme="dark"] .sheet[data-page="climate"] {
+  html[data-theme="dark"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"]) {
     --paper: oklch(0.29 0 0);
+  }
+  html[data-theme="light"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"]) {
+    --paper: oklch(0.91 0 0);
+  }
+  html[data-theme="dark"] .sheet[data-page="climate"] {
     --paper-2: oklch(1 0 0 / 0.06);
     --ink: oklch(0.95 0 0);
     --ink-mid: oklch(0.66 0 0);
@@ -1361,7 +1366,6 @@
     --climate-decision-fill: oklch(1 0 0 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="climate"] {
-    --paper: oklch(0.91 0 0);
     --paper-2: oklch(0.995 0 0);
     --ink: oklch(0.16 0 0);
     --ink-mid: oklch(0.45 0 0);
@@ -1922,9 +1926,463 @@
   }
   .cs-hero--brew .cs-hero-title {
     font-family: var(--serif);
-    font-weight: 400;
+    font-weight: 700;
     line-height: 0.98;
     letter-spacing: 0;
+  }
+  /* Brew shares Neutral's case-study grammar (measured section rhythm,
+     compact labels, framed figures, and aligned decisions) without borrowing
+     its report styling. The warmer palette and product facts keep this page
+     grounded in a designed-and-built product rather than an analysis deck. */
+  html[data-theme="dark"] .sheet[data-page="brew"] {
+    --paper-2: oklch(0.255 0.012 72);
+    --ink: oklch(0.95 0.012 82);
+    --ink-mid: oklch(0.72 0.012 78);
+    --ink-low: oklch(0.56 0.01 75);
+    --line: oklch(1 0.01 80 / 0.12);
+    --brew-cream: oklch(0.91 0.045 84);
+    --brew-cream-ink: oklch(0.2 0.018 69);
+    --brew-panel: oklch(1 0.012 82 / 0.055);
+    --brew-positive: oklch(0.76 0.09 151);
+    --brew-negative: oklch(0.74 0.1 28);
+  }
+  html[data-theme="light"] .sheet[data-page="brew"] {
+    --paper-2: oklch(0.985 0.009 82);
+    --ink: oklch(0.19 0.014 68);
+    --ink-mid: oklch(0.43 0.012 70);
+    --ink-low: oklch(0.56 0.01 72);
+    --line: oklch(0.2 0.012 70 / 0.12);
+    --brew-cream: oklch(0.965 0.018 85);
+    --brew-cream-ink: oklch(0.18 0.018 68);
+    --brew-panel: oklch(0.985 0.009 82);
+    --brew-positive: oklch(0.48 0.11 151);
+    --brew-negative: oklch(0.55 0.13 28);
+  }
+  .sheet[data-page="brew"] .cs-hero--brew {
+    background: var(--brew-cream);
+    color: var(--brew-cream-ink);
+    border-radius: 18px;
+    padding: 38px 36px 0;
+  }
+  .sheet[data-page="brew"] .cs-brew-kicker {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: oklch(0.34 0.018 70);
+  }
+  .sheet[data-page="brew"] .cs-brew-topline {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .sheet[data-page="brew"] .cs-brew-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: -5px;
+  }
+  .sheet[data-page="brew"] .cs-brew-actions .cs-cta-btn {
+    border: 0;
+    background: var(--brew-cream-ink);
+    color: var(--brew-cream);
+    box-shadow: none;
+    font-weight: 700;
+  }
+  .sheet[data-page="brew"] .cs-brew-actions .cs-cta-btn:hover,
+  .sheet[data-page="brew"] .cs-brew-actions .cs-cta-btn:focus-visible {
+    background: oklch(0.28 0.018 69);
+    color: var(--brew-cream);
+    box-shadow: none;
+  }
+  .sheet[data-page="brew"] .cs-hero--brew .cs-hero-title {
+    max-width: 760px;
+    margin-bottom: 18px;
+    color: var(--brew-cream-ink);
+  }
+  .sheet[data-page="brew"] .cs-brew-title-logo {
+    display: block;
+    width: clamp(150px, 23vw, 230px);
+    height: auto;
+    margin-bottom: 12px;
+  }
+  .sheet[data-page="brew"] .cs-hero--brew .cs-hero-title em {
+    display: block;
+    margin-top: 7px;
+    font-family: var(--sans);
+    font-size: 0.54em;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: var(--brew-cream-ink);
+  }
+  .sheet[data-page="brew"] .cs-hero-sub {
+    max-width: 760px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: oklch(0.34 0.018 70);
+  }
+  .sheet[data-page="brew"] .cs-brew-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 26px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.035em;
+    color: oklch(0.3 0.018 70);
+  }
+  .sheet[data-page="brew"] .cs-brew-status::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: var(--brew-cream-ink);
+  }
+  .sheet[data-page="brew"] .cs-brew-facts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 0 -36px;
+    border-top: 1px solid oklch(0.2 0.018 70 / 0.14);
+    border-bottom: 1px solid oklch(0.2 0.018 70 / 0.14);
+  }
+  .sheet[data-page="brew"] .cs-brew-fact {
+    padding: 17px 22px 19px;
+    border-right: 1px solid oklch(0.2 0.018 70 / 0.14);
+  }
+  .sheet[data-page="brew"] .cs-brew-fact:last-child { border-right: none; }
+  .sheet[data-page="brew"] .cs-brew-fact strong,
+  .sheet[data-page="brew"] .cs-brew-fact span { display: block; }
+  .sheet[data-page="brew"] .cs-brew-fact strong {
+    margin-bottom: 5px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--brew-cream-ink);
+  }
+  .sheet[data-page="brew"] .cs-brew-fact span {
+    font-family: var(--mono);
+    font-size: 9px;
+    line-height: 1.35;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+    color: oklch(0.4 0.016 70);
+  }
+  .sheet[data-page="brew"] .cs-section { padding-top: 66px; }
+  .sheet[data-page="brew"] .cs-label {
+    display: inline-block;
+    margin-bottom: 22px;
+    padding: 5px 8px 6px;
+    border-radius: 4px;
+    background: var(--brew-cream);
+    color: var(--brew-cream-ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+  .sheet[data-page="brew"] .cs-preview-frame,
+  .sheet[data-page="brew"] .cs-artifact-frame {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--brew-panel);
+    box-shadow: none;
+  }
+  .sheet[data-page="brew"] .cs-caption {
+    margin: 0;
+    padding: 13px 16px 15px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="brew"] .cs-two-col { gap: 24px; }
+  .sheet[data-page="brew"] .cs-product-principles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .sheet[data-page="brew"] .cs-product-principle {
+    padding: 22px 20px 24px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--brew-panel);
+  }
+  .sheet[data-page="brew"] .cs-product-principle span {
+    display: block;
+    margin-bottom: 24px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: var(--ink-low);
+  }
+  .sheet[data-page="brew"] .cs-product-principle h3 {
+    margin-bottom: 9px;
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .sheet[data-page="brew"] .cs-product-principle p {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="brew"] .cs-feature {
+    padding: 22px 20px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--brew-panel);
+  }
+  .sheet[data-page="brew"] .cs-feature h3 {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+  .sheet[data-page="brew"] .cs-decision-block {
+    padding: 26px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--brew-panel);
+  }
+  .sheet[data-page="brew"] .cs-decision-row { margin-top: 0; }
+  .sheet[data-page="brew"] .cs-decision-copy h3 {
+    font-size: 24px;
+    line-height: 1.08;
+  }
+  .sheet[data-page="brew"] .cs-iteration-player {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+    gap: 34px;
+    align-items: center;
+    margin-bottom: 28px;
+    padding: 28px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--brew-panel);
+  }
+  .sheet[data-page="brew"] .cs-iteration-visual {
+    position: relative;
+    width: min(100%, 390px);
+    aspect-ratio: 426 / 800;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 28px;
+    background: oklch(0.08 0.004 70);
+  }
+  .sheet[data-page="brew"] .cs-iteration-slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(0.985) translateY(5px);
+    transition: opacity 380ms ease, transform 520ms var(--ease-soft);
+    pointer-events: none;
+  }
+  .sheet[data-page="brew"] .cs-iteration-slide.is-active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  .sheet[data-page="brew"] .cs-iteration-eyebrow {
+    position: absolute;
+    top: 22px;
+    right: 26px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="brew"] .cs-iteration-copy {
+    padding-top: 26px;
+  }
+  .sheet[data-page="brew"] .cs-iteration-copy h3 {
+    margin-bottom: 12px;
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+  .sheet[data-page="brew"] .cs-iteration-controls {
+    display: flex;
+    gap: 8px;
+    margin: 24px 0 22px;
+  }
+  .sheet[data-page="brew"] .cs-iteration-control {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--ink-low);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-mid);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background var(--motion-fast) ease, color var(--motion-fast) ease, border-color var(--motion-fast) ease;
+  }
+  .sheet[data-page="brew"] .cs-iteration-control:hover,
+  .sheet[data-page="brew"] .cs-iteration-control:focus-visible {
+    color: var(--ink);
+    border-color: var(--ink);
+    background: transparent;
+  }
+  .sheet[data-page="brew"] .cs-iteration-control[aria-pressed="true"] {
+    border-color: var(--brew-cream);
+    background: var(--brew-cream);
+    color: var(--brew-cream-ink);
+  }
+  .sheet[data-page="brew"] .cs-iteration-note { display: none; }
+  .sheet[data-page="brew"] .cs-iteration-note.is-active { display: block; }
+  .sheet[data-page="brew"] .cs-iteration-note h4 {
+    margin-bottom: 12px;
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .sheet[data-page="brew"] .cs-iteration-note ul {
+    display: grid;
+    gap: 10px;
+    list-style: none;
+  }
+  .sheet[data-page="brew"] .cs-iteration-note li {
+    position: relative;
+    padding: 4px 0 4px 22px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .sheet[data-page="brew"] .cs-iteration-note li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 3px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.5;
+  }
+  .sheet[data-page="brew"] .cs-iteration-note li.is-plus::before {
+    content: '+';
+    color: var(--brew-positive);
+  }
+  .sheet[data-page="brew"] .cs-iteration-note li.is-minus::before {
+    content: '−';
+    color: var(--brew-negative);
+  }
+  .sheet[data-page="brew"] .cs-flow-placeholder {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(280px, 1.2fr);
+    gap: 32px;
+    align-items: center;
+    padding: 26px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--brew-panel);
+  }
+  .sheet[data-page="brew"] .cs-flow-placeholder-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-low);
+  }
+  .sheet[data-page="brew"] .cs-flow-placeholder-status {
+    padding: 4px 7px;
+    border-radius: 4px;
+    background: var(--brew-cream);
+    color: var(--brew-cream-ink);
+  }
+  .sheet[data-page="brew"] .cs-flow-placeholder h3 {
+    margin-bottom: 10px;
+    font-family: var(--serif);
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.08;
+    color: var(--ink);
+  }
+  .sheet[data-page="brew"] .cs-flow-placeholder p {
+    max-width: 42ch;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="brew"] .cs-flow-placeholder-stage {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    min-height: 230px;
+    padding: 18px;
+    border-radius: 11px;
+    background: var(--paper);
+  }
+  .sheet[data-page="brew"] .cs-flow-placeholder-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-low);
+    background: var(--paper-2);
+  }
+  .sheet[data-page="brew"] .cs-filmstrip-caption {
+    padding: 12px 2px 0;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="brew"] .cs-impact-callout {
+    padding: 32px 30px;
+    border: 0;
+    border-radius: 16px;
+    background: var(--brew-cream);
+  }
+  .sheet[data-page="brew"] .cs-impact-line {
+    font-family: var(--sans);
+    font-size: clamp(27px, 3.7vw, 40px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: var(--brew-cream-ink);
+  }
+  .sheet[data-page="brew"] .cs-learnings {
+    padding: 22px 24px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--brew-panel);
+  }
+  .sheet[data-page="brew"] .cs-learning { padding: 0 0 0 20px; }
+  .sheet[data-page="brew"] .cs-learning::before {
+    top: 0.65em;
+    background: var(--brew-cream);
   }
   /* Third pass on this hero. Dropped: the dark card (felt cold), the bubble
      cluster (felt decorative), the serif italic title, and the underlined
@@ -2397,6 +2855,27 @@
   @media (max-width: 720px) {
     .cs-decision-row { grid-template-columns: 1fr; }
     .cs-hero-stats { grid-template-columns: repeat(2, 1fr); }
+    .sheet[data-page="brew"] .cs-brew-facts { grid-template-columns: 1fr; }
+    .sheet[data-page="brew"] .cs-brew-fact {
+      border-right: 0;
+      border-bottom: 1px solid oklch(0.2 0.018 70 / 0.14);
+    }
+    .sheet[data-page="brew"] .cs-brew-fact:last-child { border-bottom: 0; }
+    .sheet[data-page="brew"] .cs-two-col { grid-template-columns: 1fr; }
+    .sheet[data-page="brew"] .cs-product-principles { grid-template-columns: 1fr; }
+    .sheet[data-page="brew"] .cs-decision-block { padding: 20px; }
+    .sheet[data-page="brew"] .cs-iteration-player {
+      grid-template-columns: 1fr;
+      padding-top: 58px;
+    }
+    .sheet[data-page="brew"] .cs-flow-placeholder { grid-template-columns: 1fr; }
+    .sheet[data-page="brew"] .cs-flow-placeholder-stage { min-height: 190px; }
+    .sheet[data-page="brew"] .cs-brew-topline {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .sheet[data-page="brew"] .cs-brew-actions { margin-top: 0; }
   }
   .cs-anno-diagram { display: flex; gap: 10px; flex: none; }
   .cs-anno-schema {
@@ -2848,7 +3327,7 @@
 
         <div class="feed-col">
           <!-- brew. -->
-          <article class="pin" data-cat="ux swe" data-page="brew" data-year="2026" data-sub="SWE &amp; Product / UX, Currently" data-cursor-label="Under construction">
+          <article class="pin" data-cat="ux swe" data-page="brew" data-year="2026" data-sub="SWE &amp; Product / UX, Currently" aria-label="Open the brew product case study">
             <div class="art art-cream art-brew ar-45">
               <div class="pin-meta">Case Study</div>
               <img class="brew-illustration" src="assets/images/brew-mug-icon.svg" alt="">
@@ -3262,138 +3741,250 @@
     brew: {
       meta: 'Product / UX · Design Eng',
       eyebrow: 'Personal Project',
-      wip: true,
       custom: `
         <div class="cs-hero cs-hero--brew">
-          <h2 class="cs-hero-title">brew.<br><em>Find your third space.</em></h2>
-          <p class="cs-hero-sub">brew. is a cafe-discovery app I'm designing and building. Cafes are organized by what you actually need (quiet, work-friendly, social) instead of by star rating, and saved as Want to Go, Been, or Favorite instead of one flat list. Reviews and comments share a feed, a card, and a thread, but not a ruleset.</p>
-          <div class="cs-role-line">
-            <span class="cs-role-pill">Role / Product design + front-end</span>
-            <span class="cs-role-pill">For / Personal project</span>
-            <span class="cs-role-pill">Year / 2026</span>
-          </div>
-          <div class="cs-preview-frame">
-            <div class="cs-preview-img has-image on-dark">
-              <a class="cs-image-link" href="assets/images/brew-fyp.png" aria-label="Open the For You feed at full size">
-                <img src="assets/images/brew-fyp.png" alt="brew. 'For You' feed showing a cafe card for Onyx House with heart, comment, shelf-status, and directions actions along the right edge" loading="eager" />
-                <span class="cs-expand-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="6.5"/>
-                    <path d="m16.5 16.5 3.5 3.5"/>
-                    <path d="M11 8.5v5M8.5 11h5"/>
-                  </svg>
-                </span>
-              </a>
+          <div class="cs-brew-topline">
+            <span class="cs-brew-kicker">Product case study · Designed and built</span>
+            <div class="cs-brew-actions" aria-label="Project links">
+              <a class="cs-cta-btn" href="https://github.com/zahsan9/brew" target="_blank" rel="noopener noreferrer">Repo ↗</a>
+              <a class="cs-cta-btn" href="https://www.figma.com/design/fRDum7bCiXLQUExZ5Kdqx8/brew.?node-id=76-4&amp;p=f&amp;t=LZwBOvpgaqXkDuEh-0" target="_blank" rel="noopener noreferrer">Figma ↗</a>
             </div>
-            <div class="cs-caption">The For You feed shows one cafe at a time, with save-state, comment, and directions actions surfaced right on the card instead of behind a tap.</div>
+          </div>
+          <h2 class="cs-hero-title"><img class="cs-brew-title-logo" src="assets/images/brew-logo.png" alt="brew."><em>Find your third space.</em></h2>
+          <p class="cs-hero-sub">brew. is a cafe-discovery app I'm designing and building. Cafes are organized by what you actually need (quiet, work-friendly, social) instead of by star rating, and saved as Want to Go, Been, or Favorite instead of one flat list. Reviews and comments share a feed, a card, and a thread, but not a ruleset.</p>
+          <p class="cs-brew-status">Currently brewing. A mobile release is on the way.</p>
+          <div class="cs-brew-facts" aria-label="Project details">
+            <div class="cs-brew-fact">
+              <strong>Product design + front-end</strong>
+              <span>Role</span>
+            </div>
+            <div class="cs-brew-fact">
+              <strong>Partner project</strong>
+              <span>Team</span>
+            </div>
+            <div class="cs-brew-fact">
+              <strong>React + Vite</strong>
+              <span>Build</span>
+            </div>
           </div>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">The Question</span>
-          <h3 class="cs-question">How do you make a review feel different from a comment, without making the product feel like two products?</h3>
-          <div class="cs-copy">
-            <p>People already find cafes across Google Maps, Instagram, TikTok, and their own Notes app. None of them let you search by what you actually need, or remember a place the way you actually think about it. brew. starts from that gap: discovery organized around intent instead of distance or rating, and three separate save states instead of one bookmark bucket.</p>
-            <p>Reviews and comments live in the same thread on the same card. A review carries a rating and is capped at one per person per cafe; a comment doesn't and isn't. That difference needed to show up in how it feels to use, not just in the data model.</p>
-          </div>
-        </div>
-
-        <div class="cs-section">
-          <span class="cs-label">Stack + Approach</span>
+          <span class="cs-label">Stack + Ownership</span>
           <div class="cs-two-col">
             <div class="cs-feature">
               <h3>Stack</h3>
               <p>React 18 + Vite, no framework. One shared state store: a plain Context plus a custom hook, no Redux or Zustand. CSS custom properties for design tokens, no Tailwind or CSS-in-JS. Sheets (bottom panels) stay always-mounted and are gated by a CSS class rather than mounted/unmounted, so their open/close transitions always have a stable node to animate.</p>
             </div>
             <div class="cs-feature">
-              <h3>Approach</h3>
-              <p>I ported the app from an earlier vanilla-JS build to React first, pixel- and behavior-identical, then iterated on the comment and review system from there. Every round was tested by walking the actual flow in a browser at real phone proportions, not by eyeballing a static mockup.</p>
-            </div>
-          </div>
-          <div class="cs-link-row">
-            <a class="cs-link-pill" href="https://github.com/zahsan9/brew" target="_blank" rel="noopener noreferrer">repo</a>
-          </div>
-        </div>
-
-        <div class="cs-section">
-          <span class="cs-label">Design Decisions</span>
-
-          <div class="cs-decision-block">
-            <div class="cs-decision-row">
-              <div class="cs-decision-copy">
-                <h3>01 / A review isn't a comment, even when it looks like one</h3>
-                <p><strong>One card, two objects.</strong> A review carries a rating and caps at one per person per cafe; a comment does neither. I flattened the cafe name to transparent uniform caps so it stops competing with the review text, aligned the avatar to the name, and cut the dead space and a stray divider around the comment body. Replies inherit the same card but lose the rating control, get a reply tag that's visually distinct from the comment text, and show the replier's real name instead of a leftover "you."</p>
-                <p><strong>A rating step you can't leave blank.</strong> Without a guardrail, someone could open the rating step, get distracted, and silently leave a cafe a 0/5. I split it into two labeled steps: cup rating, then a short list of concrete tags like quiet or has outlets. The controls turn yellow to mark review mode. Once you've reviewed a cafe the control disables; changing it means deleting the original first, not overwriting it silently.</p>
-              </div>
-              <div class="cs-decision-media-stack">
-                <div class="cs-preview-frame cs-decision-fig">
-                  <div class="cs-preview-img has-image on-dark">
-                    <a class="cs-image-link cs-crop cs-crop-bottom" href="assets/images/brew-comments.png" aria-label="Open an expanded reply thread at full size">
-                      <img src="assets/images/brew-comments.png" alt="brew. comment thread with two replies expanded under a top-level review, each showing the replier's name and no rating" loading="lazy" />
-                      <span class="cs-expand-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="11" cy="11" r="6.5"/>
-                          <path d="m16.5 16.5 3.5 3.5"/>
-                          <path d="M11 8.5v5M8.5 11h5"/>
-                        </svg>
-                      </span>
-                    </a>
-                  </div>
-                  <div class="cs-caption">Comments &amp; replies use one card with two rules: a top-level review carries a rating and a name, while a reply carries neither the rating option nor a placeholder "you."</div>
-                </div>
-                <div>
-                  <div class="cs-filmstrip">
-                    <div class="cs-filmstrip-item">
-                      <div class="cs-filmstrip-label">Step 1</div>
-                      <div class="cs-preview-frame cs-decision-fig">
-                        <div class="cs-preview-img has-image on-dark">
-                          <a class="cs-image-link cs-crop cs-crop-bottom" href="assets/images/brew-review-step1.png" aria-label="Open the cup-rating step at full size">
-                            <img src="assets/images/brew-review-step1.png" alt="brew. review flow step 1, 'Rate your experience,' with cup icons, a 3/5 fill with the number shown alongside it, and a '1/2' step indicator" loading="lazy" />
-                            <span class="cs-expand-icon" aria-hidden="true">
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="11" cy="11" r="6.5"/>
-                                <path d="m16.5 16.5 3.5 3.5"/>
-                                <path d="M11 8.5v5M8.5 11h5"/>
-                              </svg>
-                            </span>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="cs-filmstrip-item">
-                      <div class="cs-filmstrip-label">Step 2</div>
-                      <div class="cs-preview-frame cs-decision-fig">
-                        <div class="cs-preview-img has-image on-dark">
-                          <a class="cs-image-link cs-crop cs-crop-bottom" href="assets/images/brew-review-step2.png" aria-label="Open the cafe-experience step at full size">
-                            <img src="assets/images/brew-review-step2.png" alt="brew. review flow step 2, 'How was the cafe?', showing selectable experience pills like Quiet, Has outlets, and Good WiFi, with two selected" loading="lazy" />
-                            <span class="cs-expand-icon" aria-hidden="true">
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="11" cy="11" r="6.5"/>
-                                <path d="m16.5 16.5 3.5 3.5"/>
-                                <path d="M11 8.5v5M8.5 11h5"/>
-                              </svg>
-                            </span>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="cs-filmstrip-caption">The rating flow starts with a cup rating, then concrete experience tags instead of a free-text field, so a review adds structured signal the feed's intent filters can actually use.</div>
-                </div>
-              </div>
+              <h3>Ownership</h3>
+              <p>Brew is a partner project, and we shape the broader product together. I independently own the flows documented in this case study, including comments and reviews, onboarding, splash and loading states, and directions, along with their interaction design and front-end implementation. I test each flow in the working product at real phone proportions, then refine the states that static mockups do not expose.</p>
             </div>
           </div>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">Impact</span>
+          <span class="cs-label">Product Context</span>
+          <h3 class="cs-question">How might Brew help someone find the right cafe for what they need, then remember it the way they naturally think about it?</h3>
+          <div class="cs-copy">
+            <p>People already find cafes across Google Maps, Instagram, TikTok, and their own Notes app. The information is fragmented, star ratings flatten very different needs into one score, and a single bookmark does not distinguish curiosity from experience or genuine preference.</p>
+            <p>Brew reframes discovery around intent, with categories like quiet, work-friendly, and social. It also separates Want to Go, Been, and Favorite so saving a cafe communicates a meaningful relationship instead of adding it to one undifferentiated list.</p>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Product Principles</span>
+          <div class="cs-product-principles">
+            <div class="cs-product-principle">
+              <span>01</span>
+              <h3>Intent before ranking</h3>
+              <p>Lead with what someone needs from a cafe instead of asking them to decode an average star rating.</p>
+            </div>
+            <div class="cs-product-principle">
+              <span>02</span>
+              <h3>States with meaning</h3>
+              <p>Use Want to Go, Been, and Favorite to reflect distinct moments in a person's relationship with a place.</p>
+            </div>
+            <div class="cs-product-principle">
+              <span>03</span>
+              <h3>Shared surfaces, clear rules</h3>
+              <p>Keep related actions together while making differences, such as reviews versus comments, legible in the interaction.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section cs-iterations-section">
+          <span class="cs-label">Comment Section</span>
+
+          <div class="cs-iteration-player" data-iteration-player data-iteration-rank="2">
+            <div class="cs-iteration-visual" aria-live="polite">
+              <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-replies-v1.png" alt="First reply-thread iteration with strong dividers between top-level comments" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-replies-v2.png" alt="Second reply-thread iteration with clearer indentation and reduced dividers" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-replies-v3.png" alt="Third reply-thread iteration showing a contextual reply composer for Theo" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="3" src="assets/images/brew-replies-v4.png" alt="Final reply-thread iteration showing a posted reply from Zainab inside the thread" loading="lazy">
+            </div>
+            <div class="cs-iteration-copy">
+              <div class="cs-iteration-eyebrow">Reply threads</div>
+              <h3>Adding nested replies, likes, and clear reply identity</h3>
+              <div class="cs-iteration-controls" role="group" aria-label="Choose a reply-thread version">
+                <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show reply-thread version 1">V1</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show reply-thread version 2">V2</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show reply-thread version 3">V3</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="3" aria-pressed="false" aria-label="Show reply-thread version 4">V4</button>
+              </div>
+              <div class="cs-iteration-notes">
+                <div class="cs-iteration-note is-active" data-iteration-note="0">
+                  <h4>The first reply model was incomplete</h4>
+                  <ul><li class="is-minus">There was no way to reply to a reply or like one.</li><li class="is-minus">“View replies” was bold enough to distract from the conversation.</li><li class="is-minus">The profile image beside the composer added noise without helping someone write.</li></ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="1">
+                  <h4>Replying became possible, but not yet clear</h4>
+                  <ul><li class="is-plus">Added the option to reply to a reply and unbolded “View replies.”</li><li class="is-plus">Removed the unnecessary profile image from the composer.</li><li class="is-minus">The reply tag still blended into the message, replies still could not be liked, and a posted response appeared as “You” instead of the person's name.</li></ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="2">
+                  <h4>Adding the missing reply states</h4>
+                  <ul><li class="is-plus">Added likes to replies and made reply mode explicit in the composer, with a way to exit and comment normally.</li><li class="is-plus">Removed the review option from replies because a nested response should not become a second cafe review.</li><li class="is-minus">The reply tag and “You” identity issue still needed another pass.</li></ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="3">
+                  <h4>The final thread rules read clearly</h4>
+                  <ul><li class="is-plus">Differentiated the reply tag from the message text and displayed the user's real name instead of “You.”</li><li class="is-plus">Kept reply, like, and nested-thread actions while excluding the review action from replies.</li><li class="is-plus">Limited the open comment card to three quarters of the page so the cafe remains visible in context.</li></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cs-iteration-player" data-iteration-player data-iteration-rank="3">
+            <div class="cs-iteration-visual" aria-live="polite">
+              <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-card-v1.png" alt="First comment-card iteration with a bold cafe name, average label, and profile image in the composer" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-card-v2.png" alt="Second comment-card iteration with reduced cafe-name contrast and cleaner spacing" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-card-v3.png" alt="Third comment-card iteration with a uniform uppercase cafe name and clearer comment action" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="3" src="assets/images/brew-card-v4.png" alt="Fourth comment-card iteration with consistent summary styling and aligned content" loading="lazy">
+            </div>
+            <div class="cs-iteration-copy">
+              <div class="cs-iteration-eyebrow">Comment card</div>
+              <h3>Fixing hierarchy, spacing, and action clarity</h3>
+              <div class="cs-iteration-controls" role="group" aria-label="Choose a comment-card version">
+                <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show comment-card version 1">V1</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show comment-card version 2">V2</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show comment-card version 3">V3</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="3" aria-pressed="false" aria-label="Show comment-card version 4">V4</button>
+              </div>
+              <div class="cs-iteration-notes">
+                <div class="cs-iteration-note is-active" data-iteration-note="0">
+                  <h4>Too many elements competed for attention</h4>
+                  <ul><li class="is-minus">The cafe name was too bold, the average label was unnecessary, and the avatar did not align with the name.</li><li class="is-minus">Extra space and a stray divider separated content that belonged together.</li><li class="is-minus">The review icon did not look clickable. Delete and report actions were also missing.</li></ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="1">
+                  <h4>Alignment improved before hierarchy did</h4>
+                  <ul><li class="is-plus">Aligned the avatar and name, tightened the comment spacing, and removed the divider.</li><li class="is-plus">Matched the summary cup and number color and removed “avg.”</li><li class="is-minus">The transparent cafe name was still too bold, and the review action remained ambiguous.</li></ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="2">
+                  <h4>The supporting UI became quieter</h4>
+                  <ul><li class="is-plus">Changed the cafe name to transparent, uniform uppercase text so it provides context without becoming the headline.</li><li class="is-plus">Clarified that the review icon is interactive while preserving the cleaner alignment and spacing.</li><li class="is-minus">The summary cup fill still did not match its average score.</li></ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="3">
+                  <h4>A quieter, more consistent final card</h4>
+                  <ul><li class="is-plus">Matched the summary fields in color and transparency and kept the card hierarchy intentionally quiet.</li><li class="is-plus">The send action converts to a check after posting so completion is visible.</li><li class="is-plus">Preserved the improved alignment, compact spacing, and clearer review action from the previous pass.</li></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cs-iteration-player" data-iteration-player data-iteration-rank="1">
+            <div class="cs-iteration-visual" aria-live="polite">
+              <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-review-v1.png" alt="Review flow before a rating is selected, labeled step one of two" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-review-v2.png" alt="Review flow with a two and a half cup rating selected and displayed numerically" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-review-v3.png" alt="Review flow step two with selected cafe-experience tags" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="3" src="assets/images/brew-review-v4.png" alt="Completed review posted to the thread with the updated cafe average" loading="lazy">
+            </div>
+            <div class="cs-iteration-copy">
+              <div class="cs-iteration-eyebrow">Reviews + ratings</div>
+              <h3>Preventing accidental 0/5 ratings and duplicate reviews</h3>
+              <div class="cs-iteration-controls" role="group" aria-label="Choose a review-flow version">
+                <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show review-flow version 1">V1</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show review-flow version 2">V2</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show review-flow version 3">V3</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="3" aria-pressed="false" aria-label="Show review-flow version 4">V4</button>
+              </div>
+              <div class="cs-iteration-notes">
+                <div class="cs-iteration-note is-active" data-iteration-note="0">
+                  <h4>Start with an explicit first step</h4>
+                  <ul><li class="is-plus">Improved the guiding text and labeled the flow “1/2” so another step is expected.</li><li class="is-plus">Removed the silent 0/5 default. Progress depends on an intentional rating selection.</li></ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="1">
+                  <h4>Show the rating, not just the fill</h4>
+                  <ul><li class="is-plus">Displayed the numeric rating alongside the cup fill so the value is unambiguous.</li><li class="is-plus">The previous white send action becomes a yellow next button, signaling movement rather than submission.</li></ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="2">
+                  <h4>Add structured context in step two</h4>
+                  <ul><li class="is-plus">Concrete tags such as Quiet, Has outlets, and Good WiFi make the review useful to Brew's intent filters.</li><li class="is-plus">Yellow selections keep review mode visually distinct from ordinary commenting.</li></ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="3">
+                  <h4>Prevent duplicate reviews</h4>
+                  <ul><li class="is-plus">After submission, the review appears in the shared thread and the summary updates.</li><li class="is-plus">The review control becomes inactive once someone has reviewed the cafe.</li><li class="is-plus">Changing a review requires deleting the original first rather than silently overwriting it.</li></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Onboarding</span>
+          <div class="cs-flow-placeholder">
+            <div>
+              <div class="cs-flow-placeholder-meta"><span>02</span><span class="cs-flow-placeholder-status">Not yet designed</span></div>
+              <h3>Helping people define their third space</h3>
+              <p>This section will document the onboarding flow once its questions, preference model, and first-use experience are designed.</p>
+            </div>
+            <div class="cs-flow-placeholder-stage" aria-hidden="true">
+              <span class="cs-flow-placeholder-screen">Screen 01</span>
+              <span class="cs-flow-placeholder-screen">Screen 02</span>
+              <span class="cs-flow-placeholder-screen">Screen 03</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Splash + Loading</span>
+          <div class="cs-flow-placeholder">
+            <div>
+              <div class="cs-flow-placeholder-meta"><span>03</span><span class="cs-flow-placeholder-status">Work in progress</span></div>
+              <h3>Making the wait feel like part of Brew</h3>
+              <p>Splash, loading, and transition states will live here once the final motion and supporting screens are ready.</p>
+            </div>
+            <div class="cs-flow-placeholder-stage" aria-hidden="true">
+              <span class="cs-flow-placeholder-screen">Splash</span>
+              <span class="cs-flow-placeholder-screen">Loading</span>
+              <span class="cs-flow-placeholder-screen">Transition</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Directions</span>
+          <div class="cs-flow-placeholder">
+            <div>
+              <div class="cs-flow-placeholder-meta"><span>04</span><span class="cs-flow-placeholder-status">Work in progress</span></div>
+              <h3>Getting from discovery to the cafe</h3>
+              <p>This section will show how Brew hands a saved cafe off to directions without burying the action or interrupting discovery.</p>
+            </div>
+            <div class="cs-flow-placeholder-stage" aria-hidden="true">
+              <span class="cs-flow-placeholder-screen">Cafe</span>
+              <span class="cs-flow-placeholder-screen">Route</span>
+              <span class="cs-flow-placeholder-screen">Handoff</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Current Outcome</span>
           <div class="cs-impact-callout">
             <span class="cs-impact-line">Reviews and comments now share a thread but not a ruleset: one rating per person per cafe, no rating on replies, and a two-step flow that stops a distracted tap from silently leaving a cafe a 0/5.</span>
           </div>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">What I'd Change</span>
+          <span class="cs-label">Next Iteration</span>
           <div class="cs-learnings">
             <div class="cs-learning">The review summary bar's cup icon still doesn't match the average score it's showing. This bug has survived four separate rounds of otherwise-real cleanup on that card. Comments and reviews also still have no delete or report option. Both need to happen before this goes near real users, not after.</div>
           </div>
@@ -3809,6 +4400,55 @@
   const feedEl    = document.getElementById('feed');
   const tabsEl    = document.querySelector('.tabs');
 
+  function setIterationPlayerStep(player, nextIndex, moveFocus = false) {
+    const controls = [...player.querySelectorAll('[data-iteration-control]')];
+    const slides = [...player.querySelectorAll('[data-iteration-slide]')];
+    const notes = [...player.querySelectorAll('[data-iteration-note]')];
+    const boundedIndex = Math.max(0, Math.min(controls.length - 1, Number(nextIndex)));
+
+    controls.forEach((control, index) => {
+      const active = index === boundedIndex;
+      control.setAttribute('aria-pressed', String(active));
+      control.tabIndex = active ? 0 : -1;
+    });
+    slides.forEach((slide, index) => {
+      const active = index === boundedIndex;
+      slide.classList.toggle('is-active', active);
+      slide.setAttribute('aria-hidden', String(!active));
+    });
+    notes.forEach((note, index) => note.classList.toggle('is-active', index === boundedIndex));
+    player.dataset.activeIteration = String(boundedIndex);
+    if (moveFocus) controls[boundedIndex]?.focus();
+  }
+
+  function initializeIterationPlayers(root) {
+    root.querySelectorAll('.cs-iterations-section').forEach(section => {
+      const orderedPlayers = [...section.querySelectorAll(':scope > [data-iteration-player]')]
+        .sort((a, b) => Number(a.dataset.iterationRank) - Number(b.dataset.iterationRank));
+      orderedPlayers.forEach(player => section.append(player));
+    });
+    root.querySelectorAll('[data-iteration-player]').forEach(player => setIterationPlayerStep(player, 0));
+  }
+
+  sheetBody.addEventListener('click', event => {
+    const control = event.target.closest('[data-iteration-control]');
+    if (!control) return;
+    const player = control.closest('[data-iteration-player]');
+    if (player) setIterationPlayerStep(player, control.dataset.iterationControl);
+  });
+
+  sheetBody.addEventListener('keydown', event => {
+    const control = event.target.closest('[data-iteration-control]');
+    if (!control || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) return;
+    const player = control.closest('[data-iteration-player]');
+    const controls = [...player.querySelectorAll('[data-iteration-control]')];
+    const currentIndex = controls.indexOf(control);
+    const direction = event.key === 'ArrowRight' ? 1 : -1;
+    const nextIndex = (currentIndex + direction + controls.length) % controls.length;
+    event.preventDefault();
+    setIterationPlayerStep(player, nextIndex, true);
+  });
+
 
   let scrollTweenFrame;
   function easeOutQuint(t) {
@@ -3963,6 +4603,7 @@
       sheetMeta.textContent = p.meta || '';
       switchSheetTimer = setTimeout(() => {
         sheetBody.innerHTML = buildSheetHTML(p, srcEl);
+        initializeIterationPlayers(sheetBody);
         sheet.scrollTop = 0;
         sheetBody.style.opacity = '';
       }, motionDelay(160));
@@ -3976,6 +4617,7 @@
     sheet.dataset.page = key;
     sheetMeta.textContent = p.meta || '';
     sheetBody.innerHTML = buildSheetHTML(p, srcEl);
+    initializeIterationPlayers(sheetBody);
     sheet.scrollTop = 0;
     appEl.classList.remove('sheet-closing');
     flipPins(() => appEl.classList.add('sheet-open'), { srcEl });

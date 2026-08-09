@@ -96,9 +96,79 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 
 ---
 
+## Case study and report design system
+
+`PAGES.climate` and `PAGES.brew` are the two reference implementations. They share one reading system but represent different kinds of work:
+
+- **Analytical report (`climate`)**: evidence-led, finding-first, data and figure heavy.
+- **Product-design case study (`brew`)**: problem-led, ownership-first, interaction and iteration heavy.
+
+Do not make every sheet visually identical. Consistency comes from the canvas, spacing, hierarchy, figure treatment, and interaction patterns. The accent palette and content structure should still communicate the kind of work being presented.
+
+### Shared visual foundation
+
+- **Case-study canvas**: all finished case studies use the same mode-aware sheet background. Dark mode uses the lighter neutral gray `oklch(0.29 0 0)`; light mode uses the darker neutral gray `oklch(0.91 0 0)`. Keep the shared selector centralized so case-study backgrounds cannot drift apart.
+- **Section rhythm**: use `66px` of top spacing between major `.cs-section` blocks. The space belongs before the next text section, not as extra space after a figure. Every major section should use the same rhythm, including Impact/Current Outcome.
+- **Section labels**: title case, bold sans, compact rounded rectangle, and visually smaller than the content heading. Labels are not all-caps mono pills. Current size is `15px` for Brew and `16px` for Neutral.
+- **Structural boxes**: use a subtle fill with no outline and no shadow. Neutral and Brew section containers should not look like bordered cards. Borders are reserved for true content boundaries, such as figures, tables, version controls, or input-like elements.
+- **Shadows**: case-study content does not use decorative shadows in either theme.
+- **Typography**: use bold sans for direct product/report hierarchy and serif selectively for editorial questions or decision headings. Do not use pill typography for data rows or major titles.
+- **Copy**: do not use em dashes. Prefer a period, comma, colon, or parentheses.
+- **Figures**: every image sits in a stable frame and has a caption that explains what the evidence demonstrates. Captions use a quiet light-gray family, not the accent color. The graph/screenshot itself keeps its intended background; only the caption surface changes.
+- **Zoom control**: magnifying-glass controls are black with a white icon. Only hovering or focusing the control expands it to “Zoom”; hovering the whole figure must not trigger it.
+- **Top-right CTAs**: external project actions belong in the hero’s top-right, as with Neutral’s Tableau CTA and Brew’s Repo/Figma pair. Use real destinations only. Never invent or point a CTA to a generic homepage.
+- **Light and dark mode**: test both explicitly. Brew’s light-mode accent is pale warm ivory (`--brew-cream: oklch(0.965 0.018 85)`), not saturated beige. Dark mode may use a warmer cream, but both modes retain the shared neutral canvas.
+
+### Analytical report variant (`PAGES.climate`)
+
+- Lead with the finding, not the artifact name.
+- Hero facts may use a three-column stat row when those figures help a reviewer understand scale immediately.
+- Report sections typically follow: Context, The Ask, Data + Method, What I Found, Analytical + Design Decisions, Impact, and reflection.
+- Data tables and figure frames may use subtle boundaries because they are evidence containers, not decorative section cards.
+- “What I Found” and Impact may use a solid yellow break in the gray rhythm. Keep text black and use clean bullets for impact details.
+- Numbered analytical decisions align to one vertical text guide regardless of whether an alternating row has a fill.
+- Figure references are real links. Clicking a reference smoothly scrolls to the target figure with sticky-header offset.
+- Tableau and similar report CTAs stay visible in the hero.
+
+### Product-design case study variant (`PAGES.brew`)
+
+- Start with product premise, current status, role/team framing, and build context.
+- Keep Stack + Ownership near the top when implementation is materially part of the work, but do not let the stack dominate the rest of the story.
+- Preferred narrative order: hero, Stack + Ownership, Product Context, Product Principles, product flows, Current Outcome, Next Iteration.
+- Product flow section names should be direct and title case. Use “Comment Section,” “Onboarding,” “Splash + Loading,” and “Directions,” not vague headings such as “Design Work.”
+- State collaboration precisely. Brew is a partner project and broader product direction is shared. The case study separately identifies the flows the author independently owns. Never claim sole ownership of shared work or completed ownership of work that is still WIP.
+- WIP flows use honest placeholders and statuses such as “Not yet designed” or “Work in progress.” Preserve final layout space without presenting unfinished work as complete.
+- Product accents can differ from the report palette. Brew uses cream/coffee warmth over the shared gray canvas; it should not inherit Neutral’s yellow report blocks.
+- Current Outcome states what presently works. Unresolved bugs and missing actions belong under Next Iteration, not as negative annotations on the final screenshot.
+
+### Iteration players
+
+Use an annotated click-through player when several screenshots show the same surface evolving. Do not line up many near-identical screenshots.
+
+- Keep one stable screenshot frame and morph between versions with a restrained opacity/position transition.
+- The user selects versions with circular `V1`, `V2`, etc. buttons. Inactive versions are outlined; the active version is filled. Buttons must look clickable without an additional “Select a version” label.
+- Support click, keyboard focus, and Left/Right Arrow navigation. Update `aria-pressed`, roving `tabIndex`, active image, `aria-hidden`, and active annotation together.
+- Respect `prefers-reduced-motion`; version changes become effectively immediate.
+- Put the player category in the top-right of the container using literal labels such as “Reviews + ratings,” “Reply threads,” and “Comment card.”
+- Use an explicit, on-the-nose main title that names the UX change, for example “Preventing accidental 0/5 ratings and duplicate reviews.” Avoid generic titles such as “Refining the experience.”
+- Annotation text uses primary text color for contrast, not gray-on-gray. Use a soft green `+` for improvements and a soft red `−` for unresolved problems. Do not place annotation lines inside pills or outlined mini-cards.
+- The final version contains only positive annotations. Move remaining problems to Next Iteration.
+- Order Brew’s interaction stories as: Reviews + ratings, Reply threads, then Comment card. DOM order, visual order, and keyboard order must match.
+- Use the author’s actual critique notes. Do not infer or fabricate a rationale when the real iteration notes are available.
+
+### Motion and accessibility
+
+- All case-study motion must honor `prefers-reduced-motion`, including JavaScript-driven transitions and scroll behavior.
+- Animated state changes must be interruptible. A new version click should replace the current transition immediately rather than queueing.
+- Controls need visible hover and keyboard-focus states. Do not rely on hover alone to reveal essential meaning.
+- Case-study images need specific alt text describing the state or change shown. Decorative placeholders use `aria-hidden="true"`.
+- Keep inactive iteration screenshots out of the accessibility tree with `aria-hidden="true"`.
+
+---
+
 ## Case study writing guidelines
 
-Applies to any `PAGES[key].custom` write-up (the `cs-` component system). `PAGES.climate` (ESD Family Survey) is the reference implementation — copy its structure for new case studies. These rules come from how design-hiring reviewers actually read portfolios: they spend 3-5 minutes per case study (some reject in 30 seconds), and they're grading decision quality and measurable outcomes, not process narration.
+Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose the analytical-report or product-design structure above rather than copying one project mechanically. These rules come from how design-hiring reviewers actually read portfolios: they spend 3-5 minutes per case study (some reject in 30 seconds), and they're grading decision quality and measurable outcomes, not process narration.
 
 ### Structure, in order
 
