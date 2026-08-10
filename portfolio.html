@@ -2816,31 +2816,11 @@
     top: 0.65em;
     background: var(--habitat-accent);
   }
-  .sheet[data-page="habitat"] .cs-avatar-states img,
-  .sheet[data-page="habitat"] .cs-islands img {
+  .sheet[data-page="habitat"] .cs-avatar-states img {
     display: block;
     width: 100%;
     height: auto;
   }
-  .sheet[data-page="habitat"] .cs-islands {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    align-items: end;
-    background: var(--habitat-panel);
-    padding: 28px 24px 0;
-  }
-  .sheet[data-page="habitat"] .cs-islands figure { margin: 0; text-align: center; }
-  .sheet[data-page="habitat"] .cs-islands img { width: auto; max-width: 100%; margin: 0 auto; }
-  .sheet[data-page="habitat"] .cs-islands figcaption {
-    margin-top: 14px;
-    padding-bottom: 18px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.02em;
-    color: var(--ink-mid);
-  }
-  .sheet[data-page="habitat"] .cs-islands figcaption strong { color: var(--ink); }
   .sheet[data-page="habitat"] .cs-fig--phone {
     max-width: 300px;
     margin-left: auto;
@@ -5136,8 +5116,8 @@
             </div>
             <div class="cs-preview-frame">
               <div class="cs-preview-img has-image">
-                <a class="cs-image-link" href="assets/images/habitat-signup-recreation.png" aria-label="Open the signup screen at full size">
-                  <img src="assets/images/habitat-signup-recreation.png" alt="Habitat signup screen: reflected ocean background, the HABITAT wordmark tilted, the panda character anchored bottom-left, and Apple, Google, and email sign-up buttons" loading="lazy" />
+                <a class="cs-image-link" href="assets/images/habitat-signup-real.png" aria-label="Open the signup screen at full size">
+                  <img src="assets/images/habitat-signup-real.png" alt="Habitat signup screen: reflected ocean background, the HABITAT wordmark tilted, the panda character reaching up, and Apple, Google, and email sign-up buttons" loading="lazy" />
                   <span class="cs-expand-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                       <circle cx="11" cy="11" r="6.5"/>
@@ -5147,9 +5127,85 @@
                   </span>
                 </a>
               </div>
-              <div class="cs-caption">Built from the app's real assets and layout values: the ocean background reflected top and bottom at 40% opacity, the panda anchored bottom-left, and the wordmark tilted -8.61°, the exact rotation in the shipped screen.</div>
+              <div class="cs-caption">The ocean background reflected top and bottom, the panda reaching toward the wordmark, and the tilted HABITAT type: the first thing anyone sees before a single habit is logged.</div>
             </div>
           </figure>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Home Dashboard</span>
+          <div class="cs-copy">
+            <p>The home screen leads with the avatar and two numbers, streak and health, before anything else. Below it, Habitat Strength rolls every island into one percentage, and each island gets its own row with a status word (Needs Care, Stable) instead of burying that detail in a settings page.</p>
+          </div>
+          <figure class="cs-fig cs-fig--phone">
+            <div class="cs-fig-head">
+              <h4 class="cs-fig-title">Daily check-in</h4>
+            </div>
+            <div class="cs-preview-frame">
+              <div class="cs-preview-img has-image">
+                <a class="cs-image-link" href="assets/images/habitat-dashboard-real.jpg" aria-label="Open the home dashboard at full size">
+                  <img src="assets/images/habitat-dashboard-real.jpg" alt="Habitat home dashboard: avatar, streak and health stats, a Habitat Strength progress bar, and per-island status rows for Meditation and Reading" loading="lazy" />
+                  <span class="cs-expand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="6.5"/>
+                      <path d="m16.5 16.5 3.5 3.5"/>
+                      <path d="M11 8.5v5M8.5 11h5"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+              <div class="cs-caption">Habitat Strength (44% here) is every island's health averaged into one number, but the island rows below it still show which specific habit needs attention.</div>
+            </div>
+          </figure>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">World Map</span>
+          <div class="cs-copy">
+            <p>Tapping into the world replaces the dashboard's list with a spatial map: every island sits at the end of a dashed path from home, so checking in feels like visiting a place instead of scrolling a settings list. Tapping any island opens its detail view.</p>
+          </div>
+          <div class="cs-two-col">
+            <figure class="cs-fig">
+              <div class="cs-fig-head">
+                <h4 class="cs-fig-title">My Habit Islands</h4>
+              </div>
+              <div class="cs-preview-frame">
+                <div class="cs-preview-img has-image">
+                  <a class="cs-image-link" href="assets/images/habitat-map-real.jpg" aria-label="Open the world map at full size">
+                    <img src="assets/images/habitat-map-real.jpg" alt="Habitat world map: the panda on a home island with dashed paths radiating out to Reading, Meditation, Sleep, Workout, and Cooking islands" loading="lazy" />
+                    <span class="cs-expand-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="6.5"/>
+                        <path d="m16.5 16.5 3.5 3.5"/>
+                        <path d="M11 8.5v5M8.5 11h5"/>
+                      </svg>
+                    </span>
+                  </a>
+                </div>
+                <div class="cs-caption">Five islands scattered around a home island the panda actually stands on, connected by drag-to-explore dashed paths instead of a grid or list.</div>
+              </div>
+            </figure>
+            <figure class="cs-fig">
+              <div class="cs-fig-head">
+                <h4 class="cs-fig-title">Island Detail</h4>
+              </div>
+              <div class="cs-preview-frame">
+                <div class="cs-preview-img has-image">
+                  <a class="cs-image-link" href="assets/images/habitat-island-detail-real.jpg" aria-label="Open the island detail screen at full size">
+                    <img src="assets/images/habitat-island-detail-real.jpg" alt="Meditation island detail screen showing a Sick status badge, a weekly log count, a hit/missed streak grid, and XP, weekly, and health stat cards" loading="lazy" />
+                    <span class="cs-expand-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="6.5"/>
+                        <path d="m16.5 16.5 3.5 3.5"/>
+                        <path d="M11 8.5v5M8.5 11h5"/>
+                      </svg>
+                    </span>
+                  </a>
+                </div>
+                <div class="cs-caption">A hit/missed streak grid and a Sick badge instead of a single trend line. One log this week against a goal of seven, so the state reads honest, not decorative.</div>
+              </div>
+            </figure>
+          </div>
         </div>
 
         <div class="cs-section">
@@ -5167,23 +5223,6 @@
               </div>
             </div>
           </figure>
-        </div>
-
-        <div class="cs-section">
-          <span class="cs-label">Islands</span>
-          <div class="cs-copy">
-            <p>Each of the five islands, Palm Cove, Mountain, Volcano, Bamboo, and Shrine, is a hand-authored pixel grid rendered at runtime, not a static image, so it can carry the same four-state palette system as the avatar. The pair below uses the prototype's own sample data: a 12-day walking streak next to a 2-day screen-time streak.</p>
-          </div>
-          <div class="cs-islands">
-            <figure>
-              <img src="assets/images/habitat-island-palm-thriving.png" alt="Palm Cove island rendered in the thriving palette, tied to a 12-day walking streak" loading="lazy" />
-              <figcaption><strong>Palm Cove</strong> · Walk · thriving · 12-day streak</figcaption>
-            </figure>
-            <figure>
-              <img src="assets/images/habitat-island-volcano-sick.png" alt="Volcano island rendered in the sick palette, tied to a 2-day screen-time streak" loading="lazy" />
-              <figcaption><strong>Volcano</strong> · Screen Time · sick · 2-day streak</figcaption>
-            </figure>
-          </div>
         </div>
 
         <div class="cs-section">
