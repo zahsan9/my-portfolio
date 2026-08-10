@@ -27,7 +27,7 @@
     --c-cream:   oklch(0.94 0.028 82);
     --c-yellow:  oklch(0.89 0.085 90);
     --c-sage:    oklch(0.74 0.065 152);
-    --c-plum:    oklch(0.63 0.09  305);
+    --c-plum:    oklch(0.71 0.06  305);
     --c-sand:    oklch(0.88 0.022 72);
     --c-charcoal:oklch(0.27 0.010 60);
     --c-noir:    oklch(0.15 0.006 60);
@@ -168,7 +168,8 @@
     transition: width 0.32s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease, transform var(--motion-med) var(--ease-out);
   }
   .rail.is-intro-expanded,
-  .rail:has(.rail-nav:hover) { width: 168px; }
+  .rail:has(.rail-nav:hover),
+  .rail:has(.rail-nav:focus-within) { width: 168px; }
   .app.sheet-open .rail {
     opacity: 0;
     pointer-events: none;
@@ -193,10 +194,6 @@
     transition: background 0.15s, color 0.15s;
   }
   .rail-btn:hover { background: var(--control-soft); }
-  .app:has(.contact-nav a[href="#experience"]:is(:hover, :focus-visible))
-    .rail-btn[data-route="experience"]:not(.active) {
-    background: var(--control-soft);
-  }
   .app:has(.page-back:is(:hover, :focus-visible))
     .rail-btn[data-route="feed"]:not(.active) {
     background: var(--control-soft);
@@ -214,7 +211,8 @@
     transition: max-width 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.18s ease 0.1s;
   }
   .rail.is-intro-expanded .rail-label,
-  .rail:has(.rail-nav:hover) .rail-label { max-width: 140px; opacity: 1; }
+  .rail:has(.rail-nav:hover) .rail-label,
+  .rail:has(.rail-nav:focus-within) .rail-label { max-width: 140px; opacity: 1; }
   .rail-bottom {
     margin-top: auto; align-self: stretch; padding: 0 16px 4px;
   }
@@ -228,22 +226,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* ── Header contact ── */
-  .contact-nav {
-    display: flex; gap: 10px; align-items: center;
-    font-size: 13px;
-    color: var(--ink-mid);
-  }
-  .contact-nav a {
-    color: inherit;
-    transition: color 0.15s ease;
-  }
-  .contact-sep {
-    color: inherit;
-    user-select: none;
-  }
-  .contact-nav a:hover,
-  .contact-nav a:focus-visible { color: var(--ink); }
   .theme-btn {
     width: 48px; height: 48px; border-radius: 50%;
     display: grid; place-items: center;
@@ -581,9 +563,10 @@
     width: min(1080px, 100% - 72px);
     margin: 0 auto;
     display: flex; gap: var(--card-gap);
-    /* Extra bottom room absorbs the last row's hover .sub growth (~22px) so
-       hovering a bottom-row card doesn't grow the document height and jolt
-       the scrollbar/scroll position. */
+    /* Extra bottom room gives lockFeedHeight() (see the Filter + FLIP script
+       section) headroom: it pins .feed to a fixed height at rest so a card's
+       hover .sub growth (~22px) can push the card below it without ever
+       growing .feed's own box and bouncing the in-flow copyright footer. */
     padding: 8px 0 120px;
   }
   .feed-col {
@@ -662,17 +645,27 @@
     transition-duration: 120ms;
   }
   .pin .sub {
-    position: absolute; left: 0; right: 0; top: 100%;
-    display: block; margin-top: 6px; padding-left: 24px; overflow: hidden;
+    display: block; max-height: 0; margin-top: 0; padding-left: 24px; overflow: hidden;
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em;
     color: var(--sub-color); opacity: 0; white-space: nowrap;
     text-overflow: ellipsis; pointer-events: none;
+    transition: max-height 0.22s var(--ease-out), margin-top 0.22s var(--ease-out), opacity 0.18s ease;
+  }
+  .feed:not(.has-open) .pin:hover .sub,
+  .feed:not(.has-open) .pin:focus-visible .sub { max-height: 13px; margin-top: 6px; opacity: 1; }
+
+  /* A pin directly above a static component keeps its own hover subtitle,
+     but as an overlay instead of an in-flow block, so revealing it never
+     pushes the component below out of place — components stay fully static
+     regardless of what's hovered around them. */
+  .pin[data-page]:has(+ .pin:not([data-page])) .sub {
+    position: absolute; left: 0; top: 100%; margin-top: 6px;
+    max-height: none; overflow: visible;
     transform: translateY(-4px);
     transition: opacity 0.18s ease, transform 0.22s var(--ease-out);
   }
-  .feed:not(.has-open) .pin:hover .sub,
-  .feed:not(.has-open) .pin:focus-visible .sub {
-    opacity: 1;
+  .feed:not(.has-open) .pin[data-page]:has(+ .pin:not([data-page])):hover .sub,
+  .feed:not(.has-open) .pin[data-page]:has(+ .pin:not([data-page])):focus-visible .sub {
     transform: translateY(0);
   }
 
@@ -681,7 +674,7 @@
   .ar-45 { aspect-ratio: 4 / 5; }
 
   /* Art backgrounds */
-  .art-clay    { background: var(--c-clay);    color: oklch(0.97 0 0); }
+  .art-clay    { background: var(--c-clay);    color: var(--card-ink); }
   .art-blue    { background: var(--c-blue);    color: oklch(0.97 0 0); }
   .art-cream   { background: var(--c-cream);   color: var(--card-ink); }
   .art-yellow  { background: var(--c-yellow);  color: var(--card-ink); }
@@ -768,7 +761,7 @@
     padding: 5px 9px; border-radius: 999px;
     text-transform: uppercase; letter-spacing: 0.08em; align-self: flex-start;
   }
-  .art-cream .pill, .art-yellow .pill, .art-sage .pill, .art-sand .pill, .art-paper .pill, .art-plum .pill
+  .art-cream .pill, .art-yellow .pill, .art-sage .pill, .art-sand .pill, .art-paper .pill, .art-plum .pill, .art-clay .pill
     { background: var(--card-ink); color: var(--card-paper); }
 
   /* Spotify radial */
@@ -809,6 +802,9 @@
     text-transform: uppercase; letter-spacing: 0.06em;
     text-align: right; color: #000; opacity: 1;
   }
+
+  /* The CROW pin */
+  .art-crow h3 { font-size: 44px; }
 
   /* Book pin */
   .art-book { padding: 22px; display: flex; flex-direction: column; }
@@ -1390,10 +1386,10 @@
      soft lift shadow). --climate-accent-text carries the numbers/highlights
      that need to be yellow on dark but dark-on-light instead, since pale
      yellow text has no contrast on a light page. */
-  html[data-theme="dark"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"]) {
+  html[data-theme="dark"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"]) {
     --paper: oklch(0.29 0 0);
   }
-  html[data-theme="light"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"]) {
+  html[data-theme="light"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"]) {
     --paper: oklch(0.91 0 0);
   }
   html[data-theme="dark"] .sheet[data-page="climate"] {
@@ -2381,6 +2377,195 @@
     top: 0.65em;
     background: var(--brew-cream);
   }
+  /* CROW borrows brew's product-design grammar (measured section rhythm,
+     framed figures, three-up principles) rather than the report styling —
+     but with its own palette, lifted directly from the-crow/README.md's
+     documented design tokens so this page stays faithful to the real
+     brand instead of inventing a portfolio-only palette. */
+  html[data-theme="dark"] .sheet[data-page="crow"] {
+    --paper-2: oklch(1 0 0 / 0.06);
+    --ink: oklch(0.94 0.01 85);
+    --ink-mid: oklch(0.68 0.03 300);
+    --ink-low: oklch(0.5 0.03 300);
+    --line: oklch(1 0 0 / 0.12);
+    --crow-accent: #e7def7;
+    --crow-accent-ink: #191331;
+    --crow-panel: oklch(1 0 0 / 0.045);
+  }
+  html[data-theme="light"] .sheet[data-page="crow"] {
+    --paper-2: #ffffff;
+    --ink: #241c47;
+    --ink-mid: #5c5480;
+    --ink-low: #8b84a8;
+    --line: oklch(0.25 0.06 300 / 0.14);
+    --crow-accent: #2d2357;
+    --crow-accent-ink: #f5f0e8;
+    --crow-panel: #f7f5fb;
+  }
+  .sheet[data-page="crow"] .cs-hero--crow {
+    background: var(--crow-accent);
+    color: var(--crow-accent-ink);
+    border-radius: 18px;
+    padding: 38px 36px 34px;
+  }
+  .sheet[data-page="crow"] .cs-crow-kicker {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .sheet[data-page="crow"] .cs-crow-topline {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .sheet[data-page="crow"] .cs-crow-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: -5px;
+  }
+  .sheet[data-page="crow"] .cs-crow-actions .cs-cta-btn {
+    border: 0;
+    background: var(--crow-accent-ink);
+    color: var(--crow-accent);
+    box-shadow: none;
+    font-weight: 700;
+  }
+  .sheet[data-page="crow"] .cs-crow-actions .cs-cta-btn:hover,
+  .sheet[data-page="crow"] .cs-crow-actions .cs-cta-btn:focus-visible {
+    opacity: 0.85;
+    box-shadow: none;
+  }
+  .sheet[data-page="crow"] .cs-hero--crow .cs-hero-title {
+    max-width: 760px;
+    margin-bottom: 18px;
+    font-family: var(--sans);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--crow-accent-ink);
+  }
+  .sheet[data-page="crow"] .cs-hero-sub {
+    max-width: 760px;
+    margin-bottom: 22px;
+    font-size: 14px;
+    color: var(--crow-accent-ink);
+    opacity: 0.82;
+  }
+  .sheet[data-page="crow"] .cs-crow-byline {
+    margin: 0;
+    color: var(--crow-accent-ink);
+    opacity: 0.7;
+  }
+  .sheet[data-page="crow"] .cs-section { padding-top: 66px; }
+  .sheet[data-page="crow"] .cs-label {
+    display: inline-block;
+    margin-bottom: 22px;
+    padding: 5px 8px 6px;
+    border-radius: 4px;
+    background: var(--crow-accent);
+    color: var(--crow-accent-ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+  .sheet[data-page="crow"] .cs-preview-frame,
+  .sheet[data-page="crow"] .cs-artifact-frame {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--crow-panel);
+    box-shadow: none;
+  }
+  .sheet[data-page="crow"] .cs-caption {
+    margin: 0;
+    padding: 13px 16px 15px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="crow"] .cs-two-col { gap: 24px; }
+  .sheet[data-page="crow"] .cs-product-principles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .sheet[data-page="crow"] .cs-product-principle {
+    padding: 22px 20px 24px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--crow-panel);
+  }
+  .sheet[data-page="crow"] .cs-product-principle span {
+    display: block;
+    margin-bottom: 24px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: var(--ink-low);
+  }
+  .sheet[data-page="crow"] .cs-product-principle h3 {
+    margin-bottom: 9px;
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .sheet[data-page="crow"] .cs-product-principle p {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="crow"] .cs-feature {
+    padding: 22px 20px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--crow-panel);
+  }
+  .sheet[data-page="crow"] .cs-feature h3 {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+  .sheet[data-page="crow"] .cs-impact-callout {
+    padding: 32px 30px;
+    border: 0;
+    border-radius: 16px;
+    background: var(--crow-accent);
+  }
+  .sheet[data-page="crow"] .cs-impact-line {
+    font-family: var(--sans);
+    font-size: clamp(24px, 3.2vw, 34px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--crow-accent-ink);
+  }
+  .sheet[data-page="crow"] .cs-learnings {
+    padding: 22px 24px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--crow-panel);
+  }
+  .sheet[data-page="crow"] .cs-learning { padding: 0 0 0 20px; }
+  .sheet[data-page="crow"] .cs-learning::before {
+    top: 0.65em;
+    background: var(--crow-accent);
+  }
+
   /* Third pass on this hero. Dropped: the dark card (felt cold), the bubble
      cluster (felt decorative), the serif italic title, and the underlined
      pills (read as links). What's left is plainer on purpose: a bold sans
@@ -3235,7 +3420,7 @@
   <aside class="rail">
     <button class="logo" id="logoBtn" aria-label="Home"><span style="font-family:var(--serif);font-size:32px;font-weight:600;color:var(--ink);letter-spacing:-0.02em;line-height:1;user-select:none;" aria-hidden="true">ZA</span></button>
     <nav class="rail-nav">
-      <button class="rail-btn active" data-route="feed" title="Work" aria-label="Work">
+      <button class="rail-btn active" data-route="feed" title="Work" aria-label="Work" aria-current="page">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <rect x="4" y="4" width="16" height="16" rx="3"/>
           <path d="M11 4v16"/>
@@ -3270,13 +3455,6 @@
 
     <!-- Top bar -->
     <header class="topbar">
-      <nav class="contact-nav" aria-label="Portfolio and contact links">
-        <a href="#experience">Experience</a>
-        <span class="contact-sep" aria-hidden="true">/</span>
-        <a href="mailto:zahsan9@uw.edu">Email</a>
-        <span class="contact-sep" aria-hidden="true">/</span>
-        <a href="https://www.linkedin.com/in/ahsanzainab" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-      </nav>
     </header>
 
     <!-- ═══ FEED VIEW ═══ -->
@@ -3308,7 +3486,7 @@
         multi-column auto-balancer (which doesn't guarantee equal columns).
         Height units (relative to card width): ar-45 = 1.25, ar-1 = 1.00.
         Every column below sums to 3.5 units.
-          Col 1: brew (1.25) + Adobe (1.25) + Elsewhere (1.00)      = 3.5
+          Col 1: brew (1.25) + CROW (1.25) + Elsewhere (1.00)       = 3.5
           Col 2: ESD  (1.25) + WIIRED (1.25) + Releases (1.00)     = 3.5
           Col 3: Tools (1.00) + Bird by Bird (1.25) + Daily (1.25) = 3.5
       -->
@@ -3327,11 +3505,11 @@
             </div>
           </article>
 
-          <!-- Adobe internship -->
-          <article class="pin" data-cat="swe" data-page="adobe" data-year="2025" data-cursor-label="Under construction">
-            <div class="art art-sage ar-45">
+          <!-- The CROW redesign -->
+          <article class="pin" data-cat="ux studio" data-page="crow" data-year="2026" data-sub="WIIRED Studio, 2026" aria-label="Open the CROW journal redesign case study">
+            <div class="art art-plum art-crow ar-45">
               <div class="pin-meta">Case Study</div>
-              <h3>Adobe<br>Express.</h3>
+              <h3>The<br>CROW.</h3>
             </div>
           </article>
 
@@ -3456,7 +3634,7 @@
 
           <!-- Daily type -->
           <article class="pin" data-cat="misc" data-page="daily" data-year="Ongoing" data-cursor-label="Under construction">
-            <div class="art art-plum ar-45">
+            <div class="art art-clay ar-45">
               <h3 style="font-size:28px;">Daily type<br>&amp; motion.</h3>
             </div>
           </article>
@@ -3717,6 +3895,33 @@
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const prefersReducedMotion = () => reducedMotionQuery.matches;
   const motionDelay = ms => prefersReducedMotion() ? 0 : ms;
+
+  /* ─────────────────────────────────────────────────────────
+   * WORK RAIL ENTRY STORYBOARD
+   *
+   * Runs once per page load, and only when Work is the initial route.
+   *
+   *    0ms   rail rests compact for the first rendered frame
+   *  180ms   rail expands and reveals its navigation labels
+   * 2380ms   rail collapses; normal hover behavior takes over
+   * ───────────────────────────────────────────────────────── */
+  const RAIL_ENTRY_TIMING = {
+    expand:   180,
+    collapse: 2380,
+  };
+
+  function playWorkRailEntry() {
+    if (prefersReducedMotion() || !window.matchMedia('(min-width: 801px)').matches) return;
+    const rail = document.querySelector('.rail');
+    if (!rail) return;
+
+    const expandTimer = setTimeout(() => rail.classList.add('is-intro-expanded'), RAIL_ENTRY_TIMING.expand);
+    const collapseTimer = setTimeout(() => rail.classList.remove('is-intro-expanded'), RAIL_ENTRY_TIMING.collapse);
+    window.addEventListener('pagehide', () => {
+      clearTimeout(expandTimer);
+      clearTimeout(collapseTimer);
+    }, { once: true });
+  }
 
   function updateFeedScrollbar() {
     const scrollable = main.scrollHeight - main.clientHeight;
@@ -4304,13 +4509,235 @@
         </div>
       `
     },
-    adobe: {
-      meta: 'SWE · Sum \'25',
-      wip: true,
-      eyebrow: 'Adobe Express',
-      title: 'AI editing &amp; <em>template browser.</em>',
-      lead: 'Spent the summer on Adobe Express working on the AI editing surface and a redesigned template browser. Both shipped to GA.',
-      facts: [['Role','UX engineering intern'],['Reach','16M MAU'],['Outcome','Two surfaces shipped GA + hackathon win']]
+    crow: {
+      meta: 'Product / UX · WIIRED Studio',
+      eyebrow: 'Client Project',
+      custom: `
+        <div class="cs-hero cs-hero--crow">
+          <div class="cs-crow-topline">
+            <span class="cs-crow-kicker">Website redesign · Shipped</span>
+            <div class="cs-crow-actions" aria-label="Project links">
+              <a class="cs-cta-btn" href="https://github.com/zahsan9/the-crow" target="_blank" rel="noopener noreferrer">Repo ↗</a>
+              <a class="cs-cta-btn" href="https://zahsan9.github.io/the-crow/" target="_blank" rel="noopener noreferrer">Try it out ↗</a>
+            </div>
+          </div>
+          <h2 class="cs-hero-title">From an unbranded template to a journal worth submitting to.</h2>
+          <p class="cs-hero-sub">The CROW is UW Bothell's student research journal, ten volumes and counting. The original site ran on generic template styling with no real identity and buried its submission rules in walls of text. WIIRED Studio rebuilt it end to end.</p>
+          <div class="cs-hero-byline cs-crow-byline" aria-label="Project details">
+            <span>Visual design + front-end build</span>
+            <span>WIIRED Studio · Partner project</span>
+            <span>HTML, CSS, JavaScript</span>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Stack + Ownership</span>
+          <div class="cs-two-col">
+            <div class="cs-feature">
+              <h3>Stack</h3>
+              <p>Vanilla HTML, CSS, and JavaScript, no build step, so a future student board can maintain it without a dev environment. Henny Penny for display type, DM Sans for body, Poppins for nav, Inter for UI chrome.</p>
+            </div>
+            <div class="cs-feature">
+              <h3>Ownership</h3>
+              <p>A WIIRED Studio partner project. Positioning, content direction, and the full front-end build (visual system, homepage, carousel, guidelines dropdown, FAQ accordion) were all a team effort.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">The Ask</span>
+          <h3 class="cs-question">How do you make a decade of undergraduate research look worth reading, on a site built for none of it?</h3>
+          <div class="cs-copy">
+            <p>The CROW (Campus Research &amp; Observational Writings) is UW Bothell's real student journal: real submissions, real editors, real deadlines. The original site ran on generic template styling with no distinct branding, and packed its submission requirements and editorial context into unbroken paragraphs that buried the actual asks under formatting nobody had designed on purpose.</p>
+            <p>The redesign had to keep every volume, every submission rule, and every editor's voice intact while giving the journal a visual identity and a structure that could hold ten-plus volumes of content without turning back into a wall of text.</p>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Design Principles</span>
+          <div class="cs-product-principles">
+            <div class="cs-product-principle">
+              <span>01</span>
+              <h3>Identity before content</h3>
+              <p>Lead with what The CROW is and who it's for, instead of dropping visitors straight into a list of volumes with no context.</p>
+            </div>
+            <div class="cs-product-principle">
+              <span>02</span>
+              <h3>Structure over paragraphs</h3>
+              <p>Break submission rules and editorial information into scannable cards, dropdowns, and accordions instead of long unbroken blocks of text.</p>
+            </div>
+            <div class="cs-product-principle">
+              <span>03</span>
+              <h3>One system, every page</h3>
+              <p>A single stylesheet, shared type scale, and one banner treatment across the homepage, ten volume pages, guidelines, and FAQ, so nothing feels bolted on.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Homepage</span>
+          <div class="cs-two-col">
+            <figure class="cs-fig">
+              <div class="cs-fig-head">
+                <h4 class="cs-fig-title">Before: the original uwbcrow.com</h4>
+              </div>
+              <div class="cs-preview-frame">
+                <div class="cs-preview-img has-image">
+                  <a class="cs-image-link" href="assets/images/crow-before-hero.jpg" aria-label="Open the original CROW homepage at full size">
+                    <img src="assets/images/crow-before-hero.jpg" alt="Original CROW journal homepage: generic template nav, stock campus photography, no distinct visual identity" loading="lazy" />
+                    <span class="cs-expand-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="6.5"/>
+                        <path d="m16.5 16.5 3.5 3.5"/>
+                        <path d="M11 8.5v5M8.5 11h5"/>
+                      </svg>
+                    </span>
+                  </a>
+                </div>
+                <div class="cs-caption">No clear branding, low visual craft, and a stock W-logo photo standing in for identity.</div>
+              </div>
+            </figure>
+            <figure class="cs-fig">
+              <div class="cs-fig-head">
+                <h4 class="cs-fig-title">After: the redesigned homepage</h4>
+              </div>
+              <div class="cs-preview-frame">
+                <div class="cs-preview-img has-image">
+                  <a class="cs-image-link" href="assets/images/crow-after-hero.jpg" aria-label="Open the redesigned CROW homepage at full size">
+                    <img src="assets/images/crow-after-hero.jpg" alt="Redesigned CROW journal homepage: custom Henny Penny wordmark, crow mascot illustration, one clear sentence of positioning" loading="lazy" />
+                    <span class="cs-expand-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="6.5"/>
+                        <path d="m16.5 16.5 3.5 3.5"/>
+                        <path d="M11 8.5v5M8.5 11h5"/>
+                      </svg>
+                    </span>
+                  </a>
+                </div>
+                <div class="cs-caption">A custom type system, the crow mascot, and one sentence that says what the journal is before anything else.</div>
+              </div>
+            </figure>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">The Volumes</span>
+          <h3 class="cs-question">Ten years of publications, one browsable shelf.</h3>
+          <div class="cs-copy">
+            <p>A hand-built carousel replaces a flat list of PDF links, and each volume page adds live filtering and search over its publications so a reader can get from "what's in Volume Ten" to a specific abstract in two clicks instead of scanning a page of unbroken titles.</p>
+          </div>
+          <figure class="cs-fig">
+            <div class="cs-fig-head">
+              <h4 class="cs-fig-title">Volume carousel on the homepage</h4>
+            </div>
+            <div class="cs-preview-frame">
+              <div class="cs-preview-img has-image">
+                <a class="cs-image-link" href="assets/images/crow-volumes.jpg" aria-label="Open the volumes carousel at full size">
+                  <img src="assets/images/crow-volumes.jpg" alt="Volumes carousel showing Volume Eleven (coming soon), Volume Ten, and Volume Nine covers with left/right navigation" loading="lazy" />
+                  <span class="cs-expand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="6.5"/>
+                      <path d="m16.5 16.5 3.5 3.5"/>
+                      <path d="M11 8.5v5M8.5 11h5"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+              <div class="cs-caption">Volume Eleven is styled and dated before its contents are even in: a "coming soon" state instead of an empty gap on the shelf.</div>
+            </div>
+          </figure>
+          <figure class="cs-fig">
+            <div class="cs-fig-head">
+              <h4 class="cs-fig-title">Publication cards with filters and search</h4>
+            </div>
+            <div class="cs-preview-frame">
+              <div class="cs-preview-img has-image">
+                <a class="cs-image-link" href="assets/images/crow-publications.jpg" aria-label="Open the publications grid at full size">
+                  <img src="assets/images/crow-publications.jpg" alt="2025 Publications grid with subject-tag filter pills, a search field, and abstract-preview cards" loading="lazy" />
+                  <span class="cs-expand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="6.5"/>
+                      <path d="m16.5 16.5 3.5 3.5"/>
+                      <path d="M11 8.5v5M8.5 11h5"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+              <div class="cs-caption">Each card surfaces the abstract and author directly on the grid, so browsing a volume no longer means opening PDFs one at a time to find the right paper.</div>
+            </div>
+          </figure>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Guidelines</span>
+          <h3 class="cs-question">Seven submission types, one page, no scrolling through everyone else's rules.</h3>
+          <div class="cs-copy">
+            <p>The original guidelines page listed every submission type's rules in one continuous scroll. The redesign moves that into a single dropdown: pick a type and the criteria panel updates in place, so a research-abstract author never has to scroll past a literature-review checklist to find their own.</p>
+          </div>
+          <figure class="cs-fig">
+            <div class="cs-fig-head">
+              <h4 class="cs-fig-title">Submission-type dropdown</h4>
+            </div>
+            <div class="cs-preview-frame">
+              <div class="cs-preview-img has-image">
+                <a class="cs-image-link" href="assets/images/crow-guidelines.jpg" aria-label="Open the guidelines page at full size">
+                  <img src="assets/images/crow-guidelines.jpg" alt="Submission guidelines page with a criteria panel and a submission-type dropdown covering seven paper types" loading="lazy" />
+                  <span class="cs-expand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="6.5"/>
+                      <path d="m16.5 16.5 3.5 3.5"/>
+                      <path d="M11 8.5v5M8.5 11h5"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+              <div class="cs-caption">Spacing, margins, citation style, deadlines: the criteria that apply to every submission stay visible while the dropdown swaps only what's type-specific.</div>
+            </div>
+          </figure>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">FAQ</span>
+          <h3 class="cs-question">Every answer collapsed until someone actually asks the question.</h3>
+          <div class="cs-copy">
+            <p>An accordion replaces a page of pre-expanded Q&amp;A, so the page reads as a short list of questions first and only expands to full paragraphs on demand, including the 2026 AI-use policy update, which stays pinned open above the fold since it's the one answer every author needs to see.</p>
+          </div>
+          <figure class="cs-fig">
+            <div class="cs-fig-head">
+              <h4 class="cs-fig-title">FAQ accordion</h4>
+            </div>
+            <div class="cs-preview-frame">
+              <div class="cs-preview-img has-image">
+                <a class="cs-image-link" href="assets/images/crow-faq.jpg" aria-label="Open the FAQ page at full size">
+                  <img src="assets/images/crow-faq.jpg" alt="FAQ accordion with the 2026 AI-use policy expanded and a list of collapsed submission questions below it" loading="lazy" />
+                  <span class="cs-expand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="6.5"/>
+                      <path d="m16.5 16.5 3.5 3.5"/>
+                      <path d="M11 8.5v5M8.5 11h5"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+              <div class="cs-caption">Six questions collapsed to one line each; only the AI-use policy stays open by default, since it changed for 2026 and every author needs to read it.</div>
+            </div>
+          </figure>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Current Outcome</span>
+          <div class="cs-impact-callout">
+            <span class="cs-impact-line">The redesign is fully built and live: the homepage, all ten-plus volume pages, guidelines, and FAQ are running publicly on GitHub Pages, ready to become the production site.</span>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Next Iteration</span>
+          <div class="cs-learnings">
+            <div class="cs-learning">Mobile compatibility was added after the desktop build was already in place rather than designed in from the start, and it shows in a few tight spots on the volume pages. The bigger gap: uwbcrow.com itself still points at the original site. Migrating the production domain to this build is the last real step.</div>
+          </div>
+        </div>
+      `
     },
     essay: {
       meta: 'Misc · Mar 2026',
@@ -4396,6 +4823,7 @@
       ['art-sage', 'var(--c-sage)'],
       ['art-blue', 'var(--c-blue)'],
       ['art-plum', 'var(--c-plum)'],
+      ['art-clay', 'var(--c-clay)'],
       ['art-sand', 'var(--c-sand)'],
     ];
     const accent = palette.find(([className]) => art?.classList.contains(className))?.[1] || 'oklch(0.98 0 0)';
@@ -4518,6 +4946,7 @@
     visiblePins.forEach(p => { p.style.transition = 'none'; p.style.transform = ''; });
     classAction();
     void feed.offsetWidth;
+    lockFeedHeight();
     updateFeedScrollbar();
     // Settle scroll before capturing LAST so both snapshots share stable coordinates
     const maxScroll = main.scrollHeight - main.clientHeight;
@@ -4943,6 +5372,20 @@
     pin.appendChild(sub);
   });
 
+  // Cards push the card below them on hover (see .pin .sub), which would
+  // otherwise also grow .feed's own auto height and bounce the in-flow
+  // copyright footer. Locking .feed to its at-rest height (with generous
+  // bottom padding already reserved for exactly this) lets that growth
+  // happen without ever moving anything below the feed. Only re-measure at
+  // moments layout actually changes for real — not on every hover.
+  function lockFeedHeight() {
+    if (feedView.style.display === 'none') return;
+    feed.style.height = 'auto';
+    feed.style.height = feed.getBoundingClientRect().height + 'px';
+  }
+  window.addEventListener('load', lockFeedHeight);
+  window.addEventListener('resize', lockFeedHeight);
+
   let currentFilter = 'all';
 
   function applyFilter(f) {
@@ -5010,6 +5453,7 @@
 
     setTimeout(() => {
       pins.forEach(p => { p.style.transition = ''; p.style.transform = ''; p.style.opacity = ''; });
+      lockFeedHeight();
     }, motionDelay(520));
   }
 
@@ -5132,10 +5576,14 @@ const expScroll   = document.getElementById('expScroll');
     expStageTimers.push(setTimeout(() => setExperienceStage(3), b + s * 2));
   }
 
-function setRoute(name) {
+function setRoute(name, { history: historyMode = 'push' } = {}) {
     if (name === pendingRouteName) return;
     pendingRouteName = name;
-    document.querySelectorAll('.rail-btn[data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === name));
+    document.querySelectorAll('.rail-btn[data-route]').forEach(b => {
+      const isActive = b.dataset.route === name;
+      b.classList.toggle('active', isActive);
+      b.setAttribute('aria-current', isActive ? 'page' : 'false');
+    });
 
     const viewMap = { feed: feedView, about: aboutView, experience: expView };
     const leaving  = viewMap[currentRouteName];
@@ -5159,7 +5607,10 @@ function setRoute(name) {
 
       currentRouteName = name;
       pendingRouteName = name;
-      history.replaceState(null, '', name === 'feed' ? location.pathname : '#' + name);
+      const url = name === 'feed' ? location.pathname : '#' + name;
+      if (historyMode === 'push') history.pushState(null, '', url);
+      else if (historyMode === 'replace') history.replaceState(null, '', url);
+      // historyMode === 'none' → browser already owns this history entry (hash link click or back/forward)
 
       if (name === 'experience') playExperienceStoryboard();
       else { clearExperienceStoryboard(); setExperienceStage(0); }
@@ -5167,6 +5618,7 @@ function setRoute(name) {
         playAboutStackIntro();
         requestAnimationFrame(() => requestAnimationFrame(refreshAboutStack));
       }
+      if (name === 'feed') requestAnimationFrame(lockFeedHeight);
       main.scrollTo({
         top: 0,
         behavior: prefersReducedMotion() || name === 'experience' ? 'auto' : 'smooth'
@@ -5190,9 +5642,10 @@ function setRoute(name) {
     const hash = location.hash.replace('#', '');
     return VALID_ROUTES.has(hash) ? hash : 'feed';
   };
-  window.addEventListener('hashchange', () => setRoute(routeFromHash()));
+  window.addEventListener('hashchange', () => setRoute(routeFromHash(), { history: 'none' }));
   const initialRoute = routeFromHash();
-  if (initialRoute !== 'feed') setRoute(initialRoute);
+  if (initialRoute !== 'feed') setRoute(initialRoute, { history: 'replace' });
+  else playWorkRailEntry();
 
   // ── Site cursor ──
   (() => {
@@ -5289,7 +5742,7 @@ function setRoute(name) {
       el.addEventListener('mouseenter', () => cursor.classList.add('is-on-dark-surface'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-on-dark-surface'));
     });
-    document.querySelectorAll('.art-cream, .art-yellow, .art-sage, .art-sand, .art-plum').forEach(el => {
+    document.querySelectorAll('.art-cream, .art-yellow, .art-sage, .art-sand, .art-plum, .art-clay').forEach(el => {
       el.addEventListener('mouseenter', () => cursor.classList.add('is-on-light-surface'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-on-light-surface'));
     });

@@ -23,7 +23,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Feed cards
 
-Cards are `.pin` elements with `data-cat` (for filter tabs) and `data-page` (sheet key). Clicking calls `openSheet(key, srcEl)`. A JS snippet at page load moves any `.sub` inside `.art` out to be a direct child of `.pin`. Every `.sub` is absolutely positioned in the existing inter-card gap so revealing a hover caption never changes masonry height, moves another card, shifts the scrollbar, or makes the footer bounce.
+Cards are `.pin` elements with `data-cat` (for filter tabs) and `data-page` (sheet key). Clicking calls `openSheet(key, srcEl)`. A JS snippet at page load moves any `.sub` inside `.art` out to be a direct child of `.pin`. By default `.sub` is in-flow (`max-height: 0` → expands on hover/focus), so revealing a card's caption pushes the card below it down within the same column — this is intentional, not a layout bug; `overflow-anchor: none` on `.main` (see the comment near the top of the stylesheet) exists specifically to stop Chrome's scroll anchoring from fighting this on hover near the bottom of the feed. The one exception: a pin sitting directly above a static, non-case-study component (`.pin[data-page]:has(+ .pin:not([data-page])) .sub`, e.g. before "Find me elsewhere") renders its `.sub` as an absolute overlay instead, so that specific component card never gets pushed. Do not flatten this back to a universally-absolute `.sub` — that silently kills the push interaction for every other card and has regressed before.
+
+Because that push growth is real layout growth, it would also grow `.feed`'s own auto height and bounce the in-flow copyright footer beneath it — which the "card hover states cannot move it" rule (see Navigation and shared chrome below) forbids. `lockFeedHeight()` (defined next to `applyFilter` in the Filter + FLIP script section) pins `.feed` to a fixed measured height at rest, re-measuring only on real layout changes (`window load`/`resize`, after a filter's FLIP settles, on `setRoute('feed')`, and inside `flipPins` for sheet open/close) — never on hover. `.feed`'s `120px` bottom padding is the headroom that growth pushes into instead of the footer.
 
 Filter tabs match `data-filter` against `data-cat`. Visibility changes use a FLIP animation (snapshot positions before/after, then transition with `translate`).
 
@@ -70,7 +72,7 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 
 **Page chrome (theme-dependent — flips between `:root` and `[data-theme="dark"]`):** `--paper`, `--paper-2`, `--ink`, `--ink-mid`, `--ink-low`, `--line`, `--control-soft`, `--control-muted`, `--accent-soft`, `--sub-color`
 
-**Feed card palette (theme-independent — defined once in `:root`, never overridden):** `--c-clay`, `--c-blue`, `--c-cream`, `--c-yellow`, `--c-sage`, `--c-plum`, `--c-sand`, `--c-charcoal`, `--c-noir`, `--c-noir-2`, `--accent`
+**Feed card palette (theme-independent — defined once in `:root`, never overridden):** `--c-clay`, `--c-blue`, `--c-cream`, `--c-yellow`, `--c-sage`, `--c-plum`, `--c-sand`, `--c-charcoal`, `--c-noir`, `--c-noir-2`, `--accent`. `--c-plum` is a muted lavender (`oklch(0.71 0.06 305)`), lighter and softer than the old saturated plum but darkened back toward `--c-sage`/`--c-clay`'s lightness so it doesn't read as washed out next to them — don't push it lighter than ~0.72 or more saturated than ~0.07 chroma. `--c-clay` doubles as the "coral" tone (used by the Daily type & motion card and the About page's Design skill pill) — there is no separate `--c-coral` token, don't add one.
 
 **Card content colors (also theme-independent):** `--card-ink`, `--card-muted`, `--card-paper` — used for text/labels drawn on top of the `--c-*` card backgrounds, regardless of page theme.
 
@@ -99,10 +101,11 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 ## Navigation and shared chrome
 
 - **Compact rail**: the closed desktop rail is exactly `--chrome-size` (`80px`), matching the topbar's explicit height. Do not split those dimensions or widen the compact state independently.
-- **Rail reveal**: the rail stays compact on page entry and expands only when the navigation is hovered. Do not add an automatic entry expansion; Experience is already exposed as the first header link.
+- **Rail reveal**: outside the one-time entry storyboard below, the rail stays compact and expands only when the navigation is hovered or keyboard-focused (`:focus-within`).
+- **Work rail entry storyboard**: `playWorkRailEntry()` (defined next to `updateFeedScrollbar`, called from the hash-routing block only when `initialRoute === 'feed'`) briefly auto-expands the rail (`.is-intro-expanded`, same CSS as hover/focus-within) 180ms after landing on Work, then auto-collapses it at 2380ms — a one-time "there's navigation here" reveal, not a persistent state. It fires on true entry into Work (first load or a refresh while on Work), desktop widths only (`min-width: 801px`), and respects `prefers-reduced-motion`. It must never fire from in-app navigation back to Work (rail click, logo, Back to Work) — only `setRoute()` handles those, and `setRoute()` never calls it. This exact feature has been silently deleted before while "refining navigation" (the CSS class survived, the JS didn't) — don't let that happen again.
 - **Expanded width**: the rail expands only to `168px`, which is the smallest width that gives the Experience pill adequate right padding. Do not restore the older `192px` width without a demonstrated need.
 - **Rail labels**: the primary route is named **Work** in the rail even though its internal route key is `feed`. The other labels are Experience and About Me.
-- **Header utilities**: header order is **Experience / Email / LinkedIn**. Experience is first because it is a high-priority internal destination; GitHub remains in the Elsewhere card. Hovering or keyboard-focusing the header Experience link also previews the Experience rail pill's soft hover state without expanding the rail or overriding its active state.
+- **Header**: the topbar no longer carries a contact/utility nav (the Experience/Email/LinkedIn text links were removed); it exists only for the scroll-shadow chrome (`.topbar::before` / `.scrolled`) and to match the rail's `--chrome-size` height. Email, LinkedIn, GitHub, and Instagram are reachable via the social tiles in the feed banner and the Elsewhere card.
 - **Return controls**: About and Experience each show a quiet outlined **Back to Work** button beneath the introductory title. Both call `setRoute('feed')`.
 - **Footer**: the copyright is a centered, in-flow footer at the bottom of the Feed view, never fixed to the viewport. Current copy is `© 2026 Zainab Ahsan, All Rights Reserved`. Keep it low contrast and ensure card hover states cannot move it.
 - **Mobile**: the desktop rail remains hidden at `800px` and below. Do not introduce rail-only information that becomes unavailable on mobile.
@@ -111,10 +114,11 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 
 ## Case study and report design system
 
-`PAGES.climate` and `PAGES.brew` are the two reference implementations. They share one reading system but represent different kinds of work:
+`PAGES.climate`, `PAGES.brew`, and `PAGES.crow` are the reference implementations. They share one reading system but represent different kinds of work:
 
 - **Analytical report (`climate`)**: evidence-led, finding-first, data and figure heavy.
 - **Product-design case study (`brew`)**: problem-led, ownership-first, interaction and iteration heavy.
+- **Client case study (`crow`)**: brew's product-design grammar (measured section rhythm, `cs-product-principles`, framed `cs-fig` figures with real screenshots instead of an iteration player) applied to a real client redesign — WIIRED Studio × UWB CROW Journal, a WIIRED Studio partner project (partner unnamed by request). Its palette is lifted directly from `the-crow/README.md`'s documented design tokens (`--dark:#191331`, `--ink:#2d2357`, `--purple:#43396d`, `--cream:#f5f0e8`), scoped under `.sheet[data-page="crow"]` the same way brew scopes its cream/coffee palette — do not invent a different portfolio-only palette for it. Every fact in its copy (repo, Figma, demo link, contributors, timeline, the still-unmigrated `uwbcrow.com` production domain) is verified from `the-crow/README.md` and its git history, not invented — keep it that way if this entry is edited.
 
 Do not make every sheet visually identical. Consistency comes from the canvas, spacing, hierarchy, figure treatment, and interaction patterns. The accent palette and content structure should still communicate the kind of work being presented.
 
