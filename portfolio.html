@@ -1423,10 +1423,10 @@
      soft lift shadow). --climate-accent-text carries the numbers/highlights
      that need to be yellow on dark but dark-on-light instead, since pale
      yellow text has no contrast on a light page. */
-  html[data-theme="dark"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"]) {
+  html[data-theme="dark"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"], .sheet[data-page="dreamcatcher"]) {
     --paper: oklch(0.29 0 0);
   }
-  html[data-theme="light"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"]) {
+  html[data-theme="light"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"], .sheet[data-page="dreamcatcher"]) {
     --paper: oklch(0.91 0 0);
   }
   html[data-theme="dark"] .sheet[data-page="climate"] {
@@ -2415,29 +2415,27 @@
     background: var(--brew-cream);
   }
   /* CROW borrows brew's product-design grammar (measured section rhythm,
-     framed figures, three-up principles) rather than the report styling —
-     but with its own palette, lifted directly from the-crow/README.md's
-     documented design tokens so this page stays faithful to the real
-     brand instead of inventing a portfolio-only palette. */
+     framed figures, three-up principles). Its portfolio accent follows the
+     shared plum card token so the feed identity carries into the study. */
   html[data-theme="dark"] .sheet[data-page="crow"] {
-    --paper-2: oklch(1 0 0 / 0.06);
-    --ink: oklch(0.94 0.01 85);
-    --ink-mid: oklch(0.68 0.03 152);
-    --ink-low: oklch(0.5 0.03 152);
+    --paper-2: oklch(0.27 0.012 305);
+    --ink: oklch(0.95 0.012 305);
+    --ink-mid: oklch(0.72 0.025 305);
+    --ink-low: oklch(0.54 0.025 305);
     --line: oklch(1 0 0 / 0.12);
-    --crow-accent: #dcf0e3;
-    --crow-accent-ink: #17301f;
-    --crow-panel: oklch(1 0 0 / 0.045);
+    --crow-accent: var(--c-plum);
+    --crow-accent-ink: oklch(0.19 0.035 305);
+    --crow-panel: oklch(1 0.015 305 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="crow"] {
-    --paper-2: #ffffff;
-    --ink: #1c3324;
-    --ink-mid: #4f6b57;
-    --ink-low: #83988a;
-    --line: oklch(0.25 0.06 152 / 0.14);
-    --crow-accent: #1f3d29;
-    --crow-accent-ink: #f5f0e8;
-    --crow-panel: #f5faf6;
+    --paper-2: oklch(0.985 0.007 305);
+    --ink: oklch(0.2 0.035 305);
+    --ink-mid: oklch(0.44 0.03 305);
+    --ink-low: oklch(0.59 0.025 305);
+    --line: oklch(0.25 0.04 305 / 0.14);
+    --crow-accent: var(--c-plum);
+    --crow-accent-ink: oklch(0.19 0.035 305);
+    --crow-panel: oklch(0.965 0.014 305);
   }
   .sheet[data-page="crow"] .cs-hero--crow {
     background: var(--crow-accent);
@@ -2848,6 +2846,159 @@
     max-width: 300px;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  /* DreamCatcher follows the shared case-study rhythm and carries the sage
+     feed color into the sheet. The woven-circle motif belongs to the cover;
+     content surfaces stay quiet so the story remains the focus. */
+  html[data-theme="dark"] .sheet[data-page="dreamcatcher"] {
+    --paper-2: oklch(0.265 0.012 145);
+    --ink: oklch(0.95 0.012 135);
+    --ink-mid: oklch(0.72 0.018 140);
+    --ink-low: oklch(0.55 0.018 140);
+    --line: oklch(1 0.015 140 / 0.12);
+    --dream-accent: var(--c-sage);
+    --dream-deep: oklch(0.23 0.045 150);
+    --dream-cream: oklch(0.95 0.02 105);
+    --dream-panel: oklch(1 0.01 140 / 0.05);
+  }
+  html[data-theme="light"] .sheet[data-page="dreamcatcher"] {
+    --paper-2: oklch(0.985 0.008 110);
+    --ink: oklch(0.2 0.025 145);
+    --ink-mid: oklch(0.44 0.025 145);
+    --ink-low: oklch(0.58 0.02 145);
+    --line: oklch(0.2 0.025 145 / 0.12);
+    --dream-accent: var(--c-sage);
+    --dream-deep: oklch(0.23 0.045 150);
+    --dream-cream: oklch(0.96 0.02 105);
+    --dream-panel: oklch(0.965 0.012 140);
+  }
+  .sheet[data-page="dreamcatcher"] .cs-hero--dreamcatcher {
+    padding: 38px 36px 34px;
+    border-radius: 18px;
+    background: var(--dream-accent);
+    color: var(--dream-deep);
+  }
+  .sheet[data-page="dreamcatcher"] .cs-hero--dreamcatcher .cs-hero-title {
+    max-width: 820px;
+    margin-bottom: 18px;
+    font-size: clamp(42px, 5.2vw, 62px);
+    line-height: .96;
+    letter-spacing: -.035em;
+    color: var(--dream-deep);
+    text-wrap: balance;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-dream-topline {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 24px; margin-bottom: 28px;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-dream-kicker {
+    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    letter-spacing: .09em; text-transform: uppercase; opacity: .7;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-dream-actions .cs-cta-btn {
+    border: 0; background: var(--dream-deep); color: var(--dream-cream);
+    box-shadow: none; font-weight: 700;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-dream-actions .cs-cta-btn:hover,
+  .sheet[data-page="dreamcatcher"] .cs-dream-actions .cs-cta-btn:focus-visible { opacity: .84; box-shadow: none; }
+  .sheet[data-page="dreamcatcher"] .cs-hero--dreamcatcher .cs-hero-title em {
+    display: block; margin-top: 8px; color: var(--dream-deep);
+    font-family: var(--serif); font-weight: 400; opacity: .72;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-hero-sub { max-width: 730px; color: var(--dream-deep); opacity: .76; }
+  .sheet[data-page="dreamcatcher"] .cs-dream-byline { margin: 0; color: var(--dream-deep); opacity: .62; }
+  .sheet[data-page="dreamcatcher"] .cs-section { padding-top: 66px; }
+  .sheet[data-page="dreamcatcher"] .cs-copy { max-width: 66ch; }
+  .sheet[data-page="dreamcatcher"] .cs-copy p { text-wrap: pretty; }
+  .sheet[data-page="dreamcatcher"] .cs-question {
+    max-width: 24ch;
+    text-wrap: balance;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-label {
+    display: inline-block; margin-bottom: 22px; padding: 5px 8px 6px;
+    border-radius: 4px; background: var(--dream-accent); color: var(--dream-deep);
+    font-family: var(--sans); font-size: 15px; font-weight: 700;
+    line-height: 1; letter-spacing: -.01em; text-transform: none;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-product-principles {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-product-principle,
+  .sheet[data-page="dreamcatcher"] .cs-feature {
+    padding: 22px 20px 24px; border: 0; border-radius: 12px;
+    background: var(--dream-panel); box-shadow: none;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-product-principle span {
+    display: block; margin-bottom: 24px; font-family: var(--mono);
+    font-size: 9px; font-weight: 700; letter-spacing: .07em; color: var(--ink-low);
+  }
+  .sheet[data-page="dreamcatcher"] .cs-product-principle h3,
+  .sheet[data-page="dreamcatcher"] .cs-feature h3 {
+    margin-bottom: 9px; font-family: var(--sans); font-size: 16px;
+    font-weight: 700; line-height: 1.15; color: var(--ink); text-transform: none;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-product-principle p { font-size: 13px; line-height: 1.55; color: var(--ink-mid); }
+  .sheet[data-page="dreamcatcher"] .cs-preview-frame,
+  .sheet[data-page="dreamcatcher"] .cs-artifact-frame {
+    border: 1px solid var(--line); border-radius: 14px;
+    background: var(--dream-panel); box-shadow: none; overflow: hidden;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-caption {
+    margin: 0; padding: 13px 16px 15px; border-top: 1px solid var(--line);
+    font-size: 12px; line-height: 1.5; color: var(--ink-mid);
+  }
+  .sheet[data-page="dreamcatcher"] .cs-two-col { gap: 24px; }
+  .sheet[data-page="dreamcatcher"] .cs-fig--phone {
+    max-width: 360px; margin-left: auto; margin-right: auto;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-dream-screen-pair {
+    width: min(100%, 760px);
+    margin-left: auto;
+    margin-right: auto;
+    align-items: start;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-dream-screen {
+    min-width: 0;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-dream-screen .cs-preview-img {
+    position: relative;
+    max-height: 720px;
+    overflow: hidden;
+    background: #0d192b;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-dream-screen .cs-preview-img::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 110px;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent, #0d192b);
+  }
+  .sheet[data-page="dreamcatcher"] .cs-dream-screen .cs-expand-icon {
+    z-index: 2;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-impact-callout {
+    padding: 32px 30px; border: 0; border-radius: 16px;
+    background: var(--dream-accent);
+  }
+  .sheet[data-page="dreamcatcher"] .cs-impact-line {
+    font-family: var(--sans); font-size: clamp(24px, 3.2vw, 34px);
+    font-weight: 700; line-height: 1.15; letter-spacing: -.02em; color: var(--dream-deep);
+  }
+  .sheet[data-page="dreamcatcher"] .cs-learnings {
+    padding: 22px 24px; border: 0; border-radius: 14px; background: var(--dream-panel);
+  }
+  .sheet[data-page="dreamcatcher"] .cs-learning { padding-left: 20px; }
+  .sheet[data-page="dreamcatcher"] .cs-learning::before { top: .65em; background: var(--dream-accent); }
+
+  @media (max-width: 640px) {
+    .sheet[data-page="dreamcatcher"] .cs-product-principles { grid-template-columns: 1fr; }
+    .sheet[data-page="dreamcatcher"] .cs-dream-topline { flex-direction: column; }
+    .sheet[data-page="dreamcatcher"] .cs-dream-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sheet[data-page="dreamcatcher"] .cs-dream-screen .cs-preview-img { max-height: 620px; }
   }
 
   /* Third pass on this hero. Dropped: the dark card (felt cold), the bubble
@@ -3791,7 +3942,7 @@
 
           <!-- The CROW redesign -->
           <article class="pin" data-cat="ux studio" data-page="crow" data-year="2026" data-sub="WIIRED Studio, 2026" aria-label="Open the CROW journal redesign case study">
-            <div class="art art-sage art-crow ar-45">
+            <div class="art art-plum art-crow ar-45">
               <div class="pin-meta">Case Study</div>
               <h3>The<br>CROW.</h3>
             </div>
@@ -3862,18 +4013,19 @@
             </div>
           </article>
 
-          <!-- WIIRED Studio -->
-          <article class="pin" data-cat="studio" data-page="wiired" data-year="2026" data-cursor-label="Under construction">
-            <div class="art art-charcoal ar-45">
+          <!-- DreamCatcher -->
+          <article class="pin" data-cat="ux" data-page="dreamcatcher" data-year="2026" data-sub="Product / UX, FigBuild 2026" aria-label="Open the DreamCatcher product case study">
+            <div class="art art-sage art-crow ar-45">
               <div class="pin-meta">Case Study</div>
-              <h3 style="margin-top: auto;">WIIRED<br><em style="font-style:italic; color:var(--c-blue);">Studio.</em></h3>
+              <h3>Dream<br>Catcher.</h3>
             </div>
           </article>
 
-          <!-- Side project -->
-          <article class="pin" data-cat="swe" data-page="releases" data-year="2026" data-cursor-label="Under construction">
+          <!-- Temporary WIIRED Studio card -->
+          <article class="pin" data-cat="studio" data-page="wiired" data-year="2026" data-cursor-label="Under construction" aria-label="WIIRED Studio case study, under construction">
             <div class="art art-cream ar-1">
-              <h3 style="font-size:24px;">Linear-style<br>release notes.</h3>
+              <div class="pin-meta">Case Study · WIP</div>
+              <h3 style="font-size:24px; margin-top:auto;">WIIRED<br><em style="font-style:italic; color:var(--c-blue);">Studio.</em></h3>
             </div>
           </article>
         </div>
@@ -4666,6 +4818,109 @@
           </div>
         </div>
 
+      `
+    },
+    dreamcatcher: {
+      meta: 'Product / UX · FigBuild 2026',
+      eyebrow: 'Product Case Study',
+      custom: `
+        <div class="cs-hero cs-hero--dreamcatcher">
+          <div class="cs-dream-topline">
+            <span class="cs-dream-kicker">Mobile product concept · FigBuild 2026</span>
+            <div class="cs-dream-actions" aria-label="Project links">
+              <a class="cs-cta-btn" href="https://devpost.com/software/dreamcatcher-ao67xw" target="_blank" rel="noopener noreferrer">View on Devpost ↗</a>
+              <a class="cs-cta-btn" href="https://www.figma.com/proto/vHJ25w47NgOn0DFI0FzIOq/DreamCatcher---FigBuild2026?node-id=1-2&amp;p=f&amp;t=khsu4fLn9IcupSgL-1&amp;scaling=scale-down&amp;content-scaling=fixed&amp;page-id=0%3A1" target="_blank" rel="noopener noreferrer">Open Figma ↗</a>
+            </div>
+          </div>
+          <h2 class="cs-hero-title">What if you could choose your dreams?</h2>
+          <p class="cs-hero-sub">DreamCatcher is a mobile-first concept for detecting, visualizing, and intentionally shaping dream experiences. It turns an invisible part of sleep into dream worlds to explore, a guided creation flow, personal insights, and constellations that grow over time.</p>
+          <div class="cs-hero-byline cs-dream-byline" aria-label="Project details">
+            <span>Product + interaction design</span>
+            <span>Team of 2</span>
+            <span>Figma prototype</span>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Stack + Ownership</span>
+          <div class="cs-two-col">
+            <div class="cs-feature"><h3>Stack</h3><p>Designed as a mobile-first interface prototype in Figma for FigBuild 2026. The prototype covers landing and sign-in, a personal home view, dream creation, Dreamspace discovery, tonight's dream, and constellation-based achievements.</p></div>
+            <div class="cs-feature"><h3>Ownership</h3><p>A team project developed collaboratively from concept through prototype. The product direction, experience, and visual system reflect shared work, so this case study uses “we” throughout.</p></div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Product Context</span>
+          <h3 class="cs-question">Sleep trackers can measure a cycle. They cannot capture what the dream felt like.</h3>
+          <div class="cs-copy">
+            <p>Dreams are immersive and emotionally rich, but they are also invisible, difficult to control, and easy to forget. Existing trackers quantify bedtime, wake time, and sleep stages while leaving the experience inside those stages untouched.</p>
+            <p>DreamCatcher explores a speculative future where sleep-sensing technology can detect patterns and emotional states, then make them visible. The product lets someone browse shared dream worlds, design an intentional experience for the night ahead, and notice patterns across their own dream activity.</p>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Product Principles</span>
+          <div class="cs-product-principles">
+            <div class="cs-product-principle"><span>01</span><h3>Make the invisible navigable</h3><p>Translate dream activity into familiar places, cards, maps, and progress states instead of presenting raw sleep data.</p></div>
+            <div class="cs-product-principle"><span>02</span><h3>Guide an unfamiliar action</h3><p>Choosing a dream has no established interaction pattern. Prompts, examples, and progressive options give the idea enough structure to feel usable.</p></div>
+            <div class="cs-product-principle"><span>03</span><h3>Stay immersive, stay legible</h3><p>Night-sky imagery carries the emotional tone, while repeated controls and direct labels keep the experience from becoming an abstract art piece.</p></div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Entry Point</span>
+          <div class="cs-copy"><p>The landing screen makes one promise and one ask. The dreamcatcher mark establishes the product's world, while “Start Dreaming” moves directly into the experience without explaining speculative technology before the user has context for it.</p></div>
+          <figure class="cs-fig cs-fig--phone cs-dream-screen">
+            <div class="cs-fig-head"><h4 class="cs-fig-title">Landing page</h4></div>
+            <div class="cs-preview-frame"><div class="cs-preview-img has-image"><a class="cs-image-link" href="assets/images/dreamcatcher-landing.png" aria-label="Open the DreamCatcher landing page at full size"><img src="assets/images/dreamcatcher-landing.png" alt="DreamCatcher landing page on a starry navy background with the product mark and a Start Dreaming button" loading="lazy"><span class="cs-expand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16.5 16.5 3.5 3.5M11 8.5v5M8.5 11h5"/></svg></span></a></div><div class="cs-caption">One primary action against a quiet star field. The interface introduces the atmosphere before asking someone to understand the system.</div></div>
+          </figure>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Dream Creation</span>
+          <h3 class="cs-question">Give shape to an experience that normally has no controls.</h3>
+          <div class="cs-copy"><p>The creation flow begins with a plain-language description: where are you, what do you want to experience, and how do you want to feel? Intensity and duration come next, followed by optional controls for activity, time of day, and soundscape. “Deep Rest” lives beside “Design Dream” as a second mode, so opting out of dreaming is a first-class choice rather than an error state.</p></div>
+          <div class="cs-two-col cs-dream-screen-pair">
+            <figure class="cs-fig cs-dream-screen"><div class="cs-fig-head"><h4 class="cs-fig-title">Design a dream</h4></div><div class="cs-preview-frame"><div class="cs-preview-img has-image"><a class="cs-image-link" href="assets/images/dreamcatcher-create-1.png" aria-label="Open the dream creation flow at full size"><img src="assets/images/dreamcatcher-create-1.png" alt="Dream creation screen with description, intensity, duration, activity, time of day, and soundscape controls" loading="lazy"><span class="cs-expand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16.5 16.5 3.5 3.5M11 8.5v5M8.5 11h5"/></svg></span></a></div><div class="cs-caption">The essential choices appear first. Activity, time, and sound remain visibly optional so the flow can be completed without configuring everything.</div></div></figure>
+            <figure class="cs-fig cs-dream-screen"><div class="cs-fig-head"><h4 class="cs-fig-title">Choose deep rest</h4></div><div class="cs-preview-frame"><div class="cs-preview-img has-image"><a class="cs-image-link" href="assets/images/dreamcatcher-create-2.png" aria-label="Open the Deep Rest creation mode at full size"><img src="assets/images/dreamcatcher-create-2.png" alt="Deep Rest mode showing Dreamless Sleep, a duration control, and Add to Tonight's Dream" loading="lazy"><span class="cs-expand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16.5 16.5 3.5 3.5M11 8.5v5M8.5 11h5"/></svg></span></a></div><div class="cs-caption">The adjacent mode keeps the same structure but removes unnecessary settings. Rest is presented as an intentional outcome, not a failed dream.</div></div></figure>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Dreamspace</span>
+          <div class="cs-copy"><p>Dreamspace turns discovery into a visual catalog of places rather than a social feed. Recent dreams, new releases, and trending worlds provide recognizable browsing categories, while circular artwork makes each option read like a world to enter.</p></div>
+          <figure class="cs-fig cs-fig--phone cs-dream-screen"><div class="cs-fig-head"><h4 class="cs-fig-title">Browse dream worlds</h4></div><div class="cs-preview-frame"><div class="cs-preview-img has-image"><a class="cs-image-link" href="assets/images/dreamcatcher-dreamspace.png" aria-label="Open Dreamspace at full size"><img src="assets/images/dreamcatcher-dreamspace.png" alt="Dreamspace page with recent, new, and trending dream worlds displayed as circular landscape images" loading="lazy"><span class="cs-expand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16.5 16.5 3.5 3.5M11 8.5v5M8.5 11h5"/></svg></span></a></div><div class="cs-caption">The catalog uses place names and landscapes, not technical sleep labels, so exploration starts from imagination rather than system terminology.</div></div></figure>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Personal Loop</span>
+          <div class="cs-two-col cs-dream-screen-pair">
+            <figure class="cs-fig cs-dream-screen"><div class="cs-fig-head"><h4 class="cs-fig-title">Home + insights</h4></div><div class="cs-preview-frame"><div class="cs-preview-img has-image"><a class="cs-image-link" href="assets/images/dreamcatcher-home.png" aria-label="Open the DreamCatcher home screen at full size"><img src="assets/images/dreamcatcher-home.png" alt="DreamCatcher home screen with sleep schedule, achievements, friends, a recommended dream, and profile information" loading="lazy"><span class="cs-expand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16.5 16.5 3.5 3.5M11 8.5v5M8.5 11h5"/></svg></span></a></div><div class="cs-caption">Schedule, achievements, friends, and a recommendation share one view. The prototype establishes the product loop, though this density is a clear target for the next pass.</div></div></figure>
+            <figure class="cs-fig cs-dream-screen"><div class="cs-fig-head"><h4 class="cs-fig-title">Tonight's dream</h4></div><div class="cs-preview-frame"><div class="cs-preview-img has-image"><a class="cs-image-link" href="assets/images/dreamcatcher-tonight.png" aria-label="Open Tonight's Dream at full size"><img src="assets/images/dreamcatcher-tonight.png" alt="Tonight's Dream page with a selected Floating Cities Exploration, Begin and Invite Friend actions, and alternative dream cards" loading="lazy"><span class="cs-expand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16.5 16.5 3.5 3.5M11 8.5v5M8.5 11h5"/></svg></span></a></div><div class="cs-caption">A selected experience stays primary, with duration and REM-cycle context visible before the user begins. Alternatives remain available without interrupting the choice.</div></div></figure>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Achievements</span>
+          <h3 class="cs-question">Progress becomes a sky you fill in, not a checklist you clear.</h3>
+          <div class="cs-copy"><p>Achievements use constellations to connect product progress with the night-sky metaphor. The Dreamer, Architect, and Explorer tracks separate different kinds of participation, while the cards beneath translate each incomplete constellation into a concrete next action.</p></div>
+          <figure class="cs-fig cs-fig--phone cs-dream-screen"><div class="cs-fig-head"><h4 class="cs-fig-title">Constellation progress</h4></div><div class="cs-preview-frame"><div class="cs-preview-img has-image"><a class="cs-image-link" href="assets/images/dreamcatcher-achievements.png" aria-label="Open the achievements screen at full size"><img src="assets/images/dreamcatcher-achievements.png" alt="Achievements screen showing Dreamer, Explorer, and Architect constellations with progress cards" loading="lazy"><span class="cs-expand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16.5 16.5 3.5 3.5M11 8.5v5M8.5 11h5"/></svg></span></a></div><div class="cs-caption">The visual metaphor does functional work: individual stars show partial progress, color separates achievement families, and the cards name what completes each path.</div></div></figure>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Design Challenge</span>
+          <div class="cs-copy"><p>The hardest part was designing for something abstract and deeply personal without making the interface equally abstract. Dreams have no standard structure, and intentional dreaming has no familiar product convention. The team tested layouts, prompts, and cosmic metaphors to make exploration feel imaginative while keeping every screen understandable.</p><p>The prototype's strongest idea is also its main constraint: immersion can create density. The long creation flow and information-heavy home screen show where atmosphere and feature coverage started competing with hierarchy.</p></div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Prototype Outcome</span>
+          <div class="cs-impact-callout"><span class="cs-impact-line">A complete Figma concept turned dreaming into a product system: discover a world, shape an experience, enter it tonight, and watch patterns become constellations over time.</span></div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Next Iteration</span>
+          <div class="cs-learnings"><div class="cs-learning">Simplify onboarding and the dream-creation flow, clarify navigation between discovery and personal insights, and reduce dashboard density. Because the concept itself is unfamiliar, the next version should teach one action at a time before expanding into the full dream ecosystem.</div></div>
+        </div>
       `
     },
     wiired: {
