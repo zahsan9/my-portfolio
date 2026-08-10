@@ -816,7 +816,7 @@
   .art-habitat .habitat-caption {
     font-family: var(--mono); font-size: 9px; line-height: 1.5;
     text-transform: uppercase; letter-spacing: 0.06em;
-    color: var(--card-ink); opacity: 1;
+    color: currentColor; opacity: 0.82;
   }
 
   /* Book pin */
@@ -2604,19 +2604,18 @@
   }
 
   /* Habitat borrows brew's product-design grammar (measured section rhythm,
-     framed figures, three-up principles, numbered decision blocks). Like
-     brew, the accent stays one identity color across both site themes
-     instead of inverting the way crow's does: the ocean navy (#0a2656)
-     from the real signup screen, with the seashell cream the app itself
-     uses for text-on-navy. The wordmark is mustard-on-transparent, drawn
-     for that exact navy, so a light-mode accent card would wash it out. */
+     framed figures, three-up principles, numbered decision blocks). The
+     accent stays one identity color across both site themes instead of
+     inverting the way crow's does: the same blue as the feed card
+     (--c-blue), a touch lighter so the hero doesn't read as flat, with
+     the seashell cream the app itself uses for text-on-dark. */
   html[data-theme="dark"] .sheet[data-page="habitat"] {
     --paper-2: oklch(0.27 0.014 230);
     --ink: oklch(0.95 0.008 230);
     --ink-mid: oklch(0.7 0.02 230);
     --ink-low: oklch(0.52 0.02 230);
     --line: oklch(1 0.01 230 / 0.12);
-    --habitat-accent: #0a2656;
+    --habitat-accent: oklch(0.56 0.11 243);
     --habitat-accent-ink: #EAE4DA;
     --habitat-panel: oklch(1 0.01 230 / 0.05);
   }
@@ -2626,7 +2625,7 @@
     --ink-mid: oklch(0.43 0.02 230);
     --ink-low: oklch(0.58 0.02 230);
     --line: oklch(0.2 0.02 230 / 0.12);
-    --habitat-accent: #0a2656;
+    --habitat-accent: oklch(0.56 0.11 243);
     --habitat-accent-ink: #EAE4DA;
     --habitat-panel: oklch(0.97 0.008 230);
   }
@@ -2777,15 +2776,20 @@
     letter-spacing: -0.01em;
     text-transform: none;
   }
+  /* Decision blocks follow Neutral's report pattern: alternating rows get a
+     faint tint instead of every block being its own card, and every row
+     shares the same 24px inset so headings and body text align to one
+     text guide. */
   .sheet[data-page="habitat"] .cs-decision-block {
-    padding: 26px;
-    border: 0;
-    border-radius: 14px;
-    background: var(--habitat-panel);
+    padding: 24px;
+    border-bottom: none;
   }
-  .sheet[data-page="habitat"] .cs-decision-block h3 {
-    font-family: var(--sans);
-    font-size: 17px;
+  .sheet[data-page="habitat"] .cs-decision-block:last-child { padding-bottom: 0; }
+  .sheet[data-page="habitat"] .cs-decision-block:nth-child(even) {
+    background: var(--habitat-panel);
+    margin: 0;
+    border-radius: 14px;
+    border-bottom: none;
   }
   .sheet[data-page="habitat"] .cs-impact-callout {
     padding: 32px 30px;
@@ -3904,7 +3908,7 @@
 
           <!-- Habitat -->
           <article class="pin" data-cat="ux swe" data-page="habitat" data-year="2026" data-sub="Product / UX &amp; SWE, Hackathon 2026" aria-label="Open the Habitat habit-tracker case study">
-            <div class="art art-plum art-habitat ar-45">
+            <div class="art art-blue art-habitat ar-45">
               <div class="pin-meta">Case Study</div>
               <div class="habitat-mark">
                 <img class="habitat-logo-mark" src="assets/images/habitat-logo.png" alt="HABITAT">
@@ -5062,11 +5066,11 @@
     },
     habitat: {
       meta: 'Product / UX · Hackathon',
-      eyebrow: 'Team Project',
+      eyebrow: 'Hackathon Project',
       custom: `
         <div class="cs-hero cs-hero--habitat">
           <div class="cs-habitat-topline">
-            <span class="cs-habitat-kicker">Product case study · UWB Hacks: The Future!, Apr 2026</span>
+            <span class="cs-habitat-kicker">Hackathon product case study · UWB Hacks: The Future!, Apr 2026</span>
             <div class="cs-habitat-actions" aria-label="Project links">
               <a class="cs-cta-btn" href="https://github.com/zahsan9/uwbhacks26" target="_blank" rel="noopener noreferrer">Repo ↗</a>
             </div>
@@ -5075,7 +5079,7 @@
           <p class="cs-hero-sub">A gamified habit tracker that turns HealthKit data into a living island world. Each habit grows its own island, and a pixel panda's health responds to how those islands are doing, so checking in feels like visiting a place instead of reading a guilt-driven dashboard.</p>
           <div class="cs-hero-byline cs-habitat-byline" aria-label="Project details">
             <span>Visual + product design</span>
-            <span>Team of 4 · UWB Hacks 2026</span>
+            <span>Team of 4 · 48-hour hackathon</span>
             <span>React Native + Expo</span>
           </div>
         </div>
@@ -5089,7 +5093,7 @@
             </div>
             <div class="cs-feature">
               <h3>Ownership</h3>
-              <p>Habitat was a team of four, built in about 48 hours for UWB Hacks: The Future! (April 26, 2026). Archit Jaiswal built the app shell, the world map, and the island-zoom transitions. Ayaan Ali built the FastAPI + MobileCLIP photo-verification pipeline. Yatharth Sharma built the onboarding logic and habit dashboard. I owned the visual system: the pixel avatar and island-health language, the four-state palette swap, and the signup screen, translating our Figma into the React Native implementation.</p>
+              <p>Habitat was a full team effort, built in about 48 hours for UWB Hacks: The Future! (April 26, 2026): the app shell and world map, the HealthKit sync and photo-verification pipeline, and the onboarding and habit dashboard logic were split across the team. I led the front end: the pixel avatar and island-health language, the four-state palette swap, and the signup screen, translating our Figma into the React Native implementation.</p>
             </div>
           </div>
         </div>
