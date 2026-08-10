@@ -2816,10 +2816,33 @@
     top: 0.65em;
     background: var(--habitat-accent);
   }
-  .sheet[data-page="habitat"] .cs-avatar-states img {
-    display: block;
-    width: 100%;
-    height: auto;
+  .sheet[data-page="habitat"] .cs-avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .sheet[data-page="habitat"] .cs-avatar-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 28px 12px 22px;
+    text-align: center;
+  }
+  .sheet[data-page="habitat"] .cs-avatar-cell img {
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+  }
+  .sheet[data-page="habitat"] .cs-avatar-state {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .sheet[data-page="habitat"] .cs-avatar-msg {
+    font-size: 11px;
+    line-height: 1.4;
+    color: oklch(1 0 0 / 0.82);
   }
   .sheet[data-page="habitat"] .cs-fig--phone {
     max-width: 300px;
@@ -5073,7 +5096,7 @@
             </div>
             <div class="cs-feature">
               <h3>Ownership</h3>
-              <p>Habitat was a full team effort, built in about 48 hours for UWB Hacks: The Future! (April 26, 2026): the app shell and world map, the HealthKit sync and photo-verification pipeline, and the onboarding and habit dashboard logic were split across the team. I led the front end: the pixel avatar and island-health language, the four-state palette swap, and the signup screen, translating our Figma into the React Native implementation.</p>
+              <p>Habitat was a full team effort, built in about 48 hours for UWB Hacks: The Future! (April 26, 2026): the app shell and world map, the HealthKit sync and photo-verification pipeline, and the onboarding and habit dashboard logic were split across the team. I led the front end: the pixel avatar and island-health language, the four-state sprite and palette system, and the signup screen, translating our Figma into the React Native implementation.</p>
             </div>
           </div>
         </div>
@@ -5211,16 +5234,36 @@
         <div class="cs-section">
           <span class="cs-label">Avatar Health</span>
           <div class="cs-copy">
-            <p>The avatar has four states, thriving, healthy, sick, and critical, and every state is a full palette swap plus a change in motion, not just a different sprite. The idle bob slows from 1.6s at thriving to 3.5s at critical, so decline reads in movement before it reads in color.</p>
+            <p>The avatar has four states, thriving, healthy, sick, and critical, backed by four distinct animated sprites, not one sprite recolored. Motion carries the rest of the signal: the idle bob slows from 1.6s at thriving to 3.5s at critical, so decline reads in movement before anyone reads the message underneath.</p>
           </div>
           <figure class="cs-fig cs-avatar-states">
             <div class="cs-fig-head">
-              <h4 class="cs-fig-title">Same panda, four palettes</h4>
+              <h4 class="cs-fig-title">Four sprites, four states</h4>
             </div>
             <div class="cs-preview-frame">
-              <div class="cs-preview-img has-image">
-                <img src="assets/images/habitat-avatar-states.png" alt="The panda avatar in four health states: thriving in tea green, healthy in lavender, sick in tangerine, and critical in red, each with its in-app message" loading="lazy" />
+              <div class="cs-avatar-grid">
+                <div class="cs-avatar-cell" style="background:#245E55;">
+                  <img src="assets/images/habitat-panda-thriving.gif" alt="Thriving panda sprite, arms raised" loading="lazy" />
+                  <span class="cs-avatar-state">Thriving</span>
+                  <span class="cs-avatar-msg">All my islands are thriving.</span>
+                </div>
+                <div class="cs-avatar-cell" style="background:#808BC5;">
+                  <img src="assets/images/habitat-panda-healthy.gif" alt="Healthy panda sprite, standing" loading="lazy" />
+                  <span class="cs-avatar-state">Healthy</span>
+                  <span class="cs-avatar-msg">Doing okay, volcano runs warm.</span>
+                </div>
+                <div class="cs-avatar-cell" style="background:#ED773C;">
+                  <img src="assets/images/habitat-panda-sick.gif" alt="Sick panda sprite, sleepy" loading="lazy" />
+                  <span class="cs-avatar-state">Sick</span>
+                  <span class="cs-avatar-msg">My volcano needs help...</span>
+                </div>
+                <div class="cs-avatar-cell" style="background:#C63F3E;">
+                  <img src="assets/images/habitat-panda-critical.gif" alt="Critical panda sprite, crying" loading="lazy" />
+                  <span class="cs-avatar-state">Critical</span>
+                  <span class="cs-avatar-msg">I don't feel so good.</span>
+                </div>
               </div>
+              <div class="cs-caption">Four real sprites from the shipped app, each panel tinted to that state's actual color token (tea, lavender, tangerine, red) from the design system, not the sprite itself.</div>
             </div>
           </figure>
         </div>
@@ -5228,8 +5271,8 @@
         <div class="cs-section">
           <span class="cs-label">Design Decisions</span>
           <div class="cs-decision-block">
-            <h3>01 / Health as a palette, not a percentage</h3>
-            <p>A numeric health bar would have been faster to build, but it asks someone to read a number and translate it into a feeling. Swapping the entire color palette, and the animation speed, of the avatar and every island instead means the state is legible at a glance, in a screenshot, without reading a single digit.</p>
+            <h3>01 / Health as sprite and palette, not a percentage</h3>
+            <p>A numeric health bar would have been faster to build, but it asks someone to read a number and translate it into a feeling. The avatar swaps to a different sprite per state and slows its idle animation as health drops, while every island swaps its full color palette, so the state is legible at a glance, in a screenshot, without reading a single digit.</p>
           </div>
           <div class="cs-decision-block">
             <h3>02 / One island per habit, not one score for the app</h3>
