@@ -806,6 +806,19 @@
   /* The CROW pin */
   .art-crow h3 { font-size: 44px; }
 
+  /* Habitat pin */
+  .art-habitat { padding: 22px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .art-habitat .habitat-mark {
+    margin-top: auto; margin-bottom: 0;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  }
+  .art-habitat .habitat-logo-mark { width: 62%; height: auto; display: block; }
+  .art-habitat .habitat-caption {
+    font-family: var(--mono); font-size: 9px; line-height: 1.5;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--card-ink); opacity: 1;
+  }
+
   /* Book pin */
   .art-book { padding: 22px; display: flex; flex-direction: column; }
   .art-book .title { font-family: var(--serif); font-size: 22px; line-height: 1.1; margin-top: auto; }
@@ -1036,6 +1049,30 @@
     color: var(--ink);
     border-color: var(--ink-mid);
   }
+  .page-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .page-resume-btn {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 20px;
+    padding: 7px 14px;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity var(--motion-fast) ease;
+  }
+  .page-resume-btn:hover,
+  .page-resume-btn:focus-visible { opacity: 0.8; }
   /* Experience board */
   .page.active.exp-page { max-width: none; padding: 0; }
   .exp-page { width: 100%; align-items: center; position: relative; }
@@ -1386,10 +1423,10 @@
      soft lift shadow). --climate-accent-text carries the numbers/highlights
      that need to be yellow on dark but dark-on-light instead, since pale
      yellow text has no contrast on a light page. */
-  html[data-theme="dark"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"]) {
+  html[data-theme="dark"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"]) {
     --paper: oklch(0.29 0 0);
   }
-  html[data-theme="light"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"]) {
+  html[data-theme="light"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"]) {
     --paper: oklch(0.91 0 0);
   }
   html[data-theme="dark"] .sheet[data-page="climate"] {
@@ -2385,22 +2422,22 @@
   html[data-theme="dark"] .sheet[data-page="crow"] {
     --paper-2: oklch(1 0 0 / 0.06);
     --ink: oklch(0.94 0.01 85);
-    --ink-mid: oklch(0.68 0.03 300);
-    --ink-low: oklch(0.5 0.03 300);
+    --ink-mid: oklch(0.68 0.03 152);
+    --ink-low: oklch(0.5 0.03 152);
     --line: oklch(1 0 0 / 0.12);
-    --crow-accent: #e7def7;
-    --crow-accent-ink: #191331;
+    --crow-accent: #dcf0e3;
+    --crow-accent-ink: #17301f;
     --crow-panel: oklch(1 0 0 / 0.045);
   }
   html[data-theme="light"] .sheet[data-page="crow"] {
     --paper-2: #ffffff;
-    --ink: #241c47;
-    --ink-mid: #5c5480;
-    --ink-low: #8b84a8;
-    --line: oklch(0.25 0.06 300 / 0.14);
-    --crow-accent: #2d2357;
+    --ink: #1c3324;
+    --ink-mid: #4f6b57;
+    --ink-low: #83988a;
+    --line: oklch(0.25 0.06 152 / 0.14);
+    --crow-accent: #1f3d29;
     --crow-accent-ink: #f5f0e8;
-    --crow-panel: #f7f5fb;
+    --crow-panel: #f5faf6;
   }
   .sheet[data-page="crow"] .cs-hero--crow {
     background: var(--crow-accent);
@@ -2564,6 +2601,246 @@
   .sheet[data-page="crow"] .cs-learning::before {
     top: 0.65em;
     background: var(--crow-accent);
+  }
+
+  /* Habitat borrows brew's product-design grammar (measured section rhythm,
+     framed figures, three-up principles, numbered decision blocks). Like
+     brew, the accent stays one identity color across both site themes
+     instead of inverting the way crow's does: the ocean navy (#0a2656)
+     from the real signup screen, with the seashell cream the app itself
+     uses for text-on-navy. The wordmark is mustard-on-transparent, drawn
+     for that exact navy, so a light-mode accent card would wash it out. */
+  html[data-theme="dark"] .sheet[data-page="habitat"] {
+    --paper-2: oklch(0.27 0.014 230);
+    --ink: oklch(0.95 0.008 230);
+    --ink-mid: oklch(0.7 0.02 230);
+    --ink-low: oklch(0.52 0.02 230);
+    --line: oklch(1 0.01 230 / 0.12);
+    --habitat-accent: #0a2656;
+    --habitat-accent-ink: #EAE4DA;
+    --habitat-panel: oklch(1 0.01 230 / 0.05);
+  }
+  html[data-theme="light"] .sheet[data-page="habitat"] {
+    --paper-2: oklch(0.985 0.006 230);
+    --ink: oklch(0.19 0.02 230);
+    --ink-mid: oklch(0.43 0.02 230);
+    --ink-low: oklch(0.58 0.02 230);
+    --line: oklch(0.2 0.02 230 / 0.12);
+    --habitat-accent: #0a2656;
+    --habitat-accent-ink: #EAE4DA;
+    --habitat-panel: oklch(0.97 0.008 230);
+  }
+  .sheet[data-page="habitat"] .cs-hero--habitat {
+    background: var(--habitat-accent);
+    color: var(--habitat-accent-ink);
+    border-radius: 18px;
+    padding: 38px 36px 34px;
+  }
+  .sheet[data-page="habitat"] .cs-habitat-kicker {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .sheet[data-page="habitat"] .cs-habitat-topline {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .sheet[data-page="habitat"] .cs-habitat-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: -5px;
+  }
+  .sheet[data-page="habitat"] .cs-habitat-actions .cs-cta-btn {
+    border: 0;
+    background: var(--habitat-accent-ink);
+    color: var(--habitat-accent);
+    box-shadow: none;
+    font-weight: 700;
+  }
+  .sheet[data-page="habitat"] .cs-habitat-actions .cs-cta-btn:hover,
+  .sheet[data-page="habitat"] .cs-habitat-actions .cs-cta-btn:focus-visible {
+    opacity: 0.85;
+    box-shadow: none;
+  }
+  .sheet[data-page="habitat"] .cs-habitat-title-logo {
+    display: block;
+    width: clamp(150px, 22vw, 220px);
+    height: auto;
+    margin-bottom: 14px;
+  }
+  .sheet[data-page="habitat"] .cs-hero--habitat .cs-hero-title em {
+    display: block;
+    margin-top: 7px;
+    font-family: var(--sans);
+    font-size: 0.5em;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--habitat-accent-ink);
+    opacity: 0.85;
+  }
+  .sheet[data-page="habitat"] .cs-hero-sub {
+    max-width: 760px;
+    margin-bottom: 22px;
+    font-size: 14px;
+    color: var(--habitat-accent-ink);
+    opacity: 0.82;
+  }
+  .sheet[data-page="habitat"] .cs-habitat-byline {
+    margin: 0;
+    color: var(--habitat-accent-ink);
+    opacity: 0.7;
+  }
+  .sheet[data-page="habitat"] .cs-section { padding-top: 66px; }
+  .sheet[data-page="habitat"] .cs-label {
+    display: inline-block;
+    margin-bottom: 22px;
+    padding: 5px 8px 6px;
+    border-radius: 4px;
+    background: var(--habitat-accent);
+    color: var(--habitat-accent-ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+  .sheet[data-page="habitat"] .cs-preview-frame,
+  .sheet[data-page="habitat"] .cs-artifact-frame {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--habitat-panel);
+    box-shadow: none;
+  }
+  .sheet[data-page="habitat"] .cs-caption {
+    margin: 0;
+    padding: 13px 16px 15px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="habitat"] .cs-two-col { gap: 24px; }
+  .sheet[data-page="habitat"] .cs-product-principles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .sheet[data-page="habitat"] .cs-product-principle {
+    padding: 22px 20px 24px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--habitat-panel);
+  }
+  .sheet[data-page="habitat"] .cs-product-principle span {
+    display: block;
+    margin-bottom: 24px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: var(--ink-low);
+  }
+  .sheet[data-page="habitat"] .cs-product-principle h3 {
+    margin-bottom: 9px;
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .sheet[data-page="habitat"] .cs-product-principle p {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="habitat"] .cs-feature {
+    padding: 22px 20px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--habitat-panel);
+  }
+  .sheet[data-page="habitat"] .cs-feature h3 {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+  .sheet[data-page="habitat"] .cs-decision-block {
+    padding: 26px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--habitat-panel);
+  }
+  .sheet[data-page="habitat"] .cs-decision-block h3 {
+    font-family: var(--sans);
+    font-size: 17px;
+  }
+  .sheet[data-page="habitat"] .cs-impact-callout {
+    padding: 32px 30px;
+    border: 0;
+    border-radius: 16px;
+    background: var(--habitat-accent);
+  }
+  .sheet[data-page="habitat"] .cs-impact-line {
+    font-family: var(--sans);
+    font-size: clamp(24px, 3.2vw, 34px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--habitat-accent-ink);
+  }
+  .sheet[data-page="habitat"] .cs-learnings {
+    padding: 22px 24px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--habitat-panel);
+  }
+  .sheet[data-page="habitat"] .cs-learning { padding: 0 0 0 20px; }
+  .sheet[data-page="habitat"] .cs-learning::before {
+    top: 0.65em;
+    background: var(--habitat-accent);
+  }
+  .sheet[data-page="habitat"] .cs-avatar-states img,
+  .sheet[data-page="habitat"] .cs-islands img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .sheet[data-page="habitat"] .cs-islands {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    align-items: end;
+    background: var(--habitat-panel);
+    padding: 28px 24px 0;
+  }
+  .sheet[data-page="habitat"] .cs-islands figure { margin: 0; text-align: center; }
+  .sheet[data-page="habitat"] .cs-islands img { width: auto; max-width: 100%; margin: 0 auto; }
+  .sheet[data-page="habitat"] .cs-islands figcaption {
+    margin-top: 14px;
+    padding-bottom: 18px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--ink-mid);
+  }
+  .sheet[data-page="habitat"] .cs-islands figcaption strong { color: var(--ink); }
+  .sheet[data-page="habitat"] .cs-fig--phone {
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   /* Third pass on this hero. Dropped: the dark card (felt cold), the bubble
@@ -3488,7 +3765,7 @@
         Every column below sums to 3.5 units.
           Col 1: brew (1.25) + CROW (1.25) + Elsewhere (1.00)       = 3.5
           Col 2: ESD  (1.25) + WIIRED (1.25) + Releases (1.00)     = 3.5
-          Col 3: Tools (1.00) + Bird by Bird (1.25) + Daily (1.25) = 3.5
+          Col 3: Tools (1.00) + Habitat (1.25) + Daily (1.25)     = 3.5
       -->
       <div class="feed" id="feed">
 
@@ -3507,7 +3784,7 @@
 
           <!-- The CROW redesign -->
           <article class="pin" data-cat="ux studio" data-page="crow" data-year="2026" data-sub="WIIRED Studio, 2026" aria-label="Open the CROW journal redesign case study">
-            <div class="art art-plum art-crow ar-45">
+            <div class="art art-sage art-crow ar-45">
               <div class="pin-meta">Case Study</div>
               <h3>The<br>CROW.</h3>
             </div>
@@ -3588,7 +3865,7 @@
 
           <!-- Side project -->
           <article class="pin" data-cat="swe" data-page="releases" data-year="2026" data-cursor-label="Under construction">
-            <div class="art art-blue ar-1">
+            <div class="art art-cream ar-1">
               <h3 style="font-size:24px;">Linear-style<br>release notes.</h3>
             </div>
           </article>
@@ -3625,10 +3902,14 @@
             </div>
           </article>
 
-          <!-- Book — Bird by Bird -->
-          <article class="pin" data-cat="misc" data-page="birdbybird" data-year="1994" data-cursor-label="Under construction">
-            <div class="art art-sand art-book ar-45">
-              <div class="title">Bird by Bird</div>
+          <!-- Habitat -->
+          <article class="pin" data-cat="ux swe" data-page="habitat" data-year="2026" data-sub="Product / UX &amp; SWE, Hackathon 2026" aria-label="Open the Habitat habit-tracker case study">
+            <div class="art art-plum art-habitat ar-45">
+              <div class="pin-meta">Case Study</div>
+              <div class="habitat-mark">
+                <img class="habitat-logo-mark" src="assets/images/habitat-logo.png" alt="HABITAT">
+                <span class="habitat-caption">Habit Tracker /<br>Pixel World</span>
+              </div>
             </div>
           </article>
 
@@ -3651,7 +3932,10 @@
         <div class="ab-intro-panel">
           <div class="page-intro-copy">
             <h3>A little<br><em>about me</em></h3>
-            <button class="page-back" type="button" data-back-to-feed>Back to Work</button>
+            <div class="page-actions">
+              <button class="page-back" type="button" data-back-to-feed>Back to Work</button>
+              <a class="page-resume-btn" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a>
+            </div>
           </div>
           <div class="ab-arrow" aria-hidden="true">
             <svg viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -3769,7 +4053,10 @@
               <div class="exp-intro-panel">
                 <div class="page-intro-copy">
                   <h3>Experience <em>timeline</em></h3>
-                  <button class="page-back" type="button" data-back-to-feed>Back to Work</button>
+                  <div class="page-actions">
+                    <button class="page-back" type="button" data-back-to-feed>Back to Work</button>
+                    <a class="page-resume-btn" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a>
+                  </div>
                 </div>
                 <div class="exp-arrow" aria-hidden="true">
                   <svg viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -4773,13 +5060,162 @@
       lead: 'A 2kb React component for rendering MDX changelogs that look like Linear\'s.',
       facts: [['Stack','React, MDX'],['Size','2.1kb gz'],['Downloads','1.4k/wk']]
     },
-    birdbybird: {
-      meta: 'Misc · book',
-      wip: true,
-      eyebrow: 'On writing',
-      title: 'Bird by Bird',
-      lead: 'Anne Lamott\'s book on writing keeps showing up in how I think about shipping. The idea that you do the work one small, terrified bird at a time.',
-      facts: [['Author','Anne Lamott'],['Year','1994']]
+    habitat: {
+      meta: 'Product / UX · Hackathon',
+      eyebrow: 'Team Project',
+      custom: `
+        <div class="cs-hero cs-hero--habitat">
+          <div class="cs-habitat-topline">
+            <span class="cs-habitat-kicker">Product case study · UWB Hacks: The Future!, Apr 2026</span>
+            <div class="cs-habitat-actions" aria-label="Project links">
+              <a class="cs-cta-btn" href="https://github.com/zahsan9/uwbhacks26" target="_blank" rel="noopener noreferrer">Repo ↗</a>
+            </div>
+          </div>
+          <h2 class="cs-hero-title"><img class="cs-habitat-title-logo" src="assets/images/habitat-logo.png" alt="HABITAT"><em>Your habits, your world.</em></h2>
+          <p class="cs-hero-sub">A gamified habit tracker that turns HealthKit data into a living island world. Each habit grows its own island, and a pixel panda's health responds to how those islands are doing, so checking in feels like visiting a place instead of reading a guilt-driven dashboard.</p>
+          <div class="cs-hero-byline cs-habitat-byline" aria-label="Project details">
+            <span>Visual + product design</span>
+            <span>Team of 4 · UWB Hacks 2026</span>
+            <span>React Native + Expo</span>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Stack + Ownership</span>
+          <div class="cs-two-col">
+            <div class="cs-feature">
+              <h3>Stack</h3>
+              <p>The app shell is React Native + Expo with TypeScript, React Navigation, and react-native-svg, with Pixelify Sans and VT323 for the pixel-UI type. Habits HealthKit can verify automatically (steps, sleep, screen time) sync directly. Habits it can't (a workout, a reading session, meditating) go through a FastAPI service running a quantized MobileCLIP model to verify a submitted photo, with Supabase handling auth and habit data.</p>
+            </div>
+            <div class="cs-feature">
+              <h3>Ownership</h3>
+              <p>Habitat was a team of four, built in about 48 hours for UWB Hacks: The Future! (April 26, 2026). Archit Jaiswal built the app shell, the world map, and the island-zoom transitions. Ayaan Ali built the FastAPI + MobileCLIP photo-verification pipeline. Yatharth Sharma built the onboarding logic and habit dashboard. I owned the visual system: the pixel avatar and island-health language, the four-state palette swap, and the signup screen, translating our Figma into the React Native implementation.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Product Context</span>
+          <h3 class="cs-question">How might a habit tracker feel like a place you check in on, instead of a dashboard that guilt-trips you for missing a streak?</h3>
+          <div class="cs-copy">
+            <p>Most habit trackers reduce every day to a streak number and a red mark when you break it. That model is repetitive and guilt-driven, and it's a big reason people abandon habit trackers within weeks.</p>
+            <p>Habitat's premise: turn habit data into a small world instead of a scoreboard. Steps, sleep, and screen time sync from HealthKit and grow or wilt an island. Habits a phone can't sense on its own, like a workout or a reading session, get verified with a photo instead of a manual checkbox.</p>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Product Principles</span>
+          <div class="cs-product-principles">
+            <div class="cs-product-principle">
+              <span>01</span>
+              <h3>Progress you can see, not just log</h3>
+              <p>Steps and sleep don't become a number on a dashboard. They grow or wilt an actual island, so a week of good habits is something to look at, not just a total.</p>
+            </div>
+            <div class="cs-product-principle">
+              <span>02</span>
+              <h3>Consequence, not just reward</h3>
+              <p>The avatar's health responds to every island's state, not just the good ones. A missed habit shows up as a visibly sicker companion, not a silently skipped checkbox.</p>
+            </div>
+            <div class="cs-product-principle">
+              <span>03</span>
+              <h3>One island per habit</h3>
+              <p>Every habit gets its own island instead of one shared score, so a rough week on screen time doesn't erase a 12-day walking streak.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Signup</span>
+          <figure class="cs-fig cs-fig--phone">
+            <div class="cs-fig-head">
+              <h4 class="cs-fig-title">The real signup screen</h4>
+            </div>
+            <div class="cs-preview-frame">
+              <div class="cs-preview-img has-image">
+                <a class="cs-image-link" href="assets/images/habitat-signup-recreation.png" aria-label="Open the signup screen at full size">
+                  <img src="assets/images/habitat-signup-recreation.png" alt="Habitat signup screen: reflected ocean background, the HABITAT wordmark tilted, the panda character anchored bottom-left, and Apple, Google, and email sign-up buttons" loading="lazy" />
+                  <span class="cs-expand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="6.5"/>
+                      <path d="m16.5 16.5 3.5 3.5"/>
+                      <path d="M11 8.5v5M8.5 11h5"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+              <div class="cs-caption">Built from the app's real assets and layout values: the ocean background reflected top and bottom at 40% opacity, the panda anchored bottom-left, and the wordmark tilted -8.61°, the exact rotation in the shipped screen.</div>
+            </div>
+          </figure>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Avatar Health</span>
+          <div class="cs-copy">
+            <p>The avatar has four states, thriving, healthy, sick, and critical, and every state is a full palette swap plus a change in motion, not just a different sprite. The idle bob slows from 1.6s at thriving to 3.5s at critical, so decline reads in movement before it reads in color.</p>
+          </div>
+          <figure class="cs-fig cs-avatar-states">
+            <div class="cs-fig-head">
+              <h4 class="cs-fig-title">Same panda, four palettes</h4>
+            </div>
+            <div class="cs-preview-frame">
+              <div class="cs-preview-img has-image">
+                <img src="assets/images/habitat-avatar-states.png" alt="The panda avatar in four health states: thriving in tea green, healthy in lavender, sick in tangerine, and critical in red, each with its in-app message" loading="lazy" />
+              </div>
+            </div>
+          </figure>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Islands</span>
+          <div class="cs-copy">
+            <p>Each of the five islands, Palm Cove, Mountain, Volcano, Bamboo, and Shrine, is a hand-authored pixel grid rendered at runtime, not a static image, so it can carry the same four-state palette system as the avatar. The pair below uses the prototype's own sample data: a 12-day walking streak next to a 2-day screen-time streak.</p>
+          </div>
+          <div class="cs-islands">
+            <figure>
+              <img src="assets/images/habitat-island-palm-thriving.png" alt="Palm Cove island rendered in the thriving palette, tied to a 12-day walking streak" loading="lazy" />
+              <figcaption><strong>Palm Cove</strong> · Walk · thriving · 12-day streak</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/images/habitat-island-volcano-sick.png" alt="Volcano island rendered in the sick palette, tied to a 2-day screen-time streak" loading="lazy" />
+              <figcaption><strong>Volcano</strong> · Screen Time · sick · 2-day streak</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Design Decisions</span>
+          <div class="cs-decision-block">
+            <h3>01 / Health as a palette, not a percentage</h3>
+            <p>A numeric health bar would have been faster to build, but it asks someone to read a number and translate it into a feeling. Swapping the entire color palette, and the animation speed, of the avatar and every island instead means the state is legible at a glance, in a screenshot, without reading a single digit.</p>
+          </div>
+          <div class="cs-decision-block">
+            <h3>02 / One island per habit, not one score for the app</h3>
+            <p>An earlier direction rolled every habit into a single avatar health number. That punished someone for a bad screen-time week even if they'd walked every day. Splitting habits into separate islands, each with its own state, means one weak habit can't quietly erase the others.</p>
+          </div>
+          <div class="cs-decision-block">
+            <h3>03 / Photo verification instead of an honor-system checkbox</h3>
+            <p>Habits like a workout or a reading session don't emit HealthKit data, and a plain checkbox is trivial to tap without doing the thing. We built a real, if rough, photo-verification pipeline instead: a quantized MobileCLIP model behind a FastAPI service checks that a submitted photo plausibly matches the habit before it counts.</p>
+          </div>
+          <div class="cs-decision-block">
+            <h3>04 / Cutting scope to protect the demo</h3>
+            <p>Balancing scope was the hardest part of the 48 hours. We cut secondary features, including a fuller image-recognition flow, to keep the core loop, HealthKit sync, islands, and avatar health, working end to end for the demo instead of shipping more features at lower reliability.</p>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Current Outcome</span>
+          <div class="cs-impact-callout">
+            <span class="cs-impact-line">Built and submitted in about 48 hours: a working iOS prototype with real HealthKit step sync, five hand-drawn islands, and a four-state avatar that visibly degrades when habits lapse. Submitted to Devpost with no placement to report.</span>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Next Iteration</span>
+          <div class="cs-learnings">
+            <div class="cs-learning">The photo-verification pipeline was the hardest part to get right in 48 hours and shipped less reliable than the rest of the app. The real next step is making that pipeline trustworthy, then following our own hackathon roadmap: sleep, hydration, and mindfulness islands beyond steps, and customizable worlds and companions.</div>
+          </div>
+        </div>
+      `
     },
     years: {
       meta: 'Data Viz · audio',
