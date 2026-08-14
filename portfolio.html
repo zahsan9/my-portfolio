@@ -806,6 +806,19 @@
   /* The CROW pin */
   .art-crow h3 { font-size: 44px; }
 
+  /* DreamCatcher pin */
+  .art-dreamcatcher .dream-mark {
+    margin-top: auto; margin-bottom: 0;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+    width: 50%;
+  }
+  .art-dreamcatcher .dream-logo { width: 100%; height: auto; display: block; transform: rotate(-6deg); transform-origin: left center; filter: brightness(0) invert(1); }
+  .art-dreamcatcher .dream-caption {
+    font-family: var(--mono); font-size: 9px; line-height: 1.5;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: currentColor; opacity: 0.7;
+  }
+
   /* Habitat pin */
   .art-habitat { padding: 22px; display: flex; flex-direction: column; justify-content: flex-end; }
   .art-habitat .habitat-mark {
@@ -1032,8 +1045,7 @@
   .page-back {
     display: inline-flex;
     align-items: center;
-    margin-top: 20px;
-    padding: 7px 12px;
+    padding: 7px 14px;
     border: 1px solid color-mix(in oklch, var(--ink) 28%, var(--paper));
     border-radius: 999px;
     color: color-mix(in oklch, var(--ink) 68%, var(--paper));
@@ -1054,10 +1066,10 @@
     align-items: center;
     gap: 10px;
   }
+  .topbar-page-actions[hidden] { display: none; }
   .page-resume-btn {
     display: inline-flex;
     align-items: center;
-    margin-top: 20px;
     padding: 7px 14px;
     border: 1px solid var(--ink);
     border-radius: 999px;
@@ -2848,30 +2860,31 @@
     margin-right: auto;
   }
 
-  /* DreamCatcher follows the shared case-study rhythm and carries the sage
-     feed color into the sheet. The woven-circle motif belongs to the cover;
-     content surfaces stay quiet so the story remains the focus. */
+  /* DreamCatcher follows the shared case-study rhythm and carries the dark
+     charcoal feed color into the sheet, with yellow as the accent. The
+     woven-circle motif belongs to the cover; content surfaces stay quiet
+     so the story remains the focus. */
   html[data-theme="dark"] .sheet[data-page="dreamcatcher"] {
-    --paper-2: oklch(0.265 0.012 145);
-    --ink: oklch(0.95 0.012 135);
-    --ink-mid: oklch(0.72 0.018 140);
-    --ink-low: oklch(0.55 0.018 140);
-    --line: oklch(1 0.015 140 / 0.12);
-    --dream-accent: var(--c-sage);
-    --dream-deep: oklch(0.23 0.045 150);
-    --dream-cream: oklch(0.95 0.02 105);
-    --dream-panel: oklch(1 0.01 140 / 0.05);
+    --paper-2: oklch(0.265 0.012 90);
+    --ink: oklch(0.95 0.012 90);
+    --ink-mid: oklch(0.72 0.018 90);
+    --ink-low: oklch(0.55 0.018 90);
+    --line: oklch(1 0.015 90 / 0.12);
+    --dream-accent: var(--c-yellow);
+    --dream-deep: oklch(0.26 0.05 90);
+    --dream-cream: oklch(0.95 0.02 90);
+    --dream-panel: oklch(1 0.01 90 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="dreamcatcher"] {
-    --paper-2: oklch(0.985 0.008 110);
-    --ink: oklch(0.2 0.025 145);
-    --ink-mid: oklch(0.44 0.025 145);
-    --ink-low: oklch(0.58 0.02 145);
-    --line: oklch(0.2 0.025 145 / 0.12);
-    --dream-accent: var(--c-sage);
-    --dream-deep: oklch(0.23 0.045 150);
-    --dream-cream: oklch(0.96 0.02 105);
-    --dream-panel: oklch(0.965 0.012 140);
+    --paper-2: oklch(0.985 0.008 90);
+    --ink: oklch(0.2 0.025 90);
+    --ink-mid: oklch(0.44 0.025 90);
+    --ink-low: oklch(0.58 0.02 90);
+    --line: oklch(0.2 0.025 90 / 0.12);
+    --dream-accent: var(--c-yellow);
+    --dream-deep: oklch(0.26 0.05 90);
+    --dream-cream: oklch(0.96 0.02 90);
+    --dream-panel: oklch(0.965 0.012 90);
   }
   .sheet[data-page="dreamcatcher"] .cs-hero--dreamcatcher {
     padding: 38px 36px 34px;
@@ -3890,6 +3903,10 @@
 
     <!-- Top bar -->
     <header class="topbar">
+      <div class="page-actions topbar-page-actions" id="topbarPageActions" hidden>
+        <button class="page-back" type="button" data-back-to-feed>Back to Work</button>
+        <a class="page-resume-btn" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a>
+      </div>
     </header>
 
     <!-- ═══ FEED VIEW ═══ -->
@@ -4015,9 +4032,12 @@
 
           <!-- DreamCatcher -->
           <article class="pin" data-cat="ux" data-page="dreamcatcher" data-year="2026" data-sub="Product / UX, FigBuild 2026" aria-label="Open the DreamCatcher product case study">
-            <div class="art art-sage art-crow ar-45">
+            <div class="art art-charcoal art-dreamcatcher ar-45">
               <div class="pin-meta">Case Study</div>
-              <h3>Dream<br>Catcher.</h3>
+              <div class="dream-mark">
+                <img class="dream-logo" src="assets/images/dreamcatcher-logo.svg" alt="DreamCatcher">
+                <span class="dream-caption">FigBuild 2026</span>
+              </div>
             </div>
           </article>
 
@@ -4091,10 +4111,6 @@
         <div class="ab-intro-panel">
           <div class="page-intro-copy">
             <h3>A little<br><em>about me</em></h3>
-            <div class="page-actions">
-              <button class="page-back" type="button" data-back-to-feed>Back to Work</button>
-              <a class="page-resume-btn" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a>
-            </div>
           </div>
           <div class="ab-arrow" aria-hidden="true">
             <svg viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -4212,10 +4228,6 @@
               <div class="exp-intro-panel">
                 <div class="page-intro-copy">
                   <h3>Experience <em>timeline</em></h3>
-                  <div class="page-actions">
-                    <button class="page-back" type="button" data-back-to-feed>Back to Work</button>
-                    <a class="page-resume-btn" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a>
-                  </div>
                 </div>
                 <div class="exp-arrow" aria-hidden="true">
                   <svg viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -6252,6 +6264,7 @@
   const feedView        = document.getElementById('feedView');
   const aboutView       = document.getElementById('aboutView');
   const expView         = document.getElementById('expView');
+  const topbarPageActions = document.getElementById('topbarPageActions');
 const expScroll   = document.getElementById('expScroll');
   const expTrack    = document.getElementById('expTrack');
   let expTravelPx = 0;
@@ -6363,6 +6376,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       b.classList.toggle('active', isActive);
       b.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
+    if (topbarPageActions) topbarPageActions.hidden = name === 'feed';
 
     const viewMap = { feed: feedView, about: aboutView, experience: expView };
     const leaving  = viewMap[currentRouteName];
