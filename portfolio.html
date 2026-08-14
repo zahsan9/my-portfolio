@@ -1042,24 +1042,34 @@
     flex-direction: column;
     align-items: center;
   }
-  .page-back {
+  .page-back,
+  .page-resume-btn {
     display: inline-flex;
     align-items: center;
-    padding: 7px 14px;
-    border: 1px solid color-mix(in oklch, var(--ink) 28%, var(--paper));
+    line-height: 1;
+    padding: 10px 16px;
+    border: 1px solid var(--ink);
     border-radius: 999px;
-    color: color-mix(in oklch, var(--ink) 68%, var(--paper));
     font-family: var(--sans);
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 500;
     letter-spacing: -0.01em;
+    text-decoration: none;
     cursor: pointer;
-    transition: color var(--motion-fast) ease, border-color var(--motion-fast) ease;
+    transition: background var(--motion-fast) ease, color var(--motion-fast) ease, border-color var(--motion-fast) ease, opacity var(--motion-fast) ease;
+  }
+  .page-back {
+    background: var(--paper);
+    color: var(--ink);
   }
   .page-back:hover,
   .page-back:focus-visible {
-    color: var(--ink);
-    border-color: var(--ink-mid);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .page-resume-btn:hover,
+  .page-resume-btn:focus-visible {
+    opacity: 0.8;
   }
   .page-actions {
     display: flex;
@@ -1068,23 +1078,9 @@
   }
   .topbar-page-actions[hidden] { display: none; }
   .page-resume-btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 7px 14px;
-    border: 1px solid var(--ink);
-    border-radius: 999px;
     background: var(--ink);
     color: var(--paper);
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    text-decoration: none;
-    cursor: pointer;
-    transition: opacity var(--motion-fast) ease;
   }
-  .page-resume-btn:hover,
-  .page-resume-btn:focus-visible { opacity: 0.8; }
   /* Experience board */
   .page.active.exp-page { max-width: none; padding: 0; }
   .exp-page { width: 100%; align-items: center; position: relative; }
