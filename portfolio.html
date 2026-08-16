@@ -1946,6 +1946,18 @@
     font-family: var(--sans); font-size: 14px; font-style: italic;
     line-height: 1.6; opacity: 0.88; margin: 4px 0 0;
   }
+  .ab-stack-narrative {
+    font-family: var(--sans); font-size: 13px;
+    line-height: 1.48; opacity: 0.86; margin: 0;
+  }
+  .ab-stack-narrative a {
+    color: currentColor; text-decoration: underline;
+    text-decoration-color: color-mix(in oklch, currentColor 35%, transparent);
+    text-underline-offset: 2px;
+    transition: text-decoration-color var(--motion-fast) ease;
+  }
+  .ab-stack-narrative a:hover,
+  .ab-stack-narrative a:focus-visible { text-decoration-color: currentColor; }
   .ab-stack-tags {
     display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;
   }
@@ -4143,11 +4155,7 @@
             </div>
             <div style="margin-top:191px;padding-bottom:10px;">
               <div class="ab-stack-title">Hi, I'm<br><em style="font-size:1.15em;">Zainab!</em></div>
-              <ul class="ab-stack-list is-diamond" style="margin-top:21px;gap:8px;">
-                <li style="font-size:14px;">Third-year CS student at the University of Washington</li>
-                <li style="font-size:14px;">Drawn to practical, people-centered ideas: making cafés easier to discover, hackathons easier to manage, and data easier to understand</li>
-                <li style="font-size:14px;">I design things, then build them. Let's build something together!</li>
-              </ul>
+              <p class="ab-stack-narrative" style="margin-top:14px;">I'm a third-year Computer Science student at the University of Washington, minoring in Data Science. I got into this work by noticing the small frustrations in the apps I already used, and wondering what a kinder version might look like. That curiosity turned into brew., WIIRED Studio, and a habit of designing things until they're worth building. I care about people-centered problems: cafés that are easier to discover, hackathons that are easier to run, and data that's easier to understand.</p>
             </div>
           </div>
           <div class="ab-stack-body">
@@ -4164,12 +4172,7 @@
           <div class="ab-stack-tab" aria-hidden="true"><span>How I Work</span></div>
           <div class="ab-stack-header">
             <div class="ab-stack-title">How I <em>work.</em></div>
-            <ul class="ab-stack-list is-lined is-compact" style="margin-top:14px;gap:0;">
-              <li><span class="ab-stack-item-label">Start with pain points</span>I start with the messy parts: where someone might get confused, drop off, or lose trust.</li>
-              <li><span class="ab-stack-item-label">Design for recovery</span>Café app, dashboard, or AI, I plan for what happens when things don't go as planned: know what's happening, know what to do next, recover without feeling like you broke something.</li>
-              <li><span class="ab-stack-item-label">Build to learn</span>I move between Figma and code quickly. Figma shapes the experience, but building reveals the timing, the states, the edge cases, and whether it feels good, so I ship real products instead of mockups.</li>
-              <li><span class="ab-stack-item-label">Think in systems</span>I came to design through CS and data, so I think about the system underneath the interface and what people actually need, not just what we want to build. My best work happens alongside engineering, product, and users.</li>
-            </ul>
+            <p class="ab-stack-narrative" style="margin-top:14px;">What matters most to me as a designer is what happens when something goes wrong: the confusing form, the lost place, the dead end. I start every project there, then design so people can recover without feeling like they broke something. In <a href="#" data-open-case="brew">brew.</a>, that meant building real save states and clear feedback into a café discovery app, not just a nice-looking prototype. I move quickly between Figma and code because building is where I actually learn: a flow that reads perfectly on screen, like <a href="#" data-open-case="habitat">Habitat</a>'s, often needs its timing and edge cases reworked once real people touch it. I came to design through computer science, so I think about the system underneath the interface, not just its surface, and my best work happens shoulder to shoulder with engineering and real users.</p>
           </div>
           <div class="ab-stack-body">
             <div class="ab-stack-tags">
@@ -6421,6 +6424,16 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
   document.querySelectorAll('.rail-btn[data-route]').forEach(b => b.addEventListener('click', () => setRoute(b.dataset.route)));
   document.querySelectorAll('[data-back-to-feed]').forEach(button => {
     button.addEventListener('click', () => setRoute('feed'));
+  });
+  // Inline case-study mentions in prose (e.g. About's "How I work" narrative) —
+  // jump to Feed, then open the referenced sheet once the route settles.
+  document.querySelectorAll('[data-open-case]').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const key = link.dataset.openCase;
+      setRoute('feed');
+      setTimeout(() => openSheet(key), motionDelay(ROUTE_TIMING.fadeOut + 80));
+    });
   });
   document.getElementById('logoBtn').addEventListener('click', () => setRoute('feed'));
 
