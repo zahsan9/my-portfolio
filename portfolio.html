@@ -6449,7 +6449,10 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
   const VALID_ROUTES = new Set(['feed', 'about', 'experience']);
   const routeFromHash = () => {
     const hash = location.hash.replace('#', '');
-    return VALID_ROUTES.has(hash) ? hash : 'feed';
+    if (VALID_ROUTES.has(hash)) return hash;
+    // /about and /work are served here via vercel.json rewrites (no hash present on first load).
+    if (location.pathname.replace(/\/$/, '') === '/about') return 'about';
+    return 'feed';
   };
   window.addEventListener('hashchange', () => setRoute(routeFromHash(), { history: 'none' }));
   const initialRoute = routeFromHash();
