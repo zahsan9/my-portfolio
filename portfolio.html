@@ -1041,13 +1041,17 @@
     flex-direction: column;
     align-items: center;
   }
-  .page-back {
+  /* Header pills now match the rail nav's own box model exactly: 48px
+     tall, no border ever, transparent at rest, --control-soft fill on
+     hover/focus — the same three states .rail-btn uses. */
+  .page-back,
+  .page-resume-btn {
     display: inline-flex;
     align-items: center;
     gap: 7px;
+    height: 48px;
     line-height: 1;
-    padding: 14px 16px;
-    border: 1px solid var(--ink);
+    padding: 0 18px;
     border-radius: 999px;
     font-family: var(--sans);
     font-size: 13px;
@@ -1055,19 +1059,27 @@
     letter-spacing: -0.01em;
     text-decoration: none;
     cursor: pointer;
-    background: var(--paper);
+    background: transparent;
     color: var(--ink);
-    transition: background var(--motion-fast) ease, color var(--motion-fast) ease, border-color var(--motion-fast) ease, opacity var(--motion-fast) ease;
+    transition: background 0.15s, color 0.15s;
   }
-  .page-back svg { width: 14px; height: 14px; flex-shrink: 0; }
+  /* Resume stays permanently filled, the same treatment .rail-btn.active
+     uses for the current route — it's the one header pill meant to read
+     as a persistent call to action, not a plain nav-style link. */
+  .page-resume-btn { background: var(--ink); color: var(--paper); }
+  .page-back svg,
+  .page-resume-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
   .page-back:hover,
   .page-back:focus-visible {
-    /* Fixed white fill + black content on hover, deliberately not the
-       theme-relative --paper/--ink pair (which would flip to a dark fill in
-       dark mode) — same fixed pair as .cs-* card content colors. */
-    background: var(--card-paper);
-    color: var(--card-ink);
-    border-color: var(--card-ink);
+    background: var(--control-soft);
+    color: var(--ink);
+  }
+  /* A control-soft fill would fight the permanent-CTA fill above (it can
+     read as the pill going flat/duller instead of more prominent) — a
+     simple dim keeps it feeling responsive without losing that identity. */
+  .page-resume-btn:hover,
+  .page-resume-btn:focus-visible {
+    opacity: 0.82;
   }
   .page-actions {
     display: flex;
@@ -1075,29 +1087,27 @@
     gap: 10px;
   }
   .topbar-page-actions[hidden],
-  .topbar-social[hidden] { display: none; }
+  .topbar-social[hidden],
+  .page-resume-btn[hidden] { display: none; }
   .topbar-social-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
-    border: 1px solid var(--ink);
+    width: 48px;
+    height: 48px;
     border-radius: 999px;
-    background: var(--paper);
+    background: transparent;
     color: var(--ink);
     cursor: pointer;
-    transition: background 0.22s cubic-bezier(0.22,1,0.36,1), color 0.22s cubic-bezier(0.22,1,0.36,1), border-color 0.22s cubic-bezier(0.22,1,0.36,1);
+    transition: background 0.15s, color 0.15s;
   }
-  .topbar-social-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .topbar-social-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
   .topbar-social-btn .social-glyph {
-    font-family: var(--sans); font-weight: 700; font-size: 15px; letter-spacing: -0.02em;
+    font-family: var(--sans); font-weight: 700; font-size: 16px; letter-spacing: -0.02em;
   }
   .topbar-social-btn:hover,
   .topbar-social-btn:focus-visible {
-    background: var(--card-paper);
-    color: var(--card-ink);
-    border-color: var(--card-ink);
+    background: var(--control-soft);
   }
   /* Experience board */
   .page.active.exp-page { max-width: none; padding: 0; }
@@ -3933,6 +3943,7 @@
     <!-- Top bar -->
     <header class="topbar">
       <div class="page-actions topbar-page-actions" id="topbarPageActions" hidden>
+        <a class="page-resume-btn" id="topbarResume" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer" hidden>Resume ↗</a>
         <button class="page-back" type="button" data-back-to-feed>
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>
           Back to Work
@@ -6317,6 +6328,7 @@
   const expView         = document.getElementById('expView');
   const topbarPageActions = document.getElementById('topbarPageActions');
   const topbarSocial = document.getElementById('topbarSocial');
+  const topbarResume = document.getElementById('topbarResume');
 const expScroll   = document.getElementById('expScroll');
   const expTrack    = document.getElementById('expTrack');
   let expTravelPx = 0;
@@ -6430,6 +6442,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     });
     if (topbarPageActions) topbarPageActions.hidden = name === 'feed';
     if (topbarSocial) topbarSocial.hidden = name !== 'feed';
+    if (topbarResume) topbarResume.hidden = true; // Resume pill hidden for now — flip back to `name !== 'experience'` to re-enable
 
     const viewMap = { feed: feedView, about: aboutView, experience: expView };
     const leaving  = viewMap[currentRouteName];
