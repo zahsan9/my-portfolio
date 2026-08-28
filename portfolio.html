@@ -217,6 +217,70 @@
     margin-top: auto; align-self: stretch; padding: 0 16px 4px;
   }
 
+  /* ── Mobile primary nav ──
+     .rail is display:none at 800px and below (see the Navigation section
+     below), so this bottom bar is the only way to reach Experience/About or
+     the theme toggle on mobile — it must stay in sync with anything the
+     rail can do. Reuses .rail-btn so setRoute()'s generic active-state
+     toggle and click binding (both query `.rail-btn[data-route]`) already
+     cover it with no JS changes. */
+  .mobile-tabbar {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 60;
+    justify-content: space-around;
+    align-items: stretch;
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+  .mobile-tabbar .rail-btn {
+    width: auto; height: auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px 5px;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--ink-mid);
+  }
+  /* Same circular-pill language as .topbar-social-btn: bordered circle at
+     rest, filled solid for whichever route is current — reusing that
+     pattern here instead of the old full-button block fill. */
+  .mobile-tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--ink-mid);
+    border-radius: 999px;
+    color: inherit;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .mobile-tabbar .rail-btn svg { width: 18px; height: 18px; }
+  .mobile-tabbar .rail-btn.active { color: var(--ink); }
+  .mobile-tabbar .rail-btn.active .mobile-tab-icon {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .mobile-tab-label {
+    /* .rail-label is collapsed-by-default (max-width:0) for the hover-reveal
+       desktop rail — the compact tab bar has no hover state to reveal on,
+       so the label must just always be visible here. */
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.01em;
+    max-width: none; opacity: 1; white-space: nowrap;
+  }
+  .mobile-theme-btn { width: auto; height: auto; border-radius: 12px; }
+  @media (max-width: 800px) { .mobile-tabbar { display: flex; } }
+  /* Sheet view is full-screen on mobile (see --panel-w: 100vw below) and
+     already has its own close control — the tab bar would just sit on top
+     of it for no reason, same as .rail hiding on sheet-open. */
+  .app.sheet-open .mobile-tabbar { display: none; }
+
   /* ── Top bar ── */
 
   /* Local time */
@@ -3837,6 +3901,19 @@
     :root { --panel-w: 100vw; }
     .app { grid-template-columns: 1fr; }
     .rail { display: none; }
+    /* Clears .mobile-tabbar (fixed to the viewport bottom) so the last bit
+       of scrollable content — copyright footer, final exp card, About's
+       Back to Work — never sits underneath it. */
+    .main { padding-bottom: 70px; }
+    /* .app.sheet-open .tabs normally floats above the feed column that's
+       still peeking out beside the sheet (width: 100vw - panel-w). At this
+       width --panel-w is 100vw too, so that width math collapses to 0 —
+       but box-sizing:border-box can't shrink the element past its own
+       padding, so it still renders ~130px wide fixed at the top-left,
+       sitting directly on top of (and swallowing clicks on) the sheet's
+       close button. There's no feed column left to filter above anyway
+       once the sheet covers the full screen, so just hide it here. */
+    .app.sheet-open .tabs { display: none; }
     .topbar { padding: 14px 18px; }
     .banner h1 { font-size: 46px; }
     .exp-card { flex-basis: 260px; }
@@ -3848,6 +3925,22 @@
     .ab-stack { margin: 0; }
   }
   @media (max-width: 600px) {
+    /* Banner (avatar/name/bio/meta) and the filter tabs beneath it use
+       desktop-scale sizing and padding everywhere above — on a real phone
+       that reads as a huge photo, oversized name, and a wall of empty
+       space before any actual content. Scale it down to something that
+       fits a phone screen without three extra scrolls. */
+    .banner { padding: 72px 24px 40px; max-height: none; }
+    .banner .avatar {
+      width: 96px; height: 96px; min-height: 96px; max-height: 96px;
+      margin: 0 auto 20px;
+    }
+    .banner .avatar.is-open,
+    .banner .avatar:has(.em-btn:focus-visible) { width: 240px; }
+    .banner h1 { font-size: 32px; margin-bottom: 10px; }
+    .banner .bio { font-size: 14px; }
+    .banner .meta { margin-top: 12px; font-size: 12px; }
+    .tabs { padding: 14px 0 16px; gap: 18px; }
     .exp-track { padding: 0 20px; }
     .ab-stack {
       --stack-w: min(66vw, 285px);
@@ -3932,11 +4025,53 @@
       </button>
     </nav>
     <div class="rail-bottom">
-      <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">
-        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></svg>
+      <button class="theme-btn" type="button" aria-label="Toggle theme">
+        <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></svg>
       </button>
     </div>
   </aside>
+
+  <!-- Mobile primary nav — .rail is hidden at 800px and below (see CLAUDE.md),
+       so this bottom bar is the only way to reach Experience/About/theme on
+       mobile. Reuses .rail-btn's data-route so setRoute()'s generic
+       `.rail-btn[data-route]` active-state toggling covers these for free. -->
+  <nav class="mobile-tabbar" aria-label="Primary">
+    <button class="rail-btn active" data-route="feed" aria-label="Work" aria-current="page">
+      <span class="mobile-tab-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="16" height="16" rx="3"/>
+          <path d="M11 4v16"/>
+          <path d="M11 11h9"/>
+        </svg>
+      </span>
+      <span class="mobile-tab-label">Work</span>
+    </button>
+    <button class="rail-btn" data-route="experience" aria-label="Experience">
+      <span class="mobile-tab-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="7" width="18" height="13" rx="2"/>
+          <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+        </svg>
+      </span>
+      <span class="mobile-tab-label">Experience</span>
+    </button>
+    <button class="rail-btn" data-route="about" aria-label="About">
+      <span class="mobile-tab-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="9" r="3"/>
+          <path d="M6.5 19.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5"/>
+        </svg>
+      </span>
+      <span class="mobile-tab-label">About</span>
+    </button>
+    <button class="theme-btn mobile-theme-btn" type="button" aria-label="Toggle theme">
+      <span class="mobile-tab-icon">
+        <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></svg>
+      </span>
+      <span class="mobile-tab-label">Theme</span>
+    </button>
+  </nav>
 
   <main class="main">
 
@@ -6244,6 +6379,15 @@
     // letting them finish sliding — cancel it before starting a new pass.
     if (filterSettleTimer !== null) clearTimeout(filterSettleTimer);
 
+    // .feed is locked to a fixed height at rest (see lockFeedHeight). Left
+    // locked here, it stays pinned to the OUTGOING filter's height for the
+    // entire ~520ms transition — e.g. switching from a filter that fits one
+    // row to one needing two leaves the container short until the settle
+    // timeout finally re-measures it, which is what made a second-row card
+    // look like it briefly landed in the wrong place. Unlocking to the new
+    // filter's natural height up front avoids that stale window entirely.
+    feed.style.height = 'auto';
+
     const show = new Set(pins.filter(p => {
       if (f === 'all') return true;
       if (!p.dataset.page) return false;
@@ -6775,7 +6919,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
   // ── Theme toggle ──
   (() => {
     const html = document.documentElement;
-    const icon = document.getElementById('themeIcon');
+    const icons = document.querySelectorAll('.theme-icon');
     const SUN  = `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>`;
     const MOON = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
     let themeTimer;
@@ -6787,11 +6931,13 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       }
       html.setAttribute('data-theme', t);
       localStorage.setItem('theme', t);
-      icon.innerHTML = t === 'dark' ? SUN : MOON;
+      icons.forEach(icon => { icon.innerHTML = t === 'dark' ? SUN : MOON; });
     }
     applyTheme(localStorage.getItem('theme') || 'dark');
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+      });
     });
 
   })();
