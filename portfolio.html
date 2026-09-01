@@ -4,10 +4,26 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Zainab Ahsan - Portfolio</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 6 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.692 6.276C1.188 6.276 0.780001 6.152 0.468001 5.904C0.156001 5.656 7.37607e-07 5.316 7.37607e-07 4.884C7.37607e-07 4.444 0.112001 4.116 0.336001 3.9C0.560001 3.684 0.804001 3.528 1.068 3.432L3.84 2.4V2.352H1.404C1.044 2.352 0.744001 2.256 0.504001 2.064C0.272001 1.864 0.156001 1.568 0.156001 1.176C0.156001 0.776001 0.272001 0.480001 0.504001 0.288001C0.744001 0.0960009 1.044 9.53674e-07 1.404 9.53674e-07H4.344C4.728 9.53674e-07 5.052 0.092001 5.316 0.276001C5.588 0.460001 5.724 0.788001 5.724 1.26C5.724 1.62 5.612 1.924 5.388 2.172C5.172 2.42 4.856 2.624 4.44 2.784L2.16 3.648V3.696H4.608C5 3.696 5.324 3.804 5.58 4.02C5.836 4.236 5.964 4.56 5.964 4.992C5.964 5.432 5.836 5.756 5.58 5.964C5.324 6.172 5 6.276 4.608 6.276H1.692Z' fill='black'/%3E%3C/svg%3E" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 6 7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M1.692 6.276C1.188 6.276 0.780001 6.152 0.468001 5.904C0.156001 5.656 7.37607e-07 5.316 7.37607e-07 4.884C7.37607e-07 4.444 0.112001 4.116 0.336001 3.9C0.560001 3.684 0.804001 3.528 1.068 3.432L3.84 2.4V2.352H1.404C1.044 2.352 0.744001 2.256 0.504001 2.064C0.272001 1.864 0.156001 1.568 0.156001 1.176C0.156001 0.776001 0.272001 0.480001 0.504001 0.288001C0.744001 0.0960009 1.044 9.53674e-07 1.404 9.53674e-07H4.344C4.728 9.53674e-07 5.052 0.092001 5.316 0.276001C5.588 0.460001 5.724 0.788001 5.724 1.26C5.724 1.62 5.612 1.924 5.388 2.172C5.172 2.42 4.856 2.624 4.44 2.784L2.16 3.648V3.696H4.608C5 3.696 5.324 3.804 5.58 4.02C5.836 4.236 5.964 4.56 5.964 4.992C5.964 5.432 5.836 5.756 5.58 5.964C5.324 6.172 5 6.276 4.608 6.276H1.692Z'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script>
+  /* Runs before first paint: apply the stored theme (kills the light-mode
+     FOUC) and decide whether the splash mounts. It plays on every load that
+     lands on the main feed — not on deep links to About / Experience, and
+     not under reduced motion. */
+  (function () {
+    var d = document.documentElement;
+    try { d.setAttribute('data-theme', localStorage.getItem('theme') || 'dark'); } catch (e) {}
+    var hash = location.hash.replace('#', '');
+    var path = location.pathname.replace(/\/$/, '');
+    var onFeed = (hash === '' && path !== '/about') || hash === 'feed';
+    var reduce = false;
+    try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    if (onFeed && !reduce) d.classList.add('splash-active');
+  })();
+</script>
 <style>
   /* ── Tokens ── */
   :root {
@@ -181,7 +197,9 @@
     margin-bottom: 34px; cursor: pointer;
     flex-shrink: 0;
     align-self: flex-start; margin-left: 16px;
+    color: var(--ink);
   }
+  .rail .logo .logo-mark { height: 28px; width: auto; display: block; }
   .rail-nav {
     display: flex; flex-direction: column; gap: 10px;
     align-self: stretch; padding: 0 16px 8px;
@@ -3990,15 +4008,59 @@
     transition: transform 240ms var(--ease-out);
   }
   .lightbox.open .lightbox-img { transform: scale(1); }
+
+  /* ── Splash (every load onto the main feed — the mark draws itself on) ──
+     Mounted only when the head script adds html.splash-active. Sits on the
+     same --paper ground as the page, so the first painted frame is already
+     the right colour and the reveal is just this layer lifting away. */
+  #splash {
+    display: none;
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--paper);
+    place-items: center;
+    opacity: 1; transform: translateY(0);
+    transition:
+      opacity var(--splash-exit-dur, 480ms) var(--ease-soft),
+      transform var(--splash-exit-dur, 480ms) var(--ease-soft);
+  }
+  html.splash-active #splash { display: grid; }
+  #splash.is-leaving { opacity: 0; transform: translateY(-10px); pointer-events: none; }
+  .splash-glyph { width: clamp(46px, 7vw, 88px); height: auto; overflow: visible; }
+  /* The fill is revealed by a mask that sweeps along the z's writing
+     direction (top bar → diagonal → bottom bar); the outline traces the
+     contour. Both animate via stroke-dashoffset, driven from the storyboard. */
+  .splash-glyph .splash-fill { fill: var(--ink); }
+  .splash-glyph .splash-outline {
+    fill: none;
+    stroke: var(--ink); stroke-width: 0.24;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  /* Head script already blocks the splash under reduced motion; this only
+     matters if the class is ever forced on some other way. */
+  @media (prefers-reduced-motion: reduce) {
+    html.splash-active #splash { display: none; }
+  }
 </style>
 </head>
 <body>
+
+<div id="splash" aria-hidden="true">
+  <svg class="splash-glyph" viewBox="0 0 6 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <mask id="splashZWipe" maskUnits="userSpaceOnUse" x="-2" y="-2" width="10" height="11">
+        <path class="splash-wipe" d="M0.55 1.16 H4.9 L1.1 5.06 H5.7" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </mask>
+    </defs>
+    <path class="splash-fill" mask="url(#splashZWipe)" d="M1.692 6.276C1.188 6.276 0.780001 6.152 0.468001 5.904C0.156001 5.656 7.37607e-07 5.316 7.37607e-07 4.884C7.37607e-07 4.444 0.112001 4.116 0.336001 3.9C0.560001 3.684 0.804001 3.528 1.068 3.432L3.84 2.4V2.352H1.404C1.044 2.352 0.744001 2.256 0.504001 2.064C0.272001 1.864 0.156001 1.568 0.156001 1.176C0.156001 0.776001 0.272001 0.480001 0.504001 0.288001C0.744001 0.0960009 1.044 9.53674e-07 1.404 9.53674e-07H4.344C4.728 9.53674e-07 5.052 0.092001 5.316 0.276001C5.588 0.460001 5.724 0.788001 5.724 1.26C5.724 1.62 5.612 1.924 5.388 2.172C5.172 2.42 4.856 2.624 4.44 2.784L2.16 3.648V3.696H4.608C5 3.696 5.324 3.804 5.58 4.02C5.836 4.236 5.964 4.56 5.964 4.992C5.964 5.432 5.836 5.756 5.58 5.964C5.324 6.172 5 6.276 4.608 6.276H1.692Z"/>
+    <path class="splash-outline" d="M1.692 6.276C1.188 6.276 0.780001 6.152 0.468001 5.904C0.156001 5.656 7.37607e-07 5.316 7.37607e-07 4.884C7.37607e-07 4.444 0.112001 4.116 0.336001 3.9C0.560001 3.684 0.804001 3.528 1.068 3.432L3.84 2.4V2.352H1.404C1.044 2.352 0.744001 2.256 0.504001 2.064C0.272001 1.864 0.156001 1.568 0.156001 1.176C0.156001 0.776001 0.272001 0.480001 0.504001 0.288001C0.744001 0.0960009 1.044 9.53674e-07 1.404 9.53674e-07H4.344C4.728 9.53674e-07 5.052 0.092001 5.316 0.276001C5.588 0.460001 5.724 0.788001 5.724 1.26C5.724 1.62 5.612 1.924 5.388 2.172C5.172 2.42 4.856 2.624 4.44 2.784L2.16 3.648V3.696H4.608C5 3.696 5.324 3.804 5.58 4.02C5.836 4.236 5.964 4.56 5.964 4.992C5.964 5.432 5.836 5.756 5.58 5.964C5.324 6.172 5 6.276 4.608 6.276H1.692Z"/>
+  </svg>
+</div>
 
 <div class="app">
 
   <!-- Left rail -->
   <aside class="rail">
-    <button class="logo" id="logoBtn" aria-label="Home"><span style="font-family:var(--serif);font-size:32px;font-weight:600;color:var(--ink);letter-spacing:-0.02em;line-height:1;user-select:none;" aria-hidden="true">ZA</span></button>
+    <button class="logo" id="logoBtn" aria-label="Home"><svg class="logo-mark" viewBox="0 0 6 7" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1.692 6.276C1.188 6.276 0.780001 6.152 0.468001 5.904C0.156001 5.656 7.37607e-07 5.316 7.37607e-07 4.884C7.37607e-07 4.444 0.112001 4.116 0.336001 3.9C0.560001 3.684 0.804001 3.528 1.068 3.432L3.84 2.4V2.352H1.404C1.044 2.352 0.744001 2.256 0.504001 2.064C0.272001 1.864 0.156001 1.568 0.156001 1.176C0.156001 0.776001 0.272001 0.480001 0.504001 0.288001C0.744001 0.0960009 1.044 9.53674e-07 1.404 9.53674e-07H4.344C4.728 9.53674e-07 5.052 0.092001 5.316 0.276001C5.588 0.460001 5.724 0.788001 5.724 1.26C5.724 1.62 5.612 1.924 5.388 2.172C5.172 2.42 4.856 2.624 4.44 2.784L2.16 3.648V3.696H4.608C5 3.696 5.324 3.804 5.58 4.02C5.836 4.236 5.964 4.56 5.964 4.992C5.964 5.432 5.836 5.756 5.58 5.964C5.324 6.172 5 6.276 4.608 6.276H1.692Z" fill="currentColor"/></svg></button>
     <nav class="rail-nav">
       <button class="rail-btn active" data-route="feed" title="Work" aria-label="Work" aria-current="page">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -4235,10 +4297,10 @@
           </article>
 
           <!-- Temporary WIIRED Studio card -->
-          <article class="pin" data-cat="studio" data-page="wiired" data-year="2026" data-cursor-label="Under construction" aria-label="WIIRED Studio case study, under construction">
+          <article class="pin" data-cat="studio" data-page="wiired" data-year="2026" data-cursor-label="Under construction" aria-label="WIIRED Studio, work in progress">
             <div class="art art-cream ar-1">
-              <div class="pin-meta">Case Study · WIP</div>
-              <h3 style="font-size:24px; margin-top:auto;">WIIRED<br><em style="font-style:italic; color:var(--c-blue);">Studio.</em></h3>
+              <div class="pin-meta">WIP</div>
+              <h3 style="font-size:34px; margin-top:auto;">WIIRED<br><em style="font-style:italic;">Studio.</em></h3>
             </div>
           </article>
         </div>
@@ -4288,6 +4350,7 @@
           <!-- Daily type -->
           <article class="pin" data-cat="misc" data-page="daily" data-year="Ongoing" data-cursor-label="Under construction">
             <div class="art art-clay ar-45">
+              <div class="pin-meta">WIP</div>
               <h3 style="font-size:28px;">Daily type<br>&amp; motion.</h3>
             </div>
           </article>
@@ -4570,6 +4633,89 @@
     }, { once: true });
   }
 
+  /* ─────────────────────────────────────────────────────────
+   * SPLASH GLYPH STORYBOARD
+   *
+   * Every load that lands on the main feed, motion on. The head script
+   * has already mounted the layer (html.splash-active) and applied the
+   * stored theme, so the paper ground is correct from frame one.
+   *
+   *    0ms   paper ground painted, glyph hidden
+   *   80ms   outline traces the z contour, pen following the path
+   *  640ms   ink sweeps in along the writing direction — across the top
+   *          bar, down the diagonal, across the bottom bar
+   * 1620ms   hold
+   * 2200ms   layer lifts and fades to reveal the feed
+   * 2680ms   layer removed; fires splash:done so the rail entry can run
+   *
+   * Any deliberate input (pointer / key / wheel / touch) cuts to the lift.
+   * ───────────────────────────────────────────────────────── */
+  const SPLASH_TIMING = {
+    draw:     80,
+    drawDur:  820,
+    fill:     640,
+    fillDur:  980,
+    exit:     2200,
+    exitDur:  480,
+  };
+
+  (function playSplash() {
+    const root = document.documentElement;
+    const splash = document.getElementById('splash');
+    if (!splash) return;
+    if (!root.classList.contains('splash-active') || prefersReducedMotion()) {
+      splash.remove();
+      root.classList.remove('splash-active');
+      return;
+    }
+
+    const outline = splash.querySelector('.splash-outline');
+    const wipe    = splash.querySelector('.splash-wipe');
+    const oLen = outline.getTotalLength();
+    const wLen = wipe.getTotalLength();
+    const timers = [];
+    let leaving = false;
+
+    root.style.setProperty('--splash-exit-dur', SPLASH_TIMING.exitDur + 'ms');
+    outline.style.transition = 'none';
+    outline.style.strokeDasharray = oLen;
+    outline.style.strokeDashoffset = oLen;
+    wipe.style.transition = 'none';
+    wipe.style.strokeDasharray = wLen;
+    wipe.style.strokeDashoffset = wLen;
+    outline.getBoundingClientRect();
+
+    const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+
+    at(SPLASH_TIMING.draw, () => {
+      outline.style.transition = 'stroke-dashoffset ' + SPLASH_TIMING.drawDur + 'ms cubic-bezier(0.4, 0.1, 0.25, 1)';
+      outline.style.strokeDashoffset = '0';
+    });
+    at(SPLASH_TIMING.fill, () => {
+      wipe.style.transition = 'stroke-dashoffset ' + SPLASH_TIMING.fillDur + 'ms cubic-bezier(0.45, 0.05, 0.35, 1)';
+      wipe.style.strokeDashoffset = '0';
+    });
+    at(SPLASH_TIMING.exit, leave);
+
+    function leave() {
+      if (leaving) return;
+      leaving = true;
+      timers.forEach(clearTimeout);
+      splash.classList.add('is-leaving');
+      setTimeout(() => {
+        splash.remove();
+        root.classList.remove('splash-active');
+        root.style.removeProperty('--splash-exit-dur');
+        window.dispatchEvent(new Event('splash:done'));
+      }, SPLASH_TIMING.exitDur + 40);
+    }
+
+    ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev =>
+      window.addEventListener(ev, leave, { once: true, passive: true })
+    );
+    window.addEventListener('pagehide', () => timers.forEach(clearTimeout), { once: true });
+  })();
+
   function updateFeedScrollbar() {
     const scrollable = main.scrollHeight - main.clientHeight;
     if (scrollable < 2) { feedScrollThumb.style.height = '0'; return; }
@@ -4594,7 +4740,6 @@
           <div class="cs-brew-topline">
             <span class="cs-brew-kicker">Product case study · Mobile build in progress</span>
             <div class="cs-brew-actions" aria-label="Project links">
-              <a class="cs-cta-btn" href="https://github.com/zahsan9/brew" target="_blank" rel="noopener noreferrer">Repo ↗</a>
               <a class="cs-cta-btn" href="https://www.figma.com/design/fRDum7bCiXLQUExZ5Kdqx8/brew.?node-id=76-4&amp;p=f&amp;t=LZwBOvpgaqXkDuEh-0" target="_blank" rel="noopener noreferrer">Figma ↗</a>
             </div>
           </div>
@@ -5273,8 +5418,8 @@
               <a class="cs-cta-btn" href="https://zahsan9.github.io/the-crow/" target="_blank" rel="noopener noreferrer">Try it out ↗</a>
             </div>
           </div>
-          <h2 class="cs-hero-title">From an unbranded template to a journal worth submitting to.</h2>
-          <p class="cs-hero-sub">The CROW is UW Bothell's student research journal, ten volumes and counting. The original site ran on generic template styling with no real identity and buried its submission rules in walls of text. WIIRED Studio rebuilt it end to end.</p>
+          <h2 class="cs-hero-title">The CROW.</h2>
+          <p class="cs-hero-sub">UW Bothell's student research journal, ten volumes and counting. The original site ran on generic template styling with no real identity and buried its submission rules in walls of text. WIIRED Studio rebuilt it end to end, from an unbranded template into a journal worth submitting to.</p>
           <div class="cs-hero-byline cs-crow-byline" aria-label="Project details">
             <span>Visual design + front-end build</span>
             <span>WIIRED Studio · Partner project</span>
@@ -5944,14 +6089,24 @@
     }
     const last = new Map();
     visiblePins.forEach(p => last.set(p, p.getBoundingClientRect()));
+    const flipped = [];
     visiblePins.forEach(p => {
-      const dx = first.get(p).left - last.get(p).left;
-      const dy = first.get(p).top  - last.get(p).top;
-      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5)
+      const f = first.get(p), l = last.get(p);
+      // Only FLIP a pin that is actually laid out in BOTH snapshots. The
+      // component/widget cards (no data-page) and any feed column that
+      // collapses while the sheet is open are display:none in the open
+      // state, so their "first" rect is 0×0 — FLIPping that would fling
+      // them in from the viewport's top-left corner as the sheet closes.
+      if (!f.width || !f.height || !l.width || !l.height) return;
+      const dx = f.left - l.left;
+      const dy = f.top  - l.top;
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
         p.style.transform = `translate(${dx}px,${dy}px)`;
+        flipped.push(p);
+      }
     });
     void feed.offsetWidth;
-    visiblePins.forEach(p => {
+    flipped.forEach(p => {
       p.style.transition = 'transform 0.48s cubic-bezier(0.22,1,0.36,1)';
       p.style.transform = '';
     });
@@ -6633,7 +6788,13 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       });
     }, motionDelay(ROUTE_TIMING.fadeOut));
   }
-  document.querySelectorAll('.rail-btn[data-route]').forEach(b => b.addEventListener('click', () => setRoute(b.dataset.route)));
+  document.querySelectorAll('.rail-btn[data-route]').forEach(b => b.addEventListener('click', e => {
+    setRoute(b.dataset.route);
+    // A pointer click leaves focus on the button, so :focus-within holds the
+    // rail expanded even after the cursor leaves — drop focus so it collapses.
+    // Keyboard activation (e.detail === 0) keeps focus for the next Tab stop.
+    if (e.detail !== 0) b.blur();
+  }));
   document.querySelectorAll('[data-back-to-feed]').forEach(button => {
     button.addEventListener('click', () => setRoute('feed'));
   });
@@ -6661,7 +6822,10 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
   window.addEventListener('hashchange', () => setRoute(routeFromHash(), { history: 'none' }));
   const initialRoute = routeFromHash();
   if (initialRoute !== 'feed') setRoute(initialRoute, { history: 'replace' });
-  else playWorkRailEntry();
+  else if (document.documentElement.classList.contains('splash-active')) {
+    // Splash owns the opening beat; run the rail entry once it has lifted.
+    window.addEventListener('splash:done', playWorkRailEntry, { once: true });
+  } else playWorkRailEntry();
 
   // ── Site cursor ──
   (() => {
