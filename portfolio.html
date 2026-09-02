@@ -3974,22 +3974,25 @@
     /* The tech-icon stack is an absolutely-positioned column that crowds
        the narrower mobile card — drop it here. */
     .exp-tech-zone { display: none; }
-    /* Cards are all reachable by swipe now — the desktop track's per-card
-       scroll-reveal opacity never runs here, so force them visible. */
-    .exp-page.active[data-exp-stage="3"] .exp-card { opacity: 1; }
+    /* Cards + intro panel are all reachable by swipe now — the desktop
+       track's scroll-driven reveal never runs here, so force them visible
+       regardless of the storyboard stage. */
+    .exp-page.active .exp-card,
+    .exp-page.active .exp-intro-panel { opacity: 1 !important; transform: none !important; }
     /* Keep the "Experience timeline" title + arrow as the first slide, the
        arrow pointing right into the strip; compact so it doesn't crowd the
-       first card, and no snap target of its own. */
+       first card. It's the leftmost snap target so the strip opens on it
+       rather than proximity-snapping to the first card. */
     .exp-intro-panel {
       flex: 0 0 auto;
       flex-direction: column;
       align-items: flex-start;
-      gap: 8px;
-      margin-right: 2px;
-      scroll-snap-align: none;
+      gap: 10px;
+      margin-right: 4px;
+      scroll-snap-align: start;
     }
     .exp-intro-panel h3 { font-size: 26px; max-width: 7ch; text-align: left; }
-    .exp-arrow { width: 52px; height: 28px; }
+    .exp-arrow { width: 46px; height: 26px; }
     /* Intro panel: "A little about me" over a down arrow, whole row centred,
        with even breathing room above and below the arrow. */
     .ab-page-row { flex-direction: column; gap: 26px; align-items: center; }
@@ -4009,6 +4012,10 @@
       flex-direction: column;
       gap: 16px;
       perspective: none;
+    }
+    /* Lead with the intro card on mobile; rest keep DOM order. */
+    .ab-stack-card.art-charcoal {
+      order: -1;
     }
     .ab-stack-card {
       position: static;
