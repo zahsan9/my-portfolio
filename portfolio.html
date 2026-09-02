@@ -4003,7 +4003,7 @@
       width: 100%;
       aspect-ratio: auto;
       height: auto;
-      padding: 20px;
+      padding: 22px 20px 20px;
       border-radius: 16px;
       transform: none !important;
       animation: none !important;
@@ -4014,19 +4014,26 @@
     .ab-stack-card .ab-stack-header,
     .ab-stack-card .ab-stack-body { opacity: 1 !important; }
     .ab-stack-tab { display: none; }
-    .ab-stack-title { font-size: 27px; }
+    .ab-stack-title { font-size: 26px; line-height: 1.08; }
     /* No room to float the eyebrow beside a short title on a narrow card —
        let it sit inline above the title instead. */
     .ab-card-eyebrow { position: static !important; margin-bottom: 8px; }
-    /* The About card's photo is a big off-card circle on desktop; on a
-       flat card make it a normal avatar at the top. */
-    .ab-about-photo {
-      position: static !important;
-      width: 96px !important; height: 96px !important;
-      margin-bottom: 14px;
+    /* Consistent title → body → footer rhythm on the flat card. */
+    .ab-stack-header .ab-stack-list,
+    .ab-about-copy .ab-stack-narrative { margin-top: 16px !important; }
+    .ab-stack-list.is-lined li { padding-top: 12px; padding-bottom: 12px; }
+    .ab-stack-list.is-compact li { font-size: 12.5px; line-height: 1.5; }
+    .ab-stack-narrative { font-size: 12.5px; line-height: 1.55; }
+    .ab-stack-item-label { font-size: 10px; margin-bottom: 5px; opacity: 0.85; }
+    .ab-stack-body {
+      margin-top: 18px !important;
+      padding-top: 16px;
+      border-top: 1px solid color-mix(in oklch, currentColor 14%, transparent);
     }
-    .ab-about-photo img { transform: scale(1.12) !important; }
-    .ab-about-copy { margin-top: 0 !important; }
+    .ab-stack-body .ab-stack-tags { margin-top: 0; }
+    /* No room for the off-card photo on a flat card — drop it. */
+    .ab-about-photo { display: none !important; }
+    .ab-about-copy { margin-top: 0 !important; padding-bottom: 0 !important; }
   }
   @media (max-width: 600px) {
     /* Banner (avatar/name/bio/meta) and the filter tabs beneath it use
