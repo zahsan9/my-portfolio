@@ -4614,10 +4614,14 @@
    *    0ms   rail rests compact for the first rendered frame
    *  180ms   rail expands and reveals its navigation labels
    * 2380ms   rail collapses; normal hover behavior takes over
+   *
+   * On a splash load the whole storyboard starts afterSplash ms after the
+   * splash lifts, so the feed has a beat to register first.
    * ───────────────────────────────────────────────────────── */
   const RAIL_ENTRY_TIMING = {
-    expand:   180,
-    collapse: 2380,
+    expand:      180,
+    collapse:    2380,
+    afterSplash: 620,
   };
 
   function playWorkRailEntry() {
@@ -6823,8 +6827,12 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
   const initialRoute = routeFromHash();
   if (initialRoute !== 'feed') setRoute(initialRoute, { history: 'replace' });
   else if (document.documentElement.classList.contains('splash-active')) {
-    // Splash owns the opening beat; run the rail entry once it has lifted.
-    window.addEventListener('splash:done', playWorkRailEntry, { once: true });
+    // Splash owns the opening beat; let the feed settle, then nudge the rail.
+    window.addEventListener('splash:done', () => {
+      setTimeout(() => {
+        if (currentRouteName === 'feed') playWorkRailEntry();
+      }, RAIL_ENTRY_TIMING.afterSplash);
+    }, { once: true });
   } else playWorkRailEntry();
 
   // ── Site cursor ──
