@@ -1797,6 +1797,11 @@
     box-shadow: 0 22px 52px -18px oklch(0.05 0.005 60 / 0.48);
   }
   .sheet-body { padding: 48px 104px 72px; transition: opacity 160ms ease; }
+  /* The 104px side gutters are a desktop reading measure; on a narrow sheet
+     they crush the case study into a sliver, so wind them back down. */
+  @media (max-width: 1180px) { .sheet-body { padding: 48px 60px 72px; } }
+  @media (max-width: 900px)  { .sheet-body { padding: 44px 40px 64px; } }
+  @media (max-width: 600px)  { .sheet-body { padding: 34px 18px 52px; } }
   .sheet-body > * {
     opacity: 0;
     transform: translateY(10px);
