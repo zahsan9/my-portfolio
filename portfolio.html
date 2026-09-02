@@ -3955,8 +3955,8 @@
       overflow-y: hidden;
       overscroll-behavior-x: contain;
       -webkit-overflow-scrolling: touch;
-      scroll-snap-type: x proximity;
-      scroll-padding-left: 20px;
+      /* No scroll snapping: any snap target near the origin makes the strip
+         auto-scroll off the centred intro on load. Plain free swipe. */
       align-items: center;
       padding: 16px 0;
     }
@@ -3969,7 +3969,6 @@
     .exp-card {
       flex-basis: 264px;
       margin-top: 0 !important;
-      scroll-snap-align: start;
     }
     /* The tech-icon stack is an absolutely-positioned column that crowds
        the narrower mobile card — drop it here. */
@@ -3985,13 +3984,17 @@
        points right, toward the strip. It's the leftmost snap target so the
        strip opens on it. */
     .exp-intro-panel {
-      flex: 0 0 calc(100vw - 36px);
+      flex: 0 0 auto;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       gap: 18px;
-      margin-right: 0;
-      scroll-snap-align: start;
+      /* Centre the ~124px title block on screen (18px = .exp-track's own
+         padding-left, 80px ≈ half the block). */
+      margin-left: calc(50vw - 80px);
+      /* First card sits 26px off the block — same arrow-to-card gap as the
+         About intro. (+10 on top of the track's 16px gap.) */
+      margin-right: 10px;
     }
     .exp-intro-panel h3 { font-size: 30px; max-width: 9ch; text-align: center; }
     .exp-arrow { width: 52px; height: 28px; }
