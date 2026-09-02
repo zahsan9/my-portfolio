@@ -3968,6 +3968,9 @@
       margin-top: 0 !important;
       scroll-snap-align: start;
     }
+    /* The tech-icon stack is an absolutely-positioned column that crowds
+       the narrower mobile card — drop it here. */
+    .exp-tech-zone { display: none; }
     /* Cards are all reachable by swipe now — the desktop track's per-card
        scroll-reveal opacity never runs here, so force them visible. */
     .exp-page.active[data-exp-stage="3"] .exp-card { opacity: 1; }
