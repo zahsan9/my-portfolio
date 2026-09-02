@@ -3983,7 +3983,42 @@
     .ab-page-row { flex-direction: column; gap: 20px; }
     .ab-arrow { width: 38px; height: 70px; transform: rotate(90deg); }
     .ab-intro-panel { margin-right: 0; }
-    .ab-stack { margin: 0; }
+    /* The About deck is a pointer-driven fan (hover-lift, click-to-cycle).
+       Flatten it to a plain vertical read on mobile — every card full width,
+       full content, in flow. The stack JS is guarded off at this width. */
+    .ab-stack {
+      width: 100%;
+      height: auto;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      perspective: none;
+    }
+    .ab-stack-card {
+      position: static;
+      width: 100%;
+      aspect-ratio: auto;
+      height: auto;
+      border-radius: 16px;
+      transform: none !important;
+      animation: none !important;
+      opacity: 1 !important;
+      z-index: auto !important;
+      cursor: default !important;
+    }
+    .ab-stack-card .ab-stack-header,
+    .ab-stack-card .ab-stack-body { opacity: 1 !important; }
+    .ab-stack-tab { display: none; }
+    /* The About card's photo is a big off-card circle on desktop; on a
+       flat card make it a normal avatar at the top. */
+    .ab-about-photo {
+      position: static !important;
+      width: 104px !important; height: 104px !important;
+      margin-bottom: 14px;
+    }
+    .ab-about-photo img { transform: scale(1.12) !important; }
+    .ab-about-copy { margin-top: 0 !important; }
   }
   @media (max-width: 600px) {
     /* Banner (avatar/name/bio/meta) and the filter tabs beneath it use
@@ -4003,12 +4038,6 @@
     .banner .meta { margin-top: 12px; font-size: 11.5px; }
     .tabs { padding: 14px 0 16px; gap: 10px 13px; }
     .tab { font-size: 12px; padding: 5px 0 8px; }
-    .ab-stack {
-      --stack-w: min(66vw, 285px);
-      --stack-peek: 56px;
-      width: min(var(--stack-w), 100% - 32px);
-      height: calc(var(--stack-w) * 5 / 4);
-    }
 .cs-two-col,
     .cs-artifact-grid,
     .cs-viz-grid,
@@ -4142,6 +4171,15 @@
        setRoute()'s generic `.rail-btn[data-route]` active-state toggling
        covers these for free. -->
   <nav class="mobile-tabbar" aria-label="Primary">
+    <button class="rail-btn" data-route="experience" aria-label="Experience">
+      <span class="mobile-tab-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="7" width="18" height="13" rx="2"/>
+          <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+        </svg>
+      </span>
+      <span class="mobile-tab-label">Experience</span>
+    </button>
     <button class="rail-btn active" data-route="feed" aria-label="Work" aria-current="page">
       <span class="mobile-tab-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -4151,15 +4189,6 @@
         </svg>
       </span>
       <span class="mobile-tab-label">Work</span>
-    </button>
-    <button class="rail-btn" data-route="experience" aria-label="Experience">
-      <span class="mobile-tab-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="7" width="18" height="13" rx="2"/>
-          <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
-        </svg>
-      </span>
-      <span class="mobile-tab-label">Experience</span>
     </button>
     <button class="rail-btn" data-route="about" aria-label="About">
       <span class="mobile-tab-icon">
@@ -4437,10 +4466,10 @@
         <div class="ab-stack-card art-charcoal" role="button" tabindex="0">
           <div class="ab-stack-tab" aria-hidden="true"><span>About</span></div>
           <div class="ab-stack-header" style="flex:1;gap:0;position:relative;">
-            <div style="position:absolute;top:-80px;right:-80px;width:348px;height:348px;border-radius:50%;overflow:hidden;">
+            <div class="ab-about-photo" style="position:absolute;top:-80px;right:-80px;width:348px;height:348px;border-radius:50%;overflow:hidden;">
               <img src="assets/images/about-me.jpg" alt="Zainab Ahsan" style="width:100%;height:100%;object-fit:cover;object-position:50% 18%;transform:scale(1.45);">
             </div>
-            <div style="margin-top:191px;padding-bottom:10px;">
+            <div class="ab-about-copy" style="margin-top:191px;padding-bottom:10px;">
               <div class="ab-stack-title">Hi, I'm<br><em style="font-size:1.15em;">Zainab!</em></div>
               <p class="ab-stack-narrative" style="margin-top:14px;">I'm a third-year Computer Science student at the University of Washington, minoring in Data Science. I got into this work by noticing the small frustrations in the apps I already used, and wondering what a kinder version might look like. That curiosity turned into brew., WIIRED Studio, and a habit of designing things until they're worth building. I care about people-centered problems: cafés that are easier to discover, hackathons that are easier to run, and data that's easier to understand.</p>
             </div>
@@ -6301,7 +6330,15 @@
   let refreshAboutStack = () => {};
   let playAboutStackIntro = () => {};
   const aboutStack = document.querySelector('.ab-stack');
-  if (aboutStack) {
+  if (aboutStack && window.matchMedia('(max-width: 800px)').matches) {
+    // Mobile flattens the deck to a plain vertical read (see the
+    // max-width: 800px CSS) — strip the fan's button semantics and skip
+    // all the hover/cycle wiring below.
+    aboutStack.querySelectorAll('.ab-stack-card').forEach(c => {
+      c.removeAttribute('role');
+      c.removeAttribute('tabindex');
+    });
+  } else if (aboutStack) {
     const aboutCards = [...aboutStack.querySelectorAll('.ab-stack-card')];
     let aboutOrder = [1, 2, 3, 0];
     let aboutStackBusy = false;
