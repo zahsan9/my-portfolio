@@ -3979,20 +3979,22 @@
        regardless of the storyboard stage. */
     .exp-page.active .exp-card,
     .exp-page.active .exp-intro-panel { opacity: 1 !important; transform: none !important; }
-    /* Keep the "Experience timeline" title + arrow as the first slide, the
-       arrow pointing right into the strip; compact so it doesn't crowd the
-       first card. It's the leftmost snap target so the strip opens on it
-       rather than proximity-snapping to the first card. */
+    /* The "Experience timeline" title + arrow is a full-screen first slide
+       (mirrors the About intro: heading, then an arrow beneath it), centred
+       in the viewport until the user swipes right into the cards. The arrow
+       points right, toward the strip. It's the leftmost snap target so the
+       strip opens on it. */
     .exp-intro-panel {
-      flex: 0 0 auto;
+      flex: 0 0 calc(100vw - 36px);
       flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-      margin-right: 4px;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      margin-right: 0;
       scroll-snap-align: start;
     }
-    .exp-intro-panel h3 { font-size: 26px; max-width: 7ch; text-align: left; }
-    .exp-arrow { width: 46px; height: 26px; }
+    .exp-intro-panel h3 { font-size: 30px; max-width: 9ch; text-align: center; }
+    .exp-arrow { width: 52px; height: 28px; }
     /* Intro panel: "A little about me" over a down arrow, whole row centred,
        with even breathing room above and below the arrow. */
     .ab-page-row { flex-direction: column; gap: 26px; align-items: center; }
