@@ -3986,12 +3986,13 @@
     .ab-arrow { width: 38px; height: 70px; transform: rotate(90deg); }
     .ab-intro-panel { margin-right: 0; }
     /* The About deck is a pointer-driven fan (hover-lift, click-to-cycle).
-       Flatten it to a plain vertical read on mobile — every card full width,
-       full content, in flow. The stack JS is guarded off at this width. */
+       Flatten it to a plain vertical read on mobile — cards held near the
+       feed/experience card width, full content, in flow. The stack JS is
+       guarded off at this width. */
     .ab-stack {
-      width: 100%;
+      width: min(300px, 100%);
       height: auto;
-      margin: 0;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -4002,6 +4003,7 @@
       width: 100%;
       aspect-ratio: auto;
       height: auto;
+      padding: 20px;
       border-radius: 16px;
       transform: none !important;
       animation: none !important;
@@ -4012,11 +4014,15 @@
     .ab-stack-card .ab-stack-header,
     .ab-stack-card .ab-stack-body { opacity: 1 !important; }
     .ab-stack-tab { display: none; }
+    .ab-stack-title { font-size: 27px; }
+    /* No room to float the eyebrow beside a short title on a narrow card —
+       let it sit inline above the title instead. */
+    .ab-card-eyebrow { position: static !important; margin-bottom: 8px; }
     /* The About card's photo is a big off-card circle on desktop; on a
        flat card make it a normal avatar at the top. */
     .ab-about-photo {
       position: static !important;
-      width: 104px !important; height: 104px !important;
+      width: 96px !important; height: 96px !important;
       margin-bottom: 14px;
     }
     .ab-about-photo img { transform: scale(1.12) !important; }
