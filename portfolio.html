@@ -687,11 +687,13 @@
   .app.sheet-open .feed-col:not(:has(.pin[data-page]:not(.is-hidden))) { display: none; }
   @media (max-width: 1400px) { .feed { --card-gap: 32px; } }
   @media (max-width: 1000px) {
-    .feed { --card-gap: 28px; flex-direction: column; }
+    /* One column now — a full-width card reads as a giant block, so hold it
+       near the case-study/experience card width instead. */
+    .feed { --card-gap: 28px; flex-direction: column; width: min(400px, 100% - 64px); }
     .feed-col { flex-basis: auto; }
     .app:not(.sheet-open) .feed.is-filtered { grid-template-columns: 1fr; }
   }
-  @media (max-width: 600px)  { .feed { flex-direction: column; } }
+  @media (max-width: 600px)  { .feed { flex-direction: column; width: min(292px, 100% - 36px); } }
   @media (max-width: 1400px) { .app.sheet-open .feed { width: min(calc(33.333vw - 140px), 363px); } }
   @media (max-width: 1000px) { .app.sheet-open .feed { width: calc(50vw - 78px); } }
   @media (max-width: 600px)  { .app.sheet-open .feed { width: calc(100vw - 16px); } }
