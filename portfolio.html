@@ -3939,7 +3939,42 @@
     .app.sheet-open .tabs { display: none; }
     .topbar { padding: 14px 18px; }
     .banner h1 { font-size: 46px; }
-    .exp-card { flex-basis: 260px; }
+    /* Experience: the desktop track is scroll-hijacked horizontally as you
+       scroll the page down. On mobile that fights the native vertical
+       scroll, so switch to a plain horizontal swipe strip, centred in the
+       space between the top bar and the bottom nav. */
+    .exp-scroll { height: auto; }
+    .exp-viewport {
+      position: static;
+      height: auto;
+      min-height: calc(100dvh - 124px);
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+      scroll-padding-left: 20px;
+      align-items: center;
+      padding: 16px 0;
+    }
+    .exp-track {
+      transform: none !important;
+      align-items: center;
+      padding: 0 20px;
+      gap: 20px;
+    }
+    .exp-card {
+      flex-basis: 264px;
+      margin-top: 0 !important;
+      scroll-snap-align: start;
+    }
+    /* Cards are all reachable by swipe now — the desktop track's per-card
+       scroll-reveal opacity never runs here, so force them visible. */
+    .exp-page.active[data-exp-stage="3"] .exp-card { opacity: 1; }
+    /* The "Experience timeline" intro panel is the desktop track's scroll
+       cue; the swipe strip doesn't need it and snap-scroll skips past it
+       anyway, so drop it here. */
+    .exp-intro-panel { display: none; }
     /* Not enough width for intro panel + fan side by side — stack the panel
        above and point the arrow down into the deck instead of across at it. */
     .ab-page-row { flex-direction: column; gap: 20px; }
@@ -3965,7 +4000,6 @@
     .banner .meta { margin-top: 12px; font-size: 11.5px; }
     .tabs { padding: 14px 0 16px; gap: 10px 13px; }
     .tab { font-size: 12px; padding: 5px 0 8px; }
-    .exp-track { padding: 0 20px; }
     .ab-stack {
       --stack-w: min(66vw, 285px);
       --stack-peek: 56px;
@@ -6641,6 +6675,16 @@ const expScroll   = document.getElementById('expScroll');
   function updateExperienceTrackNow() {
     if (!expScroll || !expTrack) return;
     const viewport = expScroll.querySelector('.exp-viewport');
+    // Mobile drops the scroll-driven track for a plain horizontal swipe
+    // (see the max-width: 800px rules) — clear anything the desktop path set.
+    if (window.matchMedia('(max-width: 800px)').matches) {
+      expScroll.style.removeProperty('--exp-track-x');
+      expScroll.style.removeProperty('--exp-travel');
+      expTravelPx = 0;
+      viewport.style.opacity = '';
+      viewport.style.transform = '';
+      return;
+    }
     if (!expView.classList.contains('active')) {
       expScroll.style.setProperty('--exp-track-x', '0px');
       viewport.style.opacity = '';
