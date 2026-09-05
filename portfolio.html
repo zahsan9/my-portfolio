@@ -53,13 +53,24 @@
     --sans:  'Inter', -apple-system, sans-serif;
     --mono:  'Inter', -apple-system, sans-serif;
     --chrome-size: 80px;
+    /* Expanded rail: the narrowest width that still fits every study label on
+       one line — "The Neutral Response" beside its icon, and "Daily type &
+       motion" beside its WIP tag. Below this they start to ellipsize. */
+    --rail-open-w: 240px;
+    /* One duration for everything the rail moves when it opens or closes —
+       width, row heights, label heights, group spacing. Mismatched timings
+       are what made the expand read as several animations racing. */
+    --rail-motion: 360ms;
+    --rail-ease: var(--ease-out);
+    --toc-w: 168px;
+    --toc-gap: 28px;   /* reading column → index */
+    --toc-edge: 28px;  /* index → panel's right edge */
     --panel-w: 68vw;
     --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-soft: cubic-bezier(0.19, 1, 0.22, 1);
     --motion-fast: 180ms;
     --motion-med: 420ms;
     --motion-slow: 480ms;
-    --open-column-gutter: 24px;
     /* ── Route transition tokens (tunable via DialKit) ── */
     --rt-fade-out:    200ms;
     --rt-slide-y:      14px;
@@ -118,10 +129,32 @@
   ::selection { background: var(--ink); color: var(--paper); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 
+  /* Reduced motion: the storyboards already opt out in JS (motionDelay,
+     playSheetRailEntry, the splash), but every CSS transition on the site runs
+     off these four tokens — so collapsing them here is what actually honours
+     the preference. Kept at a hair above zero rather than 0s so anything
+     waiting on a transition still fires. */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion-fast: 0.01ms;
+      --motion-med:  0.01ms;
+      --motion-slow: 0.01ms;
+      --rail-motion: 0.01ms;
+    }
+  }
+
   /* ── Shell ── */
   .app {
     display: grid; grid-template-columns: var(--chrome-size) 1fr; height: 100vh;
   }
+  /* Sheet open: the panel takes everything right of the COMPACT rail, and the
+     rail's expanded index state overlays the panel's left edge rather than
+     pushing it — so hovering the rail never reflows the case study you're
+     reading, and the study keeps the full width at rest. */
+  .app.sheet-open { --panel-w: calc(100vw - var(--chrome-size)); }
+  /* Nothing behind the panel is reachable while it's open, so don't let a
+     wheel over the rail silently scroll the feed out from under it. */
+  .app.sheet-open .main { overflow: hidden; }
   .main {
     height: 100vh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
     /* Without this, Chrome's scroll-anchoring silently nudges scrollTop to
@@ -141,34 +174,24 @@
     pointer-events: none;
     user-select: none;
   }
-  /* Custom feed scrollbar — slides with the sheet */
+  /* Custom feed scrollbar */
   .feed-scroll-track {
     position: fixed;
     top: 0; bottom: 0; right: 0;
     width: 3px;
     z-index: 60;
     pointer-events: none;
-    transition: right var(--motion-slow) var(--ease-soft), width var(--motion-med) var(--ease-out), background var(--motion-med) ease;
+    transition: opacity var(--motion-med) ease;
   }
-  .app.sheet-open .feed-scroll-track {
-    right: var(--panel-w);
-    width: 8px;
-    background: var(--line);
-    box-shadow: inset 1px 0 0 var(--line), inset -1px 0 0 var(--line);
-  }
+  /* The feed doesn't scroll while a case study is open — the sheet has its
+     own scroll and the rail index replaces the feed as the browse surface. */
+  .app.sheet-open .feed-scroll-track { opacity: 0; }
   .feed-scroll-thumb {
     position: absolute;
     left: 0; right: 0;
     min-height: 32px;
     border-radius: 999px;
     background: var(--line);
-    transition: left var(--motion-med) var(--ease-out), right var(--motion-med) var(--ease-out), background var(--motion-med) ease;
-  }
-  .app.sheet-open .feed-scroll-thumb {
-    left: 1px;
-    right: 1px;
-    background: var(--feed-scroll-accent, oklch(0.98 0 0));
-    box-shadow: 0 0 0 1px color-mix(in oklch, var(--ink) 24%, transparent);
   }
 
   /* ── Rail ── */
@@ -181,15 +204,55 @@
     width: var(--chrome-size);
     overflow: hidden;
     z-index: 40;
-    transition: width 0.32s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease, transform var(--motion-med) var(--ease-out);
+    transition: width var(--rail-motion) var(--rail-ease), opacity 0.3s ease, transform var(--motion-med) var(--ease-out);
   }
   .rail.is-intro-expanded,
   .rail:has(.rail-nav:hover),
   .rail:has(.rail-nav:focus-within) { width: 168px; }
-  .app.sheet-open .rail {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(-100%);
+  /* Sheet open: the rail stays instead of sliding away — it is now the only
+     way to reach the other case studies. It rests COMPACT, showing the index
+     as a column of card-colored swatches, and expands to the full index for a
+     beat after a study opens (.is-sheet-expanded, see SHEET RAIL STORYBOARD)
+     and then on hover or keyboard focus. Above the sheet's z-index so the
+     expanded state overlays the panel instead of pushing it. */
+  .app.sheet-open .rail { z-index: 102; }
+  /* The rail owns the seam. The panel draws its own left border, which sits
+     exactly under the compact rail's right border — so as the rail expands,
+     its border travelled out with it and the panel's stayed behind at the
+     compact edge, leaving two lines and making the divider look like it had
+     been dropped and redrawn somewhere else. With the panel's edge muted, one
+     line moves with the rail through every state, which is what makes the
+     expansion read as the same navigation getting wider. */
+  .app.sheet-open .sheet { border-left-color: transparent; }
+  /* Closing is one gesture, not two. The panel slides out on --motion-slow /
+     --ease-soft; without this the rail collapsed on its own faster, different
+     curve and the two moves read as separate events. Retiming the rail's whole
+     choreography here puts them on the same clock. */
+  .app.sheet-closing {
+    --rail-motion: var(--motion-slow);
+    --rail-ease: var(--ease-soft);
+  }
+  /* The panel runs behind the rail, but its content is inset past the rail's
+     full expanded width, so nothing the visitor is reading — sheet head
+     included — ever sits under the expanded index. That's what makes the
+     overlay safe: the case study never reflows when the rail opens.
+
+     Only the shortfall is reserved, never more: on a wide window the centred
+     reading column already clears the rail and the inset falls to 0. Solving
+     `chrome + inset + (panel - inset - toc - column) / 2 >= rail-open` for the
+     inset gives the middle term; the clamp caps it at the rail's own overhang
+     for windows too narrow for the column to reach its cap. Keep this in terms
+     of the tokens — hard-coding a breakpoint here goes stale the moment the
+     rail width, the column cap or the index width moves. */
+  .app.sheet-open .sheet {
+    --sheet-inset-left: clamp(0px,
+      calc(2 * var(--rail-open-w) + var(--toc-reserve, 0px) + 1240px - var(--chrome-size) - 100vw),
+      calc(var(--rail-open-w) - var(--chrome-size)));
+    padding-left: var(--sheet-inset-left);
+  }
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) {
+    width: var(--rail-open-w);
+    box-shadow: 10px 0 34px oklch(0.05 0.005 60 / 0.16);
   }
   .rail .logo {
     width: 48px; height: 48px;
@@ -203,6 +266,26 @@
   .rail-nav {
     display: flex; flex-direction: column; gap: 10px;
     align-self: stretch; padding: 0 16px 8px;
+    max-height: 320px; overflow: hidden;
+    transition:
+      max-height var(--rail-motion) var(--rail-ease),
+      padding var(--rail-motion) var(--rail-ease),
+      opacity var(--motion-fast) ease,
+      visibility 0s;
+  }
+  /* Sheet open: the site routes step aside entirely — the case studies are
+     the navigation while you're reading one, and the logo (and the sheet's
+     own close control) is the way back out. They collapse rather than
+     display:none so the index can grow smoothly into the space they leave. */
+  .app.sheet-open .rail-nav {
+    max-height: 0; padding-top: 0; padding-bottom: 0;
+    opacity: 0; pointer-events: none;
+    visibility: hidden;
+    transition:
+      max-height var(--rail-motion) var(--rail-ease),
+      padding var(--rail-motion) var(--rail-ease),
+      opacity var(--motion-fast) ease,
+      visibility 0s linear var(--rail-motion);
   }
   .rail-btn {
     width: 100%; height: 48px; border-radius: 999px;
@@ -231,9 +314,224 @@
   .rail.is-intro-expanded .rail-label,
   .rail:has(.rail-nav:hover) .rail-label,
   .rail:has(.rail-nav:focus-within) .rail-label { max-width: 140px; opacity: 1; }
+  /* Sheet open: every label in the rail reveals together, and only while the
+     rail is expanded — auto-expanded for a beat after a study opens, hovered,
+     or keyboard-focused. Compact, the index reads as its color swatches. */
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-label {
+    max-width: 140px; opacity: 1;
+    transition: max-width var(--rail-motion) var(--rail-ease), opacity 200ms ease 90ms;
+  }
+  /* One delay, one duration, for every label in the index — names and section
+     headings land together, just behind the geometry. */
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within)
+    .rail-index-title {
+    opacity: 1;
+    transition: opacity 220ms ease 80ms;
+  }
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within)
+    .rail-index-label {
+    opacity: 1;
+    transition:
+      height var(--rail-motion) var(--rail-ease),
+      padding-bottom var(--rail-motion) var(--rail-ease),
+      opacity 220ms ease 80ms;
+  }
   .rail-bottom {
     margin-top: auto; align-self: stretch; padding: 0 16px 4px;
   }
+
+  /* ── Rail index (sheet-open only) ──
+     While a case study is open the rail becomes the browse surface: every
+     case-study card in the feed, grouped under EVERY category its data-cat
+     lists, so a project that is both product and engineering work (brew,
+     Habitat) is reachable from either discipline — that is the point of the
+     grouping, not a duplication bug. This is what lets the feed column
+     disappear entirely so the sheet can hold the rest of the screen.
+
+     It sits between the logo and .rail-nav in the DOM and is zero-height at
+     rest (`flex-grow: 0` against a `0` basis), so the closed rail is exactly
+     what it always was. Opening a study animates flex-grow 0 → 1, which is
+     what slides the routes smoothly down into the bottom of the rail. Hidden
+     with `visibility` as well, so it stays out of the tab order and the
+     accessibility tree while it has no height. */
+  .rail-index {
+    align-self: stretch;
+    flex: 0 1 0; min-height: 0;
+    /* Same 16px insets as .rail-nav, so a compact row is exactly a route
+       button's 48px circle on exactly its axis. The right inset is trimmed
+       once expanded, to buy the longest label its full line. */
+    padding: 0 16px; margin: 0;
+    /* Spacing lives on the items and groups, not in a flex gap: the compact
+       stack collapses labels and repeat rows to zero, and a gap would keep
+       reserving space for them. */
+    display: flex; flex-direction: column; gap: 0;
+    overflow-y: auto; scrollbar-width: none;
+    /* Fades whatever is under the fold on a short rail instead of slicing a
+       pill in half. Nothing shows when the list fits — there is no content
+       at the container's bottom edge to fade. */
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
+    visibility: hidden; opacity: 0;
+    /* Both the fade and the visibility flip run the collapse's own clock: on a
+       shorter one the index blanked while its box was still shrinking, which
+       is most of what made closing look choppy. */
+    transition:
+      flex-grow var(--rail-motion) var(--rail-ease),
+      padding-right var(--rail-motion) var(--rail-ease),
+      opacity var(--rail-motion) ease,
+      visibility 0s linear var(--rail-motion);
+  }
+  .rail-index::-webkit-scrollbar { display: none; }
+  .app.sheet-open .rail-index {
+    flex-grow: 1;
+    /* No top inset: the first study sits exactly where Work sits in the
+       default rail, so the two states share one baseline. */
+    padding-top: 0; padding-bottom: 12px;
+    visibility: visible; opacity: 1;
+    transition:
+      flex-grow var(--rail-motion) var(--rail-ease),
+      padding-right var(--rail-motion) var(--rail-ease),
+      opacity var(--motion-med) ease 120ms,
+      visibility 0s;
+  }
+  .rail-index-group {
+    display: flex; flex-direction: column; gap: 0;
+    transition: margin-top var(--rail-motion) var(--rail-ease);
+  }
+  .rail-index-label {
+    /* --ink-mid, not --ink-low: at 10px uppercase, low ink falls to about
+       2.4:1 on the dark rail and the section names stop being readable. */
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-mid); white-space: nowrap;
+    /* 13px matches .rail-btn's own left padding, so a category label starts
+       on the same vertical guide as the icons and route icons below it. */
+    padding: 0 13px 5px;
+    /* Collapses with the categories on the compact rail (see the stack rules
+       below). Height is explicit so it can animate. */
+    height: 0; padding-bottom: 0; overflow: hidden; opacity: 0;
+    /* Collapsing: the text leaves before the box does, so nothing is caught
+       mid-clip. Expanding reverses it in the .is-sheet-expanded rule below. */
+    transition:
+      height var(--rail-motion) var(--rail-ease),
+      padding-bottom var(--rail-motion) var(--rail-ease),
+      opacity 160ms ease;
+  }
+  /* Study rows are .rail-btn with the study's own icon in the icon slot: same
+     height, radius, padding, gap and label type as Work / Experience / About,
+     so the whole rail reads as one navigation. */
+  /* Exactly a .rail-btn's box: same 48px height, radius, 13px left padding,
+     10px icon gap and 10px rhythm between rows. Compact, that makes a row the
+     same circle a route button is, on the same axis and the same pitch — the
+     two rail states line up row for row. */
+  .rail-index-item {
+    width: 100%; height: 48px; border-radius: 999px;
+    display: flex; align-items: center; flex-shrink: 0;
+    padding-left: 13px; padding-right: 0; gap: 10px;
+    margin-bottom: 10px;
+    color: var(--ink); overflow: hidden; cursor: pointer;
+    opacity: 0; transform: translateX(-8px);
+    transition:
+      background var(--motion-fast) ease,
+      color var(--motion-fast) ease,
+      opacity var(--motion-med) var(--ease-out),
+      transform var(--motion-med) var(--ease-out),
+      padding-right var(--rail-motion) var(--rail-ease),
+      height var(--rail-motion) var(--rail-ease),
+      margin-bottom var(--rail-motion) var(--rail-ease);
+  }
+  /* ── Compact stack ──
+     Collapsed, the rail has no category labels to explain why a project would
+     appear twice, so it shows each project ONCE, evenly spaced: the labels and
+     the group spacing collapse to nothing, and every entry but the one
+     representing its project (see syncRailIndex — the open entry represents
+     its own project, so the fill is never on a hidden row) collapses with
+     them. Expanding restores the sections, and the rows slide down into them.
+
+     Nothing about the row's own box changes between the two states — the
+     rail's width is what turns the same 48px pill into a circle — so no icon
+     ever shifts sideways as it opens.
+
+     Staggered reveal: delays apply to opacity/transform only, so hover colour
+     still responds instantly once a row has landed. */
+  .app.sheet-open .rail-index-item {
+    opacity: 1; transform: none;
+    transition-delay: 0s, 0s,
+      calc(140ms + var(--i, 0) * 22ms), calc(140ms + var(--i, 0) * 22ms),
+      0s, 0s, 0s;
+  }
+  /* A repeat row unfolding on hover is part of the same move as everything
+     else, so it drops the per-item entry stagger the open storyboard sets —
+     that delay is what made the second copy of a study arrive after the rest. */
+  .app.sheet-open .rail-index-item.is-compact-hidden {
+    height: 0; margin-bottom: 0;
+    opacity: 0; pointer-events: none;
+    transition-delay: 0s;
+  }
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-index {
+    padding-right: 12px;
+  }
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-index-item {
+    padding-right: 8px;
+  }
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-index-item.is-compact-hidden {
+    height: 48px; margin-bottom: 10px;
+    opacity: 1; pointer-events: auto;
+    transition-delay: 0s;
+  }
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-index-label {
+    /* 22 = the 10px line plus 10px of air before the first pill. Height is
+       border-box here, so the padding has to be paid for in the height or the
+       label crops itself. */
+    height: 22px; padding-bottom: 10px; opacity: 1;
+  }
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within)
+    .rail-index-group + .rail-index-group { margin-top: 10px; }
+  .rail-index-item:hover,
+  .rail-index-item:focus-visible { background: var(--control-soft); }
+  /* The active study fills with its own card color instead of the rail's ink,
+     so the pill and the case study you're reading are visibly the same thing.
+     --card-on is the text color that card already uses on that background. */
+  .rail-index-item.active {
+    background: var(--card-color, var(--ink));
+    color: var(--card-on, var(--paper));
+    box-shadow: inset 0 0 0 1px var(--card-ring, transparent);
+  }
+  /* Each study's icon sits in the same 22px slot a route button's icon does,
+     solid rather than stroked (see RAIL_INDEX_ICONS) so the set matches brew's
+     own filled card mark — a compact rail then reads as a legible column of
+     studies rather than anonymous dots. */
+  /* Icons read as rail chrome, not as seven accents competing down a column:
+     they take the theme's ink, black on the light rail and white on the dark
+     one. Card color still identifies a study — it's just held for the active
+     pill's fill, where it means "this is the one you're reading". */
+  .rail-index-icon {
+    width: 22px; height: 22px; flex-shrink: 0;
+    color: var(--ink);
+    transition: color var(--motion-fast) ease;
+  }
+  .rail-index-icon svg {
+    width: 100%; height: 100%; display: block;
+  }
+  /* On the filled pill the icon would vanish into the card's own color, so it
+     flips to the pill's text color. */
+  .rail-index-item.active .rail-index-icon { color: var(--card-on, var(--paper)); }
+  /* Study names fade as a group rather than each clipping itself open. A
+     max-width wipe (what .rail-label does) finishes when the label runs out of
+     letters, so "brew." arrived a third of the way through while "The Neutral
+     Response" was still unrolling — which is what read as the rows popping up
+     one at a time. The row's own overflow, and the rail's, still clip them
+     while the rail is narrow; only the fade is animated. */
+  .rail-index-title {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.01em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 140px; opacity: 0;
+    transition: opacity 220ms ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .app.sheet-open .rail-index-item { transition-delay: 0s; }
+  }
+  /* Narrow desktop: hold more of the screen for the case study itself. */
+  @media (max-width: 1100px) { :root { --rail-open-w: 212px; } }
 
   /* ── Mobile primary nav ──
      .rail is display:none at 800px and below (see the Navigation section
@@ -296,7 +594,7 @@
   @media (max-width: 800px) { .mobile-tabbar { display: flex; } }
   /* Sheet view is full-screen on mobile (see --panel-w: 100vw below) and
      already has its own close control — the tab bar would just sit on top
-     of it for no reason, same as .rail hiding on sheet-open. */
+     of it for no reason. */
   .app.sheet-open .mobile-tabbar { display: none; }
 
   /* ── Top bar ── */
@@ -490,7 +788,14 @@
     overflow: hidden; max-height: 700px;
     transition: opacity var(--motion-fast) ease;
   }
-  .app.sheet-open .banner { max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; pointer-events: none; }
+  /* The banner fades like the rest of the board — it must NOT collapse its
+     height. It used to (max-height: 0 plus its padding), which removed ~700px
+     of layout above the feed the instant a study opened: everything below
+     jumped up, and .main going overflow:hidden clamped the scroll against the
+     newly shorter content. That was the flash of a scrolled-looking feed
+     before the panel arrived. Nothing here is visible behind the panel
+     anyway, so there is nothing to gain by collapsing it. */
+  .app.sheet-open .banner { opacity: 0; pointer-events: none; }
   .banner .avatar {
     width: 140px; height: 140px; min-height: 140px; max-height: 140px; border-radius: 999px;
     margin: 0 auto 36px;
@@ -525,7 +830,7 @@
   .banner .meta-sep { font-weight: 700; padding: 0 5px; }
   .feed {
     transform: translateX(calc(var(--feed-shift, 0px) * -1));
-    transition: transform var(--motion-slow) var(--ease-soft);
+    transition: transform var(--motion-slow) var(--ease-soft), opacity var(--motion-med) ease;
     will-change: transform;
   }
   .app.sheet-closing .feed,
@@ -550,73 +855,9 @@
     display: flex; flex-wrap: wrap; gap: 28px;
     justify-content: flex-start; align-items: center;
     position: relative;
-    background: transparent;
-    box-shadow: inset 0 -1px 0 transparent, inset -1px 0 0 transparent;
-    transform: translate(var(--tabs-dx, 0px), var(--tabs-dy, 0px));
-    transition:
-      transform var(--motion-slow) var(--ease-soft),
-      background var(--motion-slow) var(--ease-soft),
-      box-shadow var(--motion-slow) var(--ease-soft),
-      opacity var(--motion-fast) var(--ease-out);
+    transition: opacity var(--motion-med) ease;
   }
-  .app.sheet-open .tabs {
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 102;
-    background: var(--paper);
-    width: calc(100vw - var(--panel-w));
-    margin: 0;
-    height: var(--chrome-size);
-    min-height: 0;
-    padding: 0 var(--open-column-gutter) 0 calc(var(--chrome-size) + var(--open-column-gutter));
-    gap: 22px;
-    flex-wrap: nowrap;
-    overflow: hidden;
-    box-shadow: inset 0 -1px 0 var(--line), inset -1px 0 0 transparent;
-    transform: translate(var(--tabs-dx, 0px), var(--tabs-dy, 0px));
-  }
-  .app.sheet-open .tabs-group,
-  .app.sheet-open .tab,
-  .app.sheet-open .tabs .scroll-hint {
-    flex: 0 0 auto;
-  }
-  .app.sheet-open .tabs-label {
-    color: var(--control-muted);
-    text-transform: none;
-    letter-spacing: 0;
-  }
-  .app.sheet-open .tabs-group { padding: 5px 0 9px; }
   .tabs-scroll { display: contents; }
-  .app.sheet-open .tabs-scroll {
-    display: flex;
-    flex: 1;
-    min-width: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-    gap: 22px;
-    align-items: center;
-    height: 100%;
-  }
-  .app.sheet-open .tabs-scroll::-webkit-scrollbar { display: none; }
-  .app.sheet-open .tab { font-size: 15px; padding: 6px 0 10px; }
-  .app.sheet-open .tab[data-filter="misc"] { display: none; }
-  .tabs .scroll-hint {
-    margin-left: auto;
-    flex: 0 0 126px;
-    text-align: right;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: oklch(0.98 0 0);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    opacity: 0;
-    transform: translateX(8px);
-    transition: opacity var(--motion-med) ease, transform var(--motion-med) var(--ease-out);
-    pointer-events: none;
-  }
-
-  .app.sheet-open .tabs .scroll-hint { opacity: 0.72; transform: translateX(0); }
   .tab {
     font-family: var(--mono); font-size: 15px; font-weight: 600;
     padding: 6px 0 10px; background: transparent; color: var(--control-muted);
@@ -660,43 +901,39 @@
   }
   /* Filtered results flatten the hand-balanced source columns into one grid,
      so visible cards always occupy each row from left to right before wrapping. */
-  .app:not(.sheet-open) .feed.is-filtered {
+  .feed.is-filtered {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .app:not(.sheet-open) .feed.is-filtered .feed-col { display: contents; }
+  .feed.is-filtered .feed-col { display: contents; }
   /* A column with nothing visible in it collapses instead of leaving a dead
      gap — remaining columns then naturally pack against the left edge. */
   .feed-col:not(:has(.pin:not(.is-hidden))) { display: none; }
-  .app.sheet-open .feed {
-    width: calc(25vw - 56px + var(--open-column-gutter));
-    max-width: 363px;
-    margin: 0;
-    flex-direction: column;
-    padding: calc(var(--chrome-size) + 24px) 0 80px var(--open-column-gutter);
-    transform: none;
+  /* Sheet open: the feed keeps its exact layout and simply fades out behind
+     the panel. Nothing reflows into a mini column, so closing is a straight
+     cross-fade back to the board the visitor left — and the rail index
+     (see .rail-index) is what they browse with in the meantime. */
+  .app.sheet-open .feed,
+  .app.sheet-open .tabs,
+  .app.sheet-open .banner,
+  .app.sheet-open .feed-empty,
+  .app.sheet-open .copyright {
+    opacity: 0;
+    pointer-events: none;
+    /* Visibility too, held until the fade finishes, so the cards behind the
+       panel can't keep collecting Tab stops. It flips back instantly on close. */
+    visibility: hidden;
+    transition: opacity var(--motion-med) ease, visibility 0s linear var(--motion-med);
   }
-  /* Flex-basis is a main-axis size — once .feed stacks to a column, the
-     column's main axis is vertical, so the width-based calc() above must
-     not apply; let each .feed-col size to its natural content height. */
-  .app.sheet-open .feed-col { flex-basis: auto; }
-  /* Component/widget cards (no data-page — "Find me elsewhere", "In the
-     overlap") don't link to a case study, so they don't belong in the
-     mini single-column list shown while browsing case studies. */
-  .app.sheet-open .pin:not([data-page]) { display: none; }
-  .app.sheet-open .feed-col:not(:has(.pin[data-page]:not(.is-hidden))) { display: none; }
   @media (max-width: 1400px) { .feed { --card-gap: 32px; } }
   @media (max-width: 1000px) {
     /* One column now — a full-width card reads as a giant block, so hold it
        near the case-study/experience card width instead. */
     .feed { --card-gap: 28px; flex-direction: column; width: min(400px, 100% - 64px); }
     .feed-col { flex-basis: auto; }
-    .app:not(.sheet-open) .feed.is-filtered { grid-template-columns: 1fr; }
+    .feed.is-filtered { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px)  { .feed { flex-direction: column; width: min(292px, 100% - 36px); } }
-  @media (max-width: 1400px) { .app.sheet-open .feed { width: min(calc(33.333vw - 140px), 363px); } }
-  @media (max-width: 1000px) { .app.sheet-open .feed { width: calc(50vw - 78px); } }
-  @media (max-width: 600px)  { .app.sheet-open .feed { width: calc(100vw - 16px); } }
 
   .pin {
     cursor: pointer;
@@ -1158,6 +1395,14 @@
     background: var(--control-soft);
     color: var(--ink);
   }
+  /* The sheet focuses its Back to Work as soon as a case study opens, so the
+     UA's blue ring would land on top of the study's own palette. Ink, at the
+     pill's own scale, for every header pill. */
+  .page-back:focus-visible,
+  .page-resume-btn:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
   /* A control-soft fill would fight the permanent-CTA fill above (it can
      read as the pill going flat/duller instead of more prominent) — a
      simple dim keeps it feeling responsive without losing that identity. */
@@ -1186,6 +1431,27 @@
     transition: background 0.15s, color 0.15s;
   }
   .topbar-social-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+  /* Quiet metadata, not a control: same mono the rail's section labels use,
+     one hairline divider away from the icon row. */
+  .topbar-divider {
+    color: var(--line);
+    font-size: 15px;
+    line-height: 1;
+    user-select: none;
+  }
+  .topbar-updated {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    white-space: nowrap;
+    padding-right: 6px;
+  }
+  /* The icons alone carry the header on a phone. */
+  @media (max-width: 600px) {
+    .topbar-divider, .topbar-updated { display: none; }
+  }
   .topbar-social-btn .social-glyph {
     font-family: var(--sans); font-weight: 700; font-size: 16px; letter-spacing: -0.02em;
   }
@@ -1359,65 +1625,6 @@
     text-transform: uppercase;
     opacity: 0.7;
   }
-  .exp-tech-zone { position: absolute; }
-  .exp-tech-stack {
-    top: 0;
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 7px;
-    box-sizing: border-box;
-    width: 76px;
-    height: 210px;
-    padding: 18px 20px 0;
-  }
-  .exp-tech-icon { position: relative; }
-  .exp-tech-stack .exp-tech-icon {
-    display: grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    flex: 0 0 32px;
-  }
-  .exp-tech-icon img { display: block; width: 100%; height: 100%; object-fit: contain; }
-  .exp-tech-stack .exp-tech-icon img { width: 27px; height: 27px; }
-  .exp-tech-stack .exp-tech-icon img.is-quicksight { width: 26px; height: 26px; }
-  .exp-tech-stack .exp-tech-icon img.is-padded-sql { width: 34px; height: 34px; }
-  .exp-tech-stack .exp-tech-icon img.is-padded-redshift {
-    width: 36px;
-    height: 36px;
-    object-position: center;
-    transform: translate(-2px, -1px);
-  }
-  .exp-tech-stack .exp-tech-icon img.is-padded-figma {
-    width: 43px;
-    height: 43px;
-    transform: translate(-5px, -6px);
-  }
-  .exp-tech-stack .exp-tech-icon img.is-offset-canva { transform: translateY(-2px); }
-  .exp-tech-label {
-    position: absolute;
-    top: 50%;
-    right: calc(100% + 8px);
-    transform: translateY(-50%) translateX(6px);
-    white-space: nowrap;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    background: oklch(0.15 0.01 60 / 0.92);
-    color: oklch(0.96 0.005 80);
-    padding: 4px 10px;
-    border-radius: 6px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 180ms ease, transform 180ms ease;
-  }
-  .exp-tech-icon:hover .exp-tech-label {
-    opacity: 1;
-    transform: translateY(-50%) translateX(0);
-  }
   .exp-card-header { display: flex; justify-content: space-between; align-items: baseline; }
   .exp-link-card:focus-visible {
     outline-color: currentColor;
@@ -1477,32 +1684,46 @@
   /* ── Detail sheet ── */
   .sheet.open { opacity: 1; pointer-events: auto; transform: translateX(0); }
   .sheet-head {
-    display: flex; flex-direction: row-reverse;
-    justify-content: space-between; align-items: center;
-    padding: 18px 24px; border-bottom: 1px solid var(--line);
+    /* The study's tag sits on the reading column's left edge, over the study's
+       own headers, and the way out sits at its right edge — both on the same
+       guides as the case study underneath, never floating on the panel's. */
+    display: flex; flex-direction: row;
+    justify-content: space-between; align-items: center; gap: 18px;
+    /* The head spans the whole panel — its rule runs from the rail's edge to
+       the edge of the screen — by cancelling the insets the panel reserves for
+       the rail overlay and the section index, then paying them back as
+       padding. Its controls still sit on the reading column's own edges (1240px
+       capped body + its 104px gutter) rather than the panel's, so they line up
+       with the case study; percentages here resolve against the panel's content
+       box, which is what that column is centred in. */
+    margin-left: calc(var(--sheet-inset-left, 0px) * -1);
+    margin-right: calc(var(--toc-reserve, 0px) * -1);
+    /* 16px against the 48px pill keeps the head exactly --chrome-size tall,
+       so its rule lines up with the rail's own chrome. */
+    padding: 16px calc(var(--toc-reserve, 0px) + max(24px, calc((100% - 1240px) / 2 + 104px)))
+             16px calc(var(--sheet-inset-left, 0px) + max(24px, calc((100% - 1240px) / 2 + 104px)));
+    border-bottom: 1px solid var(--line);
     position: sticky; top: 0; background: var(--paper); z-index: 2;
     min-height: var(--chrome-size);
   }
   .sheet-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-mid); text-transform: uppercase; letter-spacing: 0.08em; }
   .sheet-actions { display: flex; gap: 8px; align-items: center; }
-  .sheet-close {
-    display: inline-flex; align-items: center; gap: 0;
-    height: 38px; padding: 0 12px; border-radius: 999px;
-    background: transparent; color: var(--ink);
-    box-shadow: 0 0 0 1px var(--line);
-    cursor: pointer;
-    transition: background var(--motion-fast) ease, color var(--motion-fast) ease,
-                box-shadow var(--motion-fast) ease, gap var(--motion-fast) ease;
-  }
+  /* .sheet-close is .page-back and nothing more at rest (see Header pills):
+     the same transparent pill About and Experience use, so every Back to Work
+     on the site is one control. It carried a hairline for a while to separate
+     it from a case study's repainted canvas — that read as a different
+     button, which is worse than the separation was worth.
+
+     Its hover/focus fill is the one thing it can't inherit. --control-soft is
+     a page-theme token, but a case study repaints --paper and --ink for its
+     own palette, so that fill lands too close to the canvas (or clashes with
+     it) depending on the study. Mixing the study's own ink into its own paper
+     is always a visible step away from whatever it's sitting on. */
   .sheet-close:hover,
-  .sheet-close:focus-visible { background: var(--ink); color: var(--paper); box-shadow: 0 0 0 1px var(--ink); gap: 6px; }
-  .sheet-btn-label {
-    font-family: var(--mono); font-size: 12px; letter-spacing: 0.01em;
-    white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0;
-    transition: max-width 0.28s var(--ease-out), opacity 0.16s ease 0.08s;
+  .sheet-close:focus-visible {
+    background: color-mix(in oklch, var(--ink) 18%, var(--paper));
+    color: var(--ink);
   }
-  .sheet-close:hover .sheet-btn-label,
-  .sheet-close:focus-visible .sheet-btn-label { max-width: 80px; opacity: 1; }
   .cs-cta-btn {
     display: inline-flex; align-items: center; gap: 6px;
     height: 40px; padding: 0 18px; border-radius: 999px;
@@ -1523,7 +1744,74 @@
     transform: translateX(100%);
     transition: transform var(--motion-slow) var(--ease-soft), opacity var(--motion-med) ease;
     will-change: transform;
+    /* Anchor jumps from the section index and the figure references glide
+       rather than snap. */
+    scroll-behavior: smooth;
   }
+  @media (prefers-reduced-motion: reduce) { .sheet { scroll-behavior: auto; } }
+
+  /* ── Case-study section index ──
+     A study's own .cs-section labels, floated into a reserved right gutter and
+     stuck under the sheet head. It sits inside .sheet on purpose: each study
+     remaps --ink/--paper/--line for its own palette (climate's yellow, brew's
+     cream), and the index has to repaint with them. Floated with a negative
+     margin so it occupies the gutter the panel reserves below, never the
+     reading column, and so it costs .sheet-body no layout. */
+  .cs-toc {
+    display: none;
+    position: sticky;
+    /* Set per study by buildSheetToc() to the top of that study's hero box,
+       so the index starts on the same line as the title it belongs to. The
+       fallback covers a sheet with no hero. */
+    top: var(--toc-top, calc(var(--chrome-size) + 32px));
+    float: right;
+    width: var(--toc-w);
+    margin-right: calc((var(--toc-w) + var(--toc-gap)) * -1);
+    max-height: calc(100vh - var(--chrome-size) - 96px);
+    overflow-y: auto; scrollbar-width: none;
+    /* Under the sticky head (z-index 2), so a long index slides beneath it. */
+    z-index: 1;
+  }
+  .cs-toc::-webkit-scrollbar { display: none; }
+  .cs-toc-list {
+    display: flex; flex-direction: column;
+    border-left: 1px solid var(--line);
+  }
+  .cs-toc-link {
+    display: block;
+    padding: 7px 0 7px 13px;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    font-family: var(--mono); font-size: 11.5px; line-height: 1.35;
+    letter-spacing: 0.01em;
+    /* --ink-mid, not --ink-low: on a case study's own canvas the low ink lands
+       around 2.5:1, under the 4.5:1 floor for text. Current stays ink + bold
+       + its rule, so the two are still clearly different. */
+    color: var(--ink-mid);
+    text-decoration: none;
+    transition: color var(--motion-fast) ease, border-color var(--motion-fast) ease;
+  }
+  .cs-toc-link:hover { color: var(--ink); }
+  /* The section you're reading: bolder, full ink, and its own rule on the
+     left, so position within the study is readable at a glance. */
+  .cs-toc-link.is-current {
+    color: var(--ink); font-weight: 700;
+    border-left-color: var(--ink);
+  }
+  /* Shown only where the panel has a gutter to spare for it — below this the
+     study keeps the full width instead of being squeezed by an index. */
+  @media (min-width: 1400px) {
+    /* --toc-reserve also feeds the left inset above, which has to know the
+       index is taking width off the right. */
+    .app.sheet-open .sheet {
+      --toc-reserve: calc(var(--toc-w) + var(--toc-gap) + var(--toc-edge));
+      padding-right: var(--toc-reserve);
+    }
+    .cs-toc.has-sections { display: block; }
+  }
+  /* Every .cs-section is an anchor target for the index, so they need the
+     same sticky-head offset the figure references use. */
+  .sheet .cs-section[id] { scroll-margin-top: 96px; }
   /* Climate case study: the sheet's own color tokens are remapped to the
      card's yellow + its always-dark card-content text colors, so every
      cs- component downstream (already themed off --paper/--ink/--line)
@@ -1798,7 +2086,16 @@
     transform: translateY(-6px);
     box-shadow: 0 22px 52px -18px oklch(0.05 0.005 60 / 0.48);
   }
-  .sheet-body { padding: 48px 104px 72px; transition: opacity 160ms ease; }
+  /* The panel is nearly the full window (the rail replaced the feed column
+     beside it), so cap the reading column rather than letting body copy run
+     the whole width. 1240 - 208 of gutter is a ~1030px measure: wider than
+     the ~950 the case studies were figured against, still inside a
+     comfortable line length. Widen this further only with a real look at the
+     figures, which are sized against this column. */
+  .sheet-body {
+    max-width: 1240px; margin: 0 auto;
+    padding: 48px 104px 72px; transition: opacity 160ms ease;
+  }
   /* The 104px side gutters are a desktop reading measure; on a narrow sheet
      they crush the case study into a sliver, so wind them back down. */
   @media (max-width: 1180px) { .sheet-body { padding: 48px 60px 72px; } }
@@ -3925,21 +4222,23 @@
   }
   @media (max-width: 800px) {
     :root { --panel-w: 100vw; }
+    /* The rail is gone here, so the sheet takes the whole screen — this has
+       to re-state --panel-w because .app.sheet-open outranks :root, and drop
+       the strip the rail's expanded index would have overlaid. */
+    .app.sheet-open { --panel-w: 100vw; }
+    .app.sheet-open .sheet { padding-left: 0; }
     .app { grid-template-columns: 1fr; }
     .rail { display: none; }
     /* Clears .mobile-tabbar (fixed to the viewport bottom) so the last bit
        of scrollable content — copyright footer, final exp card, About's
        Back to Work — never sits underneath it. */
     .main { padding-bottom: 70px; }
-    /* .app.sheet-open .tabs normally floats above the feed column that's
-       still peeking out beside the sheet (width: 100vw - panel-w). At this
-       width --panel-w is 100vw too, so that width math collapses to 0 —
-       but box-sizing:border-box can't shrink the element past its own
-       padding, so it still renders ~130px wide fixed at the top-left,
-       sitting directly on top of (and swallowing clicks on) the sheet's
-       close button. There's no feed column left to filter above anyway
-       once the sheet covers the full screen, so just hide it here. */
-    .app.sheet-open .tabs { display: none; }
+    /* A WIP card can't be opened, and the one thing that says so — the custom
+       cursor's "Under construction" — is pointer:fine only. On a phone it
+       looks exactly like a card that works and does nothing when tapped, so
+       it doesn't ship here. Misc goes with it: daily is its only entry. */
+    .pin[data-cursor-label="Under construction"] { display: none; }
+    .tab[data-filter="misc"] { display: none; }
     .topbar { padding: 14px 18px; }
     .banner h1 { font-size: 46px; }
     /* Experience: the desktop track is scroll-hijacked horizontally as you
@@ -3970,9 +4269,6 @@
       flex-basis: 264px;
       margin-top: 0 !important;
     }
-    /* The tech-icon stack is an absolutely-positioned column that crowds
-       the narrower mobile card — drop it here. */
-    .exp-tech-zone { display: none; }
     /* Cards + intro panel are all reachable by swipe now — the desktop
        track's scroll-driven reveal never runs here, so force them visible
        regardless of the storyboard stage. */
@@ -4174,6 +4470,10 @@
   <!-- Left rail -->
   <aside class="rail">
     <button class="logo" id="logoBtn" aria-label="Home"><svg class="logo-mark" viewBox="0 0 6 7" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1.692 6.276C1.188 6.276 0.780001 6.152 0.468001 5.904C0.156001 5.656 7.37607e-07 5.316 7.37607e-07 4.884C7.37607e-07 4.444 0.112001 4.116 0.336001 3.9C0.560001 3.684 0.804001 3.528 1.068 3.432L3.84 2.4V2.352H1.404C1.044 2.352 0.744001 2.256 0.504001 2.064C0.272001 1.864 0.156001 1.568 0.156001 1.176C0.156001 0.776001 0.272001 0.480001 0.504001 0.288001C0.744001 0.0960009 1.044 9.53674e-07 1.404 9.53674e-07H4.344C4.728 9.53674e-07 5.052 0.092001 5.316 0.276001C5.588 0.460001 5.724 0.788001 5.724 1.26C5.724 1.62 5.612 1.924 5.388 2.172C5.172 2.42 4.856 2.624 4.44 2.784L2.16 3.648V3.696H4.608C5 3.696 5.324 3.804 5.58 4.02C5.836 4.236 5.964 4.56 5.964 4.992C5.964 5.432 5.836 5.756 5.58 5.964C5.324 6.172 5 6.276 4.608 6.276H1.692Z" fill="currentColor"/></svg></button>
+    <!-- Case-study index — built by buildRailIndex() from the feed cards, and
+         only given height while a sheet is open (see .rail-index). It sits
+         above the routes so that opening a study slides them down. -->
+    <nav class="rail-index" id="railIndex" aria-label="Case studies"></nav>
     <nav class="rail-nav">
       <button class="rail-btn active" data-route="feed" title="Work" aria-label="Work" aria-current="page">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -4269,6 +4569,11 @@
             <path d="M9 8 5 12l4 4M15 8l4 4-4 4"/>
           </svg>
         </a>
+        <span class="topbar-divider" aria-hidden="true">|</span>
+        <!-- The month here is the fallback that ships in the file: it renders
+             offline and on file://, and refreshUpdatedTag() replaces it with
+             the date of the latest public push when GitHub answers. -->
+        <span class="topbar-updated" id="topbarUpdated">Updated Sep 26</span>
       </div>
     </header>
 
@@ -4309,7 +4614,7 @@
 
         <div class="feed-col">
           <!-- brew. -->
-          <article class="pin" data-cat="ux swe" data-page="brew" data-year="2026" data-sub="SWE &amp; Product / UX, Currently" aria-label="Open the brew product case study">
+          <article class="pin" data-cat="ux swe" data-page="brew" data-title="brew." data-year="2026" data-sub="SWE &amp; Product / UX, Currently" aria-label="Open the brew product case study">
             <div class="art art-cream art-brew ar-45">
               <div class="pin-meta">Case Study</div>
               <img class="brew-illustration" src="assets/images/brew-mug-icon.svg" alt="">
@@ -4321,7 +4626,7 @@
           </article>
 
           <!-- The CROW redesign -->
-          <article class="pin" data-cat="ux studio" data-page="crow" data-year="2026" data-sub="WIIRED Studio, 2026" aria-label="Open the CROW journal redesign case study">
+          <article class="pin" data-cat="ux studio" data-page="crow" data-title="The CROW" data-year="2026" data-sub="WIIRED Studio, 2026" aria-label="Open the CROW journal redesign case study">
             <div class="art art-plum art-crow ar-45">
               <div class="pin-meta">Case Study</div>
               <h3>The<br>CROW.</h3>
@@ -4368,7 +4673,7 @@
 
         <div class="feed-col">
           <!-- ESD climate survey case study -->
-          <article class="pin" data-cat="viz" data-page="climate" data-year="2026">
+          <article class="pin" data-cat="viz" data-page="climate" data-title="The Neutral Response" data-year="2026">
             <div class="art art-yellow ar-45">
               <div class="pin-meta">Report</div>
               <div class="climate-mark">
@@ -4394,7 +4699,7 @@
           </article>
 
           <!-- DreamCatcher -->
-          <article class="pin" data-cat="ux" data-page="dreamcatcher" data-year="2026" data-sub="Product / UX, FigBuild 2026" aria-label="Open the DreamCatcher product case study">
+          <article class="pin" data-cat="ux" data-page="dreamcatcher" data-title="DreamCatcher" data-year="2026" data-sub="Product / UX, FigBuild 2026" aria-label="Open the DreamCatcher product case study">
             <div class="art art-charcoal art-dreamcatcher ar-45">
               <div class="pin-meta">Case Study</div>
               <div class="dream-mark">
@@ -4405,7 +4710,7 @@
           </article>
 
           <!-- Temporary WIIRED Studio card -->
-          <article class="pin" data-cat="studio" data-page="wiired" data-year="2026" data-cursor-label="Under construction" aria-label="WIIRED Studio, work in progress">
+          <article class="pin" data-cat="studio" data-page="wiired" data-title="WIIRED Studio." data-year="2026" data-cursor-label="Under construction" aria-label="WIIRED Studio, work in progress">
             <div class="art art-cream ar-1">
               <div class="pin-meta">WIP</div>
               <h3 style="font-size:34px; margin-top:auto;">WIIRED<br><em style="font-style:italic;">Studio.</em></h3>
@@ -4445,7 +4750,7 @@
           </article>
 
           <!-- Habitat -->
-          <article class="pin" data-cat="ux swe" data-page="habitat" data-year="2026" data-sub="Product / UX &amp; SWE, Hackathon 2026" aria-label="Open the Habitat habit-tracker case study">
+          <article class="pin" data-cat="ux swe" data-page="habitat" data-title="Habitat" data-year="2026" data-sub="Product / UX &amp; SWE, Hackathon 2026" aria-label="Open the Habitat habit-tracker case study">
             <div class="art art-blue art-habitat ar-45">
               <div class="pin-meta">Case Study</div>
               <div class="habitat-mark">
@@ -4456,7 +4761,7 @@
           </article>
 
           <!-- Daily type -->
-          <article class="pin" data-cat="misc" data-page="daily" data-year="Ongoing" data-cursor-label="Under construction">
+          <article class="pin" data-cat="misc" data-page="daily" data-title="Daily type &amp; motion" data-year="Ongoing" data-cursor-label="Under construction">
             <div class="art art-clay ar-45">
               <div class="pin-meta">WIP</div>
               <h3 style="font-size:28px;">Daily type<br>&amp; motion.</h3>
@@ -4599,28 +4904,6 @@
                 </div>
               </div>
               <article class="exp-card art-yellow">
-                <div class="exp-tech-zone exp-tech-stack">
-                  <div class="exp-tech-icon">
-                    <img src="assets/logos/python-logo.png" alt="Python">
-                    <span class="exp-tech-label">Python</span>
-                  </div>
-                  <div class="exp-tech-icon">
-                    <img class="is-padded-sql" src="assets/logos/sql-logo.png" alt="SQL">
-                    <span class="exp-tech-label">SQL</span>
-                  </div>
-                  <div class="exp-tech-icon">
-                    <img src="assets/logos/claude-logo.png" alt="Claude" style="border-radius:5px;">
-                    <span class="exp-tech-label">Claude Code</span>
-                  </div>
-                  <div class="exp-tech-icon">
-                    <img class="is-quicksight" src="assets/logos/quicksight-logo.png" alt="QuickSight">
-                    <span class="exp-tech-label">Amazon QuickSight</span>
-                  </div>
-                  <div class="exp-tech-icon">
-                    <img class="is-padded-redshift" src="assets/logos/redshift-logo.png" alt="Redshift">
-                    <span class="exp-tech-label">Amazon Redshift</span>
-                  </div>
-                </div>
                 <div class="yr">Jun 2026 – Present</div>
                 <h3>GoDaddy<span>Data Analytics Intern</span></h3>
                 <ul>
@@ -4631,24 +4914,6 @@
                 <div class="place">Internship</div>
               </article>
               <article class="exp-card art-sage exp-link-card" role="link" tabindex="0" aria-label="Open WIIRED Studio on Instagram" data-cursor-link="↗︎ @wiiredstudio" data-href="https://www.instagram.com/wiiredstudio/">
-                <div class="exp-tech-zone exp-tech-stack">
-                  <div class="exp-tech-icon">
-                    <img src="assets/logos/js-logo.png" alt="JavaScript" style="border-radius:5px;">
-                    <span class="exp-tech-label">JavaScript</span>
-                  </div>
-                  <div class="exp-tech-icon">
-                    <img src="assets/logos/ts-logo.png" alt="TypeScript">
-                    <span class="exp-tech-label">TypeScript</span>
-                  </div>
-                  <div class="exp-tech-icon">
-                    <img src="assets/logos/claude-logo.png" alt="Claude" style="border-radius:5px;">
-                    <span class="exp-tech-label">Claude Code + Design</span>
-                  </div>
-                  <div class="exp-tech-icon">
-                    <img class="is-padded-figma" src="assets/logos/figma-logo.png" alt="Figma">
-                    <span class="exp-tech-label">Figma + MCP</span>
-                  </div>
-                </div>
                 <div class="exp-card-header">
                   <div class="yr">Apr 2026 – Present</div>
                 </div>
@@ -4689,13 +4954,24 @@
   </main>
 
 <!-- Detail sheet -->
-<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetMeta">
+<!-- Not aria-modal: the rail beside the panel is live navigation while a case
+     study is open, so the rest of the page must stay in the a11y tree. -->
+<div class="sheet" id="sheet" role="dialog" aria-label="Case study">
   <div class="sheet-head">
     <span class="sheet-meta" id="sheetMeta"></span>
     <div class="sheet-actions">
-      <button class="sheet-close" id="sheetClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span class="sheet-btn-label" id="sheetCloseLabel">Close</span></button>
+      <!-- The same Back to Work pill About and Experience use, so every route
+           out of a subview is the same control. -->
+      <button class="page-back sheet-close" id="sheetClose" type="button">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>
+        Back to Work
+      </button>
     </div>
   </div>
+  <!-- Section index — built by buildSheetToc() from the open study's own
+       .cs-section labels. It floats in the reserved right gutter (see .cs-toc)
+       and lives inside .sheet so it inherits each study's own color tokens. -->
+  <nav class="cs-toc" id="sheetToc" aria-label="Sections"></nav>
   <div class="sheet-body" id="sheetBody"></div>
 </div>
 
@@ -4746,6 +5022,51 @@
       clearTimeout(expandTimer);
       clearTimeout(collapseTimer);
     }, { once: true });
+  }
+
+  /* ─────────────────────────────────────────────────────────
+   * SHEET RAIL STORYBOARD
+   *
+   * Runs each time a case study opens from the feed.
+   *
+   *    0ms   routes slide down; the index grows in above them, expanded,
+   *          so you see what else is there without hunting for it
+   * 2600ms   rail collapses back to its column of card-colored swatches,
+   *          handing the width to the case study. Hover or keyboard focus
+   *          reopens it from there, overlaying the panel.
+   *
+   * Hover holds it open on its own (CSS), so the timer never has to know
+   * where the pointer is. Reduced motion skips the auto-expand entirely and
+   * leaves the compact swatch column, which hover still opens.
+   * ───────────────────────────────────────────────────────── */
+  const SHEET_RAIL_TIMING = { collapse: 2600 };
+  let sheetRailTimer;
+
+  function playSheetRailEntry() {
+    const rail = document.querySelector('.rail');
+    if (!rail) return;
+    clearTimeout(sheetRailTimer);
+    if (!window.matchMedia('(min-width: 801px)').matches) return;
+
+    // A device that can't hover can't reopen the index once it collapses, and
+    // tapping a row opens that study rather than expanding the rail — so on
+    // touch the expanded state simply stays. It reuses .is-sheet-expanded, so
+    // nothing else changes: the panel already reserves the expanded width.
+    if (window.matchMedia('(hover: none)').matches) {
+      rail.classList.add('is-sheet-expanded');
+      return;
+    }
+    if (prefersReducedMotion()) return;
+    rail.classList.add('is-sheet-expanded');
+    sheetRailTimer = setTimeout(
+      () => rail.classList.remove('is-sheet-expanded'),
+      SHEET_RAIL_TIMING.collapse
+    );
+  }
+
+  function endSheetRailEntry() {
+    clearTimeout(sheetRailTimer);
+    document.querySelector('.rail')?.classList.remove('is-sheet-expanded');
   }
 
   /* ─────────────────────────────────────────────────────────
@@ -6051,23 +6372,35 @@
   const sheetBody = document.getElementById('sheetBody');
   const appEl     = document.querySelector('.app');
   const feedEl    = document.getElementById('feed');
-  const tabsEl    = document.querySelector('.tabs');
 
-  function setFeedScrollbarAccent(card) {
+  // Per card color: the surface a rail-index row fills with when it's the open
+  // study, and the text color that card already uses on that surface (mirrors
+  // the .art-* rules). Icons don't take card color — they follow the rail's
+  // ink (see .rail-index-icon) so the column reads as chrome.
+  //
+  // The near-black cards invert. A charcoal or noir fill reads as a hole
+  // punched in the rail rather than a sibling of the cream and yellow chips,
+  // so those pills take the light tone the card draws its own text in, with
+  // the card's color as the text and as a hairline `ring` — without the ring
+  // an off-white chip disappears into the light rail. Both colors still come
+  // from the same card; they just swap roles at chip scale.
+  const CARD_PALETTE = {
+    clay:     { color: 'var(--c-clay)',     on: 'var(--card-ink)' },
+    blue:     { color: 'var(--c-blue)',     on: 'oklch(0.97 0 0)' },
+    cream:    { color: 'var(--c-cream)',    on: 'var(--card-ink)' },
+    yellow:   { color: 'var(--c-yellow)',   on: 'var(--card-ink)' },
+    sage:     { color: 'var(--c-sage)',     on: 'var(--card-ink)' },
+    plum:     { color: 'var(--c-plum)',     on: 'var(--card-ink)' },
+    sand:     { color: 'var(--c-sand)',     on: 'var(--card-ink)' },
+    charcoal: { color: 'oklch(0.94 0.005 80)', on: 'var(--c-charcoal)', ring: 'var(--c-charcoal)' },
+    noir:     { color: 'oklch(0.90 0.006 80)', on: 'var(--c-noir)',     ring: 'var(--c-noir)' },
+  };
+  const CARD_PALETTE_DEFAULT = { color: 'var(--line)', on: 'var(--ink)' };
+
+  function cardPalette(card) {
     const art = card?.querySelector('.art');
-    const palette = [
-      ['art-charcoal', 'oklch(0.98 0 0)'],
-      ['art-noir', 'oklch(0.98 0 0)'],
-      ['art-cream', 'var(--c-cream)'],
-      ['art-yellow', 'var(--c-yellow)'],
-      ['art-sage', 'var(--c-sage)'],
-      ['art-blue', 'var(--c-blue)'],
-      ['art-plum', 'var(--c-plum)'],
-      ['art-clay', 'var(--c-clay)'],
-      ['art-sand', 'var(--c-sand)'],
-    ];
-    const accent = palette.find(([className]) => art?.classList.contains(className))?.[1] || 'oklch(0.98 0 0)';
-    appEl.style.setProperty('--feed-scroll-accent', accent);
+    const name = Object.keys(CARD_PALETTE).find(color => art?.classList.contains('art-' + color));
+    return CARD_PALETTE[name] || CARD_PALETTE_DEFAULT;
   }
 
   function setIterationPlayerStep(player, nextIndex, moveFocus = false) {
@@ -6156,91 +6489,9 @@
     feedEl.style.setProperty('--feed-shift', '0px');
   }
 
-  function setTabsOffset(dx, dy) {
-    tabsEl.style.setProperty('--tabs-dx', dx + 'px');
-    tabsEl.style.setProperty('--tabs-dy', dy + 'px');
-  }
-
-  function resetTabsTransform() {
-    setTabsOffset(0, 0);
-  }
-
-  function animateTabsToOpen(fromRect) {
-    const toRect = tabsEl.getBoundingClientRect();
-    setTabsOffset(fromRect.left - toRect.left, fromRect.top - toRect.top);
-    void tabsEl.offsetWidth;
-    requestAnimationFrame(resetTabsTransform);
-  }
-
-  function animateTabsToNormal(beforeRect) {
-    const afterRect = tabsEl.getBoundingClientRect();
-    setTabsOffset(beforeRect.left - afterRect.left, beforeRect.top - afterRect.top);
-    void tabsEl.offsetWidth;
-    requestAnimationFrame(resetTabsTransform);
-  }
-
-  function flipPins(classAction, { srcEl, activeEl, restoreScrollTop } = {}) {
-    const visiblePins = pins.filter(p => !p.classList.contains('is-hidden'));
-    const first = new Map();
-    visiblePins.forEach(p => first.set(p, p.getBoundingClientRect()));
-    visiblePins.forEach(p => { p.style.transition = 'none'; p.style.transform = ''; });
-    classAction();
-    void feed.offsetWidth;
-    lockFeedHeight();
-    updateFeedScrollbar();
-    // Settle scroll before capturing LAST so both snapshots share stable coordinates
-    const maxScroll = main.scrollHeight - main.clientHeight;
-    if (typeof restoreScrollTop === 'number') {
-      main.scrollTop = Math.max(0, Math.min(maxScroll, restoreScrollTop));
-    } else if (srcEl) {
-      const r = srcEl.getBoundingClientRect();
-      main.scrollTop = Math.max(0, Math.min(maxScroll,
-        main.scrollTop + r.top + r.height * 0.5 - main.clientHeight * 0.5));
-    } else if (activeEl) {
-      const prevTop = first.get(activeEl)?.top ?? 0;
-      const nowTop  = activeEl.getBoundingClientRect().top;
-      main.scrollTop = Math.max(0, Math.min(maxScroll,
-        main.scrollTop + nowTop - prevTop));
-    }
-    const last = new Map();
-    visiblePins.forEach(p => last.set(p, p.getBoundingClientRect()));
-    const flipped = [];
-    visiblePins.forEach(p => {
-      const f = first.get(p), l = last.get(p);
-      // Only FLIP a pin that is actually laid out in BOTH snapshots. The
-      // component/widget cards (no data-page) and any feed column that
-      // collapses while the sheet is open are display:none in the open
-      // state, so their "first" rect is 0×0 — FLIPping that would fling
-      // them in from the viewport's top-left corner as the sheet closes.
-      if (!f.width || !f.height || !l.width || !l.height) return;
-      const dx = f.left - l.left;
-      const dy = f.top  - l.top;
-      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
-        p.style.transform = `translate(${dx}px,${dy}px)`;
-        flipped.push(p);
-      }
-    });
-    void feed.offsetWidth;
-    flipped.forEach(p => {
-      p.style.transition = 'transform 0.48s cubic-bezier(0.22,1,0.36,1)';
-      p.style.transform = '';
-    });
-    setTimeout(() => {
-      visiblePins.forEach(p => { p.style.transition = ''; p.style.transform = ''; });
-    }, motionDelay(560));
-  }
-
   let closeSheetTimer;
 
-  window.addEventListener('resize', () => {
-    updateExperienceTrack();
-    if (!sheet.classList.contains('open')) return;
-    const active = document.querySelector('.pin.pin-active');
-    if (active) {
-      const card = active.getBoundingClientRect();
-      animateMainScrollTo(main.scrollTop + card.top + card.height * 0.5 - main.clientHeight * 0.5);
-    }
-  });
+  window.addEventListener('resize', updateExperienceTrack);
 
   function buildSheetHTML(p, srcEl) {
     let html = '';
@@ -6269,12 +6520,122 @@
   let switchSheetTimer = null;
   let feedScrollBeforeOpen = 0;
 
-  function openSheet(key, srcEl) {
-    const p = PAGES[key]; if (!p) return;
-    setFeedScrollbarAccent(srcEl);
+  // The panel is a dialog, so its name is what a screen reader announces on
+  // open. Pointing that at the meta line named the discipline ("Product / UX ·
+  // Design Eng") rather than the study, which tells you nothing about what
+  // just opened — so name the study and let the meta follow it.
+  function setSheetLabel(key, srcEl, page) {
+    const pin = srcEl || document.querySelector(`.pin[data-page="${key}"]`);
+    const title = pin?.dataset.title || page.title || key;
+    const meta = page.meta ? `, ${page.meta}` : '';
+    sheet.setAttribute('aria-label', `${title}${meta}`);
+  }
 
-    // Same card already open — do nothing
-    if (sheet.classList.contains('open') && sheet.dataset.page === key) return;
+  /* ── Case-study section index ──
+     Built from the open study's own `.cs-section > .cs-label` text, so a study
+     gets an index by being written normally — nothing to maintain per page.
+     A study with fewer than two labelled sections (the WIP placeholders) gets
+     none, and the panel keeps the gutter for the reading column instead. */
+  const sheetToc = document.getElementById('sheetToc');
+  let sheetTocScroll = null;   // scroll handler while an index is mounted
+  let sheetTocFrame = null;
+
+  function clearSheetToc() {
+    if (sheetTocScroll) sheet.removeEventListener('scroll', sheetTocScroll);
+    sheetTocScroll = null;
+    cancelAnimationFrame(sheetTocFrame);
+    sheetToc.innerHTML = '';
+    sheetToc.classList.remove('has-sections');
+  }
+
+  function buildSheetToc() {
+    clearSheetToc();
+    const sections = [...sheetBody.querySelectorAll('.cs-section')]
+      .map(section => ({ section, label: section.querySelector(':scope > .cs-label')?.textContent?.trim() }))
+      .filter(entry => entry.label);
+    if (sections.length < 2) return;
+
+    const page = sheet.dataset.page || 'cs';
+    const list = document.createElement('div');
+    list.className = 'cs-toc-list';
+    const links = sections.map(({ section, label }, i) => {
+      if (!section.id) section.id = `${page}-section-${i + 1}`;
+      const link = document.createElement('a');
+      link.className = 'cs-toc-link';
+      link.href = `#${section.id}`;
+      link.textContent = label;
+      list.appendChild(link);
+      return link;
+    });
+    sheetToc.appendChild(list);
+    sheetToc.classList.add('has-sections');
+
+    // Park the index level with the study's hero rather than at a fixed
+    // offset: heroes carry different eyebrows and toplines, so a hard-coded
+    // top lands differently in every study.
+    const hero = sheetBody.querySelector('.cs-hero');
+    if (hero) {
+      // Discount the first link's own padding so the first section NAME lands
+      // on the hero's top edge, not the index's invisible box.
+      const pad = parseFloat(getComputedStyle(links[0]).paddingTop) || 0;
+      const top = Math.round(
+        hero.getBoundingClientRect().top - sheet.getBoundingClientRect().top + sheet.scrollTop - pad
+      );
+      if (top > 0) sheetToc.style.setProperty('--toc-top', `${top}px`);
+    } else {
+      sheetToc.style.removeProperty('--toc-top');
+    }
+
+    // Current section = the last one whose top has crossed the reading line
+    // just under the sticky head, with the final section claimed outright at
+    // the bottom of the scroll (it is often too short to ever cross). Read
+    // straight off scroll position rather than through an IntersectionObserver:
+    // one link must be current at every offset, including mid-section where an
+    // observer sits silent between threshold crossings.
+    let current = -1;
+    const setCurrent = target => {
+      if (target === current) return;
+      current = target;
+      links.forEach((link, i) => {
+        link.classList.toggle('is-current', i === target);
+        if (i === target) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      });
+    };
+
+    const measure = () => {
+      sheetTocFrame = null;
+      const line = 120;
+      const atBottom = sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 8;
+      if (atBottom) return setCurrent(sections.length - 1);
+      let next = 0;
+      sections.forEach(({ section }, i) => {
+        if (section.getBoundingClientRect().top <= line) next = i;
+      });
+      setCurrent(next);
+    };
+
+    sheetTocScroll = () => {
+      if (sheetTocFrame) return;
+      sheetTocFrame = requestAnimationFrame(measure);
+    };
+    sheet.addEventListener('scroll', sheetTocScroll, { passive: true });
+    measure();
+  }
+
+  function openSheet(key, srcEl, { indexId } = {}) {
+    const p = PAGES[key]; if (!p) return;
+
+    // Same study already open — nothing to load. It can still have been
+    // reached from the study's other discipline entry, so move the highlight,
+    // and take it back to the top: choosing a study always starts it at the
+    // beginning, whether or not that meant loading anything. This one glides,
+    // since the content underneath isn't changing.
+    if (sheet.classList.contains('open') && sheet.dataset.page === key) {
+      syncRailIndex(key, indexId);
+      sheet.scrollTo({ top: 0 });
+      return;
+    }
 
     // Sheet already open — cross-fade content instead of re-running the full open sequence
     if (sheet.classList.contains('open')) {
@@ -6283,11 +6644,16 @@
       document.querySelectorAll('.pin').forEach(pin => pin.classList.remove('pin-active'));
       srcEl?.classList.add('pin-active');
       sheet.dataset.page = key;
+      syncRailIndex(key, indexId);
       sheetMeta.textContent = p.meta || '';
+      setSheetLabel(key, srcEl, p);
       switchSheetTimer = setTimeout(() => {
         sheetBody.innerHTML = buildSheetHTML(p, srcEl);
         initializeIterationPlayers(sheetBody);
-        sheet.scrollTop = 0;
+        buildSheetToc();
+        // Explicit auto: .sheet sets scroll-behavior: smooth for anchor jumps,
+        // and a content swap must not animate a long scroll back to the top.
+        sheet.scrollTo({ top: 0, behavior: 'auto' });
         sheetBody.style.opacity = '';
       }, motionDelay(160));
       return;
@@ -6295,19 +6661,23 @@
 
     clearTimeout(closeSheetTimer);
     cancelAnimationFrame(scrollTweenFrame);
+    // .main goes overflow:hidden while the sheet is open, so remember where
+    // the board was to put it back untouched on close.
     feedScrollBeforeOpen = main.scrollTop;
-    const tabsBefore = tabsEl.getBoundingClientRect();
     sheet.dataset.page = key;
     sheetMeta.textContent = p.meta || '';
+    setSheetLabel(key, srcEl, p);
     sheetBody.innerHTML = buildSheetHTML(p, srcEl);
     initializeIterationPlayers(sheetBody);
-    sheet.scrollTop = 0;
+    buildSheetToc();
+    sheet.scrollTo({ top: 0, behavior: 'auto' });
     appEl.classList.remove('sheet-closing');
-    flipPins(() => appEl.classList.add('sheet-open'), { srcEl });
-    animateTabsToOpen(tabsBefore);
+    appEl.classList.add('sheet-open');
     feedEl.classList.add('has-open');
     document.querySelectorAll('.pin').forEach(pin => pin.classList.remove('pin-active'));
     srcEl?.classList.add('pin-active');
+    syncRailIndex(key, indexId);
+    playSheetRailEntry();
     requestAnimationFrame(() => {
       sheet.classList.add('open');
       setTimeout(() => document.getElementById('sheetClose').focus(), 80);
@@ -6319,18 +6689,25 @@
     clearTimeout(switchSheetTimer);
     cancelAnimationFrame(scrollTweenFrame);
     sheetBody.style.opacity = '';
+    clearSheetToc();
     const active = document.querySelector('.pin.pin-active');
-    resetTabsTransform();
-    const tabsBefore = tabsEl.getBoundingClientRect();
     requestAnimationFrame(() => {
       sheet.classList.remove('open');
       delete sheet.dataset.page;
+      // .sheet-closing first: it retimes the rail to the panel's clock, so it
+      // has to be in place before anything the rail animates changes. Letting
+      // the rail collapse a frame early (it used to, from outside this rAF)
+      // is exactly what made the close read as two separate moves.
       appEl.classList.add('sheet-closing');
+      endSheetRailEntry();
       feedEl.classList.remove('has-open');
       document.querySelectorAll('.pin').forEach(p => p.classList.remove('pin-active'));
       resetFeedPosition();
-      flipPins(() => appEl.classList.remove('sheet-open'), { restoreScrollTop: feedScrollBeforeOpen });
-      animateTabsToNormal(tabsBefore);
+      syncRailIndex(null);
+      appEl.classList.remove('sheet-open');
+      main.scrollTop = feedScrollBeforeOpen;
+      lockFeedHeight();
+      updateFeedScrollbar();
     });
     closeSheetTimer = setTimeout(() => {
       appEl.classList.remove('sheet-closing');
@@ -6630,6 +7007,172 @@
     pin.appendChild(sub);
   });
 
+  // ── Rail index ──
+  // With a sheet open the feed fades out behind the panel and the rail is the
+  // browsing surface: every case-study card, listed under each DISCIPLINE it
+  // carries. Work that is genuinely both product and engineering (brew,
+  // Habitat) is listed in both places — someone browsing SWE should find it
+  // there, and those entries will eventually open a product view and a
+  // software view of the same project. Only one entry is ever active (see
+  // syncRailIndex): the one that was actually opened.
+  //
+  // Studio is deliberately not a section here: it's a client relationship,
+  // not a discipline, and the studio work already appears under the craft it
+  // represents. Anything whose data-cat lands outside these four falls back
+  // to Misc so nothing can drop out of the index.
+  const RAIL_INDEX_CATS = ['ux', 'swe', 'viz', 'misc'];
+  // Order within every section, independent of the feed's hand-balanced
+  // column order — a study listed in two sections then sits in the same
+  // relative place in both (brew, then Habitat, under Product / UX as well as
+  // under SWE). Anything missing here keeps feed order, after the listed ones.
+  const RAIL_INDEX_ORDER = ['brew', 'habitat', 'crow', 'dreamcatcher', 'climate', 'wiired', 'daily'];
+  const railIndex = document.getElementById('railIndex');
+
+  // One icon per study, keyed by sheet slug. All SOLID, on a 24×24 box, to sit
+  // with brew's own filled card mark — the route buttons above stay stroked,
+  // the studies read as a set of their own. Each says what the project IS (a
+  // cloud for a dream app, a target for habit goals), because the compact rail
+  // shows nothing but these. A new case study without an entry here falls back
+  // to `default` rather than rendering an empty slot.
+  const RAIL_INDEX_ICONS = {
+    // brew — its own card mark, inlined from assets/images/brew-mug-icon.svg
+    // rather than referenced: as an external CSS mask it left an empty slot
+    // whenever the file didn't load. The viewBox is the mark's own, recentred
+    // on its measured ink centroid (42.4%/48.6% of the artwork, not 50/50 —
+    // the cup carries the weight, the handle doesn't) and widened so the mark
+    // fills ~86% of the box: the drawn icons carry ~2px of padding inside
+    // theirs and this one runs edge to edge. That is what puts it on the same
+    // axis and optical size as the rest. Re-measure both if the mark changes.
+    brew: {
+      viewBox: '969.75 1505.49 439 439',
+      paths: '<path d="M1377.83 1764.68C1377.81 1771.63 1376.41 1778.12 1373.63 1784.14C1370.84 1790.03 1366.6 1794.81 1360.91 1798.47C1355.22 1802 1348.08 1803.76 1339.49 1803.74L1257.94 1804.41L1257.99 1773.12L1343.51 1773.27C1345.1 1773.28 1346.55 1772.89 1347.87 1772.1C1349.2 1771.32 1350.26 1770.27 1351.05 1768.96C1351.85 1767.65 1352.25 1766.21 1352.25 1764.64C1352.25 1763.06 1351.86 1761.62 1351.07 1760.31C1350.28 1759 1349.22 1757.95 1347.9 1757.16C1346.58 1756.37 1345.13 1755.97 1343.54 1755.97L1309.64 1755.91C1301.44 1755.9 1294.5 1754.18 1288.83 1750.76C1283.15 1747.34 1278.86 1742.68 1275.96 1736.78C1272.94 1730.74 1271.43 1723.99 1271.44 1716.52C1271.45 1709.05 1272.99 1702.37 1276.04 1696.47C1278.96 1690.58 1283.26 1685.93 1288.95 1682.54C1294.64 1679.14 1301.58 1677.45 1309.78 1677.46L1343.68 1677.52C1345.27 1677.52 1346.72 1677.13 1348.05 1676.35C1349.37 1675.57 1350.43 1674.52 1351.22 1673.21C1352.02 1671.77 1352.42 1670.26 1352.42 1668.69C1352.43 1667.12 1352.03 1665.67 1351.24 1664.36C1350.45 1663.05 1349.39 1662 1348.07 1661.21C1346.75 1660.42 1345.3 1660.03 1343.71 1660.02L1273.92 1659.9L1273.98 1629.42L1339.8 1629.54C1348.4 1629.56 1355.53 1631.4 1361.21 1635.08C1366.88 1638.63 1371.11 1643.43 1373.87 1649.46C1376.64 1655.36 1378.01 1661.79 1378 1668.74C1377.99 1675.68 1376.59 1682.17 1373.8 1688.19C1371.01 1694.09 1366.78 1698.86 1361.09 1702.52C1355.4 1706.18 1348.25 1708.01 1339.66 1707.99L1305.96 1707.93C1304.24 1707.93 1302.72 1708.32 1301.39 1709.1C1300.07 1709.89 1299.01 1710.93 1298.22 1712.24C1297.42 1713.55 1297.02 1714.99 1297.02 1716.57C1297.02 1718.14 1297.41 1719.65 1298.2 1721.09C1298.99 1722.4 1300.05 1723.45 1301.37 1724.24C1302.69 1725.03 1304.21 1725.43 1305.92 1725.43L1339.63 1725.49C1348.22 1725.5 1355.36 1727.35 1361.03 1731.03C1366.71 1734.58 1370.93 1739.37 1373.7 1745.41C1376.46 1751.31 1377.84 1757.74 1377.83 1764.68Z"/> <rect x="1050.35" y="1606.89" width="209.14" height="197.521"/> <rect x="1050.35" y="1625.48" width="209.14" height="224.245" rx="40"/>',
+    },
+    // The CROW — a student research journal: open book
+    crow: '<path d="M11.1 8.1C9.7 6.8 7.9 6.1 5.7 6.1H3.6c-.6 0-1 .4-1 1v9.2c0 .6.4 1 1 1h2.1c1.9 0 3.5.5 4.8 1.6.3.3.6.1.6-.3z"/><path d="M12.9 8.1c1.4-1.3 3.2-2 5.4-2h2.1c.6 0 1 .4 1 1v9.2c0 .6-.4 1-1 1h-2.1c-1.9 0-3.5.5-4.8 1.6-.3.3-.6.1-.6-.3z"/>',
+    // The Neutral Response — survey analysis: response distribution
+    climate: '<rect x="3.6" y="12.6" width="4.2" height="7.6" rx="1.2"/><rect x="9.9" y="7.4" width="4.2" height="12.8" rx="1.2"/><rect x="16.2" y="3.8" width="4.2" height="16.4" rx="1.2"/>',
+    // DreamCatcher — dreaming: a cloud. (A literal hoop-and-feather reads as a
+    // wine glass at this size, and a crescent moon would echo the theme toggle
+    // at the bottom of this same rail.)
+    dreamcatcher: '<path d="M7 19.1h10.1a4.1 4.1 0 0 0 .6-8.1 5.8 5.8 0 0 0-11.1-1.4A4.8 4.8 0 0 0 7 19.1z"/>',
+    // WIIRED Studio — the studio mark: bolt
+    wiired: '<path d="M13.7 2.6 6 13.3c-.3.4 0 1 .5 1h4.1l-.8 7c-.1.6.7.9 1 .4l7.4-10.4c.3-.4 0-1-.5-1h-4l.9-7c.1-.6-.7-.9-1-.4z"/>',
+    // Habitat — habit goals: target
+    habitat: '<path fill-rule="evenodd" d="M12 3.1a8.9 8.9 0 1 0 0 17.8 8.9 8.9 0 0 0 0-17.8zm0 2.3a6.6 6.6 0 1 1 0 13.2 6.6 6.6 0 0 1 0-13.2z"/><path fill-rule="evenodd" d="M12 7.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9zm0 2.3a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4z"/><circle cx="12" cy="12" r="1.5"/>',
+    // Daily type & motion — letterforms: type mark
+    daily: '<path d="M4.8 4.2h14.4c.6 0 1 .5 1 1v2c0 .6-.4 1-1 1s-1-.4-1-1V6.3h-4.2v11.4H15c.6 0 1 .5 1 1s-.4 1-1 1H9c-.6 0-1-.4-1-1s.4-1 1-1h1.1V6.3H5.8v.9c0 .6-.4 1-1 1s-1-.4-1-1v-2c0-.5.4-1 1-1z"/>',
+    default: '<circle cx="12" cy="12" r="7"/>',
+  };
+
+  // An entry is either path data on the standard 24×24 box, or an object that
+  // brings its own viewBox (a card mark drawn at its own scale).
+  function applyRailIndexIcon(el, pin) {
+    const icon = RAIL_INDEX_ICONS[pin.dataset.page] || RAIL_INDEX_ICONS.default;
+    const paths = typeof icon === 'string' ? icon : icon.paths;
+    const viewBox = (typeof icon === 'string' ? null : icon.viewBox) || '0 0 24 24';
+    el.innerHTML = `<svg viewBox="${viewBox}" fill="currentColor">${paths}</svg>`;
+  }
+
+  function railIndexCats(pin) {
+    const cats = (pin.dataset.cat || '').split(/\s+/).filter(cat => RAIL_INDEX_CATS.includes(cat));
+    return cats.length ? cats : ['misc'];
+  }
+
+  function railIndexRank(pin) {
+    const i = RAIL_INDEX_ORDER.indexOf(pin.dataset.page);
+    return i === -1 ? RAIL_INDEX_ORDER.length : i;
+  }
+
+  function buildRailIndex() {
+    // Written studies only. An index is navigation, and a card still under
+    // construction has nothing to open — it stays in the feed, where its WIP
+    // badge means something. Finish one and it appears here on its own.
+    const casePins = pins.filter(pin =>
+      pin.dataset.page && pin.dataset.cursorLabel !== 'Under construction');
+    RAIL_INDEX_CATS.forEach(cat => {
+      const label = CAT_LABELS[cat];
+      const group = casePins
+        .filter(pin => railIndexCats(pin).includes(cat))
+        .sort((a, b) => railIndexRank(a) - railIndexRank(b));
+      if (!group.length) return;
+      const section = document.createElement('div');
+      section.className = 'rail-index-group';
+      section.setAttribute('role', 'group');
+      // The category name is only rendered while the rail is expanded, so
+      // point the group at it rather than relying on the visible text alone.
+      section.setAttribute('aria-labelledby', `railIndexLabel-${cat}`);
+      const heading = document.createElement('div');
+      heading.className = 'rail-index-label';
+      heading.id = `railIndexLabel-${cat}`;
+      heading.textContent = label;
+      section.appendChild(heading);
+      group.forEach(pin => section.appendChild(buildRailIndexItem(pin, cat)));
+      railIndex.appendChild(section);
+    });
+    railIndex.querySelectorAll('.rail-index-item')
+      .forEach((item, i) => item.style.setProperty('--i', i));
+    // Sets which entry represents each project in the compact stack.
+    syncRailIndex(null);
+  }
+
+  function buildRailIndexItem(pin, cat) {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'rail-index-item';
+    item.dataset.page = pin.dataset.page;
+    // Identifies this entry rather than the project, so a study listed under
+    // two disciplines lights up only where it was opened from.
+    item.dataset.indexId = `${cat}:${pin.dataset.page}`;
+
+    const palette = cardPalette(pin);
+    item.style.setProperty('--card-color', palette.color);
+    item.style.setProperty('--card-on', palette.on);
+    if (palette.ring) item.style.setProperty('--card-ring', palette.ring);
+
+    const icon = document.createElement('span');
+    icon.className = 'rail-index-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    applyRailIndexIcon(icon, pin);
+
+    const title = document.createElement('span');
+    title.className = 'rail-index-title';
+    title.textContent = pin.dataset.title || pin.dataset.page;
+
+    item.append(icon, title);
+    item.addEventListener('click', () => openSheet(pin.dataset.page, pin, { indexId: item.dataset.indexId }));
+    return item;
+  }
+
+  // Exactly one entry is active. Opening from the index activates the entry
+  // that was clicked; opening from a feed card (or an About deep link) has no
+  // discipline context, so the project's first listed entry stands in.
+  function syncRailIndex(key, indexId) {
+    const items = [...railIndex.querySelectorAll('.rail-index-item')];
+    const current = key
+      ? items.find(item => item.dataset.indexId === indexId)
+        || items.find(item => item.dataset.page === key)
+      : null;
+
+    // One entry per project represents it in the compact stack, which has no
+    // category labels to explain a repeat. The OPEN entry always represents
+    // its own project, so the active fill can never land on a collapsed row;
+    // every other project falls back to its first entry.
+    const shown = new Map();
+    if (current) shown.set(current.dataset.page, current);
+    items.forEach(item => {
+      if (!shown.has(item.dataset.page)) shown.set(item.dataset.page, item);
+    });
+
+    items.forEach(item => {
+      const active = item === current;
+      item.classList.toggle('active', active);
+      item.classList.toggle('is-compact-hidden', shown.get(item.dataset.page) !== item);
+      item.setAttribute('aria-current', active ? 'true' : 'false');
+    });
+  }
+
+  buildRailIndex();
+
   // Cards push the card below them on hover (see .pin .sub), which would
   // otherwise also grow .feed's own auto height and bounce the in-flow
   // copyright footer. Locking .feed to its at-rest height (with generous
@@ -6743,6 +7286,60 @@
       applyFilter(filter);
     });
   });
+
+  /* ── "Updated" tag ──
+     The month shipped in the markup is the source of truth offline; this only
+     upgrades it when GitHub answers. It reads the public events feed (no key,
+     no backend — CORS-open, and a portfolio's traffic stays far under the
+     unauthenticated limit) and takes the newest push. That feed only reaches
+     back ~90 days, so a quiet stretch leaves the shipped month standing
+     rather than showing a stale-looking gap. The answer is cached for half a
+     day so a visitor clicking around spends one request, not one per view.
+     Every failure path is silent: a portfolio header is not the place to
+     report that an API is down. */
+  const GITHUB_USER = 'zahsan9';
+  const UPDATED_CACHE_KEY = 'za:lastPush';
+  const UPDATED_CACHE_MS = 12 * 60 * 60 * 1000;
+
+  function formatUpdated(iso) {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+    const month = d.toLocaleString('en-US', { month: 'short' });
+    return `Updated ${month} ${String(d.getFullYear()).slice(-2)}`;
+  }
+
+  async function refreshUpdatedTag() {
+    const el = document.getElementById('topbarUpdated');
+    if (!el) return;
+
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem(UPDATED_CACHE_KEY) || 'null'); } catch (e) {}
+    if (cached?.iso) {
+      const label = formatUpdated(cached.iso);
+      if (label) el.textContent = label;
+      if (Date.now() - (cached.at || 0) < UPDATED_CACHE_MS) return;
+    }
+
+    try {
+      const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/events/public?per_page=100`, {
+        headers: { Accept: 'application/vnd.github+json' },
+      });
+      if (!res.ok) return;
+      const events = await res.json();
+      if (!Array.isArray(events)) return;
+      const push = events.find(e => e.type === 'PushEvent' && e.created_at);
+      if (!push) return;
+      const label = formatUpdated(push.created_at);
+      if (!label) return;
+      el.textContent = label;
+      try {
+        localStorage.setItem(UPDATED_CACHE_KEY, JSON.stringify({ iso: push.created_at, at: Date.now() }));
+      } catch (e) {}
+    } catch (e) {
+      /* offline, rate-limited, or blocked — the shipped month stands */
+    }
+  }
+  refreshUpdatedTag();
 
   // ── Routing ──
   const feedView        = document.getElementById('feedView');
@@ -6922,6 +7519,9 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     }, motionDelay(ROUTE_TIMING.fadeOut));
   }
   document.querySelectorAll('.rail-btn[data-route]').forEach(b => b.addEventListener('click', e => {
+    // The rail stays reachable while a sheet is open now, so leaving for
+    // another route (or back to Work) has to put the panel away first.
+    closeSheet();
     setRoute(b.dataset.route);
     // A pointer click leaves focus on the button, so :focus-within holds the
     // rail expanded even after the cursor leaves — drop focus so it collapses.
@@ -6941,7 +7541,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       setTimeout(() => openSheet(key), motionDelay(ROUTE_TIMING.fadeOut + 80));
     });
   });
-  document.getElementById('logoBtn').addEventListener('click', () => setRoute('feed'));
+  document.getElementById('logoBtn').addEventListener('click', () => { closeSheet(); setRoute('feed'); });
 
   // ── Hash routing ──
   const VALID_ROUTES = new Set(['feed', 'about', 'experience']);
@@ -7004,22 +7604,6 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
         if (e.key !== 'Enter' && e.key !== ' ') return;
         e.preventDefault();
         window.open(card.dataset.href, '_blank', 'noopener,noreferrer');
-      });
-    });
-
-    // Tech icon corner inside pill cards reverts to the regular active cursor
-    document.querySelectorAll('[data-cursor-link] .exp-tech-zone').forEach(zone => {
-      zone.addEventListener('mouseenter', () => {
-        cursor.textContent = '';
-        cursor.classList.remove('is-pill');
-        cursor.classList.add('is-hover');
-      });
-      zone.addEventListener('mouseleave', () => {
-        const card = zone.closest('[data-cursor-link]');
-        cursor.classList.remove('is-hover');
-        if (!card) return;
-        cursor.textContent = card.dataset.cursorLink;
-        cursor.classList.add('is-pill');
       });
     });
 
