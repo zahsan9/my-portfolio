@@ -62,6 +62,9 @@
        are what made the expand read as several animations racing. */
     --rail-motion: 360ms;
     --rail-ease: var(--ease-out);
+    /* Case-study reading column. It also drives the sheet head's alignment
+       and the rail-clearance inset below, so it has to be one number. */
+    --cs-col: 1180px;
     --toc-w: 168px;
     --toc-gap: 28px;   /* reading column → index */
     --toc-edge: 28px;  /* index → panel's right edge */
@@ -246,7 +249,7 @@
      rail width, the column cap or the index width moves. */
   .app.sheet-open .sheet {
     --sheet-inset-left: clamp(0px,
-      calc(2 * var(--rail-open-w) + var(--toc-reserve, 0px) + 1240px - var(--chrome-size) - 100vw),
+      calc(2 * var(--rail-open-w) + var(--toc-reserve, 0px) + var(--cs-col) - var(--chrome-size) - 100vw),
       calc(var(--rail-open-w) - var(--chrome-size)));
     padding-left: var(--sheet-inset-left);
   }
@@ -1692,16 +1695,16 @@
     /* The head spans the whole panel — its rule runs from the rail's edge to
        the edge of the screen — by cancelling the insets the panel reserves for
        the rail overlay and the section index, then paying them back as
-       padding. Its controls still sit on the reading column's own edges (1240px
-       capped body + its 104px gutter) rather than the panel's, so they line up
+       padding. Its controls still sit on the reading column's own edges
+       (--cs-col plus its 104px gutter) rather than the panel's, so they line up
        with the case study; percentages here resolve against the panel's content
        box, which is what that column is centred in. */
     margin-left: calc(var(--sheet-inset-left, 0px) * -1);
     margin-right: calc(var(--toc-reserve, 0px) * -1);
     /* 16px against the 48px pill keeps the head exactly --chrome-size tall,
        so its rule lines up with the rail's own chrome. */
-    padding: 16px calc(var(--toc-reserve, 0px) + max(24px, calc((100% - 1240px) / 2 + 104px)))
-             16px calc(var(--sheet-inset-left, 0px) + max(24px, calc((100% - 1240px) / 2 + 104px)));
+    padding: 16px calc(var(--toc-reserve, 0px) + max(24px, calc((100% - var(--cs-col)) / 2 + 104px)))
+             16px calc(var(--sheet-inset-left, 0px) + max(24px, calc((100% - var(--cs-col)) / 2 + 104px)));
     border-bottom: 1px solid var(--line);
     position: sticky; top: 0; background: var(--paper); z-index: 2;
     min-height: var(--chrome-size);
@@ -2088,12 +2091,12 @@
   }
   /* The panel is nearly the full window (the rail replaced the feed column
      beside it), so cap the reading column rather than letting body copy run
-     the whole width. 1240 - 208 of gutter is a ~1030px measure: wider than
-     the ~950 the case studies were figured against, still inside a
-     comfortable line length. Widen this further only with a real look at the
-     figures, which are sized against this column. */
+     the whole width. --cs-col minus its 208px of gutter is the measure: at
+     1180 that's ~970px. The same token drives the sheet head's alignment and
+     the rail-clearance inset, so change it there and everything follows —
+     and check the figures, which are sized against this column. */
   .sheet-body {
-    max-width: 1240px; margin: 0 auto;
+    max-width: var(--cs-col); margin: 0 auto;
     padding: 48px 104px 72px; transition: opacity 160ms ease;
   }
   /* The 104px side gutters are a desktop reading measure; on a narrow sheet
@@ -6639,7 +6642,7 @@
     // since the content underneath isn't changing.
     if (sheet.classList.contains('open') && sheet.dataset.page === key) {
       syncRailIndex(key, indexId);
-      sheet.scrollTo({ top: 0 });
+      sheet.scrollTo({ top: 0, behavior: 'auto' });
       return;
     }
 
@@ -6685,6 +6688,11 @@
     syncRailIndex(key, indexId);
     playSheetRailEntry();
     requestAnimationFrame(() => {
+      // Reset once more in the frame the panel becomes visible. The first
+      // reset runs before the content is measured (buildSheetToc, the
+      // iteration players); this one is what guarantees that whatever
+      // happened in between, a study is at its top when you first see it.
+      sheet.scrollTo({ top: 0, behavior: 'auto' });
       sheet.classList.add('open');
       setTimeout(() => document.getElementById('sheetClose').focus(), 80);
     });
