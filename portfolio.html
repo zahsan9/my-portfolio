@@ -61,6 +61,13 @@
        width, row heights, label heights, group spacing. Mismatched timings
        are what made the expand read as several animations racing. */
     --rail-motion: 360ms;
+    /* The index rows' own fade + slide, held apart from --rail-motion so the
+       rows can trail the box's geometry slightly — they are the mass that
+       moves. It has to be a token rather than --motion-med so .sheet-closing
+       can retime it: on --motion-med it sat outside the remap and the rows
+       left on 420ms/ease-out while the panel and the rail box left on
+       480ms/ease-soft, which is two clocks inside one gesture. */
+    --rail-item-motion: var(--motion-med);
     /* Where .rail-nav rests, measured from the rail's top: the logo block plus
        the zero-height index. The routes pin here while they tuck away. */
     --rail-nav-top: 100px;
@@ -210,7 +217,15 @@
     width: var(--chrome-size);
     overflow: hidden;
     z-index: 40;
-    transition: width var(--rail-motion) var(--rail-ease), opacity 0.3s ease, transform var(--motion-med) var(--ease-out);
+    /* Exactly two things about .rail ever change: its width, and the shadow
+       the sheet-open overlay carries (see the .is-sheet-expanded rule below).
+       opacity and transform were declared here and animated nothing — the rail
+       is never faded or moved, it is display:none at 800px and under — while
+       box-shadow, the one property with two states, was missing and therefore
+       snapped on at hover-in against a 360ms width. */
+    transition:
+      width var(--rail-motion) var(--rail-ease),
+      box-shadow var(--rail-motion) var(--rail-ease);
   }
   .rail.is-intro-expanded,
   .rail:has(.rail-nav:hover),
@@ -237,6 +252,7 @@
   .app.sheet-closing {
     --rail-motion: var(--motion-slow);
     --rail-ease: var(--ease-soft);
+    --rail-item-motion: var(--motion-slow);
   }
   /* The panel runs behind the rail, but its content is inset past the rail's
      full expanded width, so nothing the visitor is reading — sheet head
@@ -318,7 +334,7 @@
     display: flex; align-items: center;
     padding-left: 13px; gap: 10px;
     color: var(--ink); overflow: hidden;
-    transition: background 0.15s, color 0.15s;
+    transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
   }
   .rail-btn:hover { background: var(--control-soft); }
   .app:has(.page-back:is(:hover, :focus-visible))
@@ -335,7 +351,7 @@
   .rail-label {
     font-family: var(--mono); font-size: 13px; letter-spacing: 0.01em;
     white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0;
-    transition: max-width 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.18s ease 0.1s;
+    transition: max-width var(--rail-motion) var(--ease-out), opacity var(--motion-fast) ease 0.1s;
   }
   .rail.is-intro-expanded .rail-label,
   .rail:has(.rail-nav:hover) .rail-label,
@@ -345,14 +361,14 @@
      or keyboard-focused. Compact, the index reads as its color swatches. */
   .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-label {
     max-width: 140px; opacity: 1;
-    transition: max-width var(--rail-motion) var(--rail-ease), opacity 200ms ease 90ms;
+    transition: max-width var(--rail-motion) var(--rail-ease), opacity var(--motion-fast) ease 90ms;
   }
   /* One delay, one duration, for every label in the index — names and section
      headings land together, just behind the geometry. */
   .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within)
     .rail-index-title {
     opacity: 1;
-    transition: opacity 220ms ease 80ms;
+    transition: opacity var(--motion-fast) ease 80ms;
   }
   .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within)
     .rail-index-label {
@@ -360,7 +376,7 @@
     transition:
       height var(--rail-motion) var(--rail-ease),
       padding-bottom var(--rail-motion) var(--rail-ease),
-      opacity 220ms ease 80ms;
+      opacity var(--motion-fast) ease 80ms;
   }
   .rail-bottom {
     margin-top: auto; align-self: stretch; padding: 0 16px 4px;
@@ -391,19 +407,29 @@
        stack collapses labels and repeat rows to zero, and a gap would keep
        reserving space for them. */
     display: flex; flex-direction: column; gap: 0;
-    overflow-y: auto; scrollbar-width: none;
+    /* clip on x, not the `auto` that a lone overflow-y would force onto it:
+       the rows enter from the right (see .rail-index-item) and that offset
+       has to be clipped, never turned into a scrollable region. */
+    overflow-x: clip; overflow-y: auto; scrollbar-width: none;
     /* Fades whatever is under the fold on a short rail instead of slicing a
        pill in half. Nothing shows when the list fits — there is no content
        at the container's bottom edge to fade. */
     mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
-    visibility: hidden; opacity: 0;
-    /* Both the fade and the visibility flip run the collapse's own clock: on a
-       shorter one the index blanked while its box was still shrinking, which
-       is most of what made closing look choppy. */
+    /* No opacity here. The container used to fade 0 -> 1 at the same time as
+       every row inside it did, so the visible result was the PRODUCT of two
+       curves: rows sat near-invisible well past their own delay and then
+       arrived abruptly, which is what made the index read as lagging the
+       geometry. The rows own the fade; this box owns only geometry and
+       visibility. It is still fully hidden at rest — zero height from
+       `flex: 0 1 0`, plus visibility.
+
+       The visibility flip runs the collapse's own clock, so it lands with the
+       rows rather than blanking them mid-fade: --rail-motion and
+       --rail-item-motion are both --motion-slow while .sheet-closing is on. */
+    visibility: hidden;
     transition:
       flex-grow var(--rail-motion) var(--rail-ease),
       padding-right var(--rail-motion) var(--rail-ease),
-      opacity var(--rail-motion) ease,
       visibility 0s linear var(--rail-motion);
   }
   .rail-index::-webkit-scrollbar { display: none; }
@@ -412,11 +438,10 @@
     /* No top inset: the first study sits exactly where Work sits in the
        default rail, so the two states share one baseline. */
     padding-top: 0; padding-bottom: 12px;
-    visibility: visible; opacity: 1;
+    visibility: visible;
     transition:
       flex-grow var(--rail-motion) var(--rail-ease),
       padding-right var(--rail-motion) var(--rail-ease),
-      opacity var(--motion-med) ease 120ms,
       visibility 0s;
   }
   .rail-index-group {
@@ -440,7 +465,7 @@
     transition:
       height var(--rail-motion) var(--rail-ease),
       padding-bottom var(--rail-motion) var(--rail-ease),
-      opacity 160ms ease;
+      opacity var(--motion-fast) ease;
   }
   /* Study rows are .rail-btn with the study's own icon in the icon slot: same
      height, radius, padding, gap and label type as Work / Experience / About,
@@ -455,12 +480,24 @@
     padding-left: 13px; padding-right: 0; gap: 10px;
     margin-bottom: 10px;
     color: var(--ink); overflow: hidden; cursor: pointer;
-    opacity: 0; transform: translateX(-8px);
+    /* Enters from the RIGHT, travelling left. The routes tuck left out of the
+       rail (see .app.sheet-open .rail-nav) and the index arrives behind them
+       going the same way, so the two states read as one thing replacing
+       another rather than two lists crossfading in place. It used to rest at
+       -8px, which slid the rows rightward — against the tuck, and the reason
+       the swap read as a fade. Closing reverses it for free: the rows animate
+       back out to the right as they fade.
+
+       22px, not the routes' full --chrome-size exit: the rail is auto-expanded
+       to --rail-open-w while this plays, so there is no single "off the right
+       edge" number to match, and a short travel still carries the direction
+       while keeping the row inside the rail at either width. */
+    opacity: 0; transform: translateX(22px);
     transition:
       background var(--motion-fast) ease,
       color var(--motion-fast) ease,
-      opacity var(--motion-med) var(--ease-out),
-      transform var(--motion-med) var(--ease-out),
+      opacity var(--rail-item-motion) var(--rail-ease),
+      transform var(--rail-item-motion) var(--rail-ease),
       padding-right var(--rail-motion) var(--rail-ease),
       height var(--rail-motion) var(--rail-ease),
       margin-bottom var(--rail-motion) var(--rail-ease);
@@ -551,7 +588,7 @@
     font-family: var(--mono); font-size: 13px; letter-spacing: 0.01em;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     max-width: 140px; opacity: 0;
-    transition: opacity 220ms ease;
+    transition: opacity var(--motion-fast) ease;
   }
   @media (prefers-reduced-motion: reduce) {
     .app.sheet-open .rail-index-item { transition-delay: 0s; }
