@@ -263,14 +263,8 @@
     margin-bottom: 34px; cursor: pointer;
     flex-shrink: 0;
     align-self: flex-start; margin-left: 16px;
-    /* Same quiet ink as the Updated tag: the mark is a wayfinder, not a
-       call to action, and full ink made it the loudest thing in the rail.
-       It brightens on hover so it still reads as the way home. */
-    color: var(--ink-mid);
-    transition: color var(--motion-fast) ease;
+    color: var(--ink);
   }
-  .rail .logo:hover,
-  .rail .logo:focus-visible { color: var(--ink); }
   .rail .logo .logo-mark { height: 28px; width: auto; display: block; }
   .rail-nav {
     display: flex; flex-direction: column; gap: 10px;
