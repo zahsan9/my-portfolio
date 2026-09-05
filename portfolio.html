@@ -61,6 +61,9 @@
        width, row heights, label heights, group spacing. Mismatched timings
        are what made the expand read as several animations racing. */
     --rail-motion: 360ms;
+    /* Where .rail-nav rests, measured from the rail's top: the logo block plus
+       the zero-height index. The routes pin here while they tuck away. */
+    --rail-nav-top: 100px;
     --rail-ease: var(--ease-out);
     /* Case-study reading column. It also drives the sheet head's alignment
        and the rail-clearance inset below, so it has to be one number. */
@@ -270,24 +273,44 @@
     display: flex; flex-direction: column; gap: 10px;
     align-self: stretch; padding: 0 16px 8px;
     max-height: 320px; overflow: hidden;
+    transform: translateX(0);
     transition:
       max-height var(--rail-motion) var(--rail-ease),
       padding var(--rail-motion) var(--rail-ease),
-      opacity var(--motion-fast) ease,
+      transform calc(var(--rail-motion) * 0.55) var(--rail-ease),
+      opacity calc(var(--rail-motion) * 0.45) var(--rail-ease),
       visibility 0s;
   }
   /* Sheet open: the site routes step aside entirely — the case studies are
      the navigation while you're reading one, and the logo (and the sheet's
-     own close control) is the way back out. They collapse rather than
-     display:none so the index can grow smoothly into the space they leave. */
+     own close control) is the way back out.
+
+     They TUCK LEFT, out through the rail's own overflow.
+
+     The routes go ABSOLUTE the moment a study opens, pinned at the top they
+     rest at (--rail-nav-top: below the logo, where the zero-height index sits
+     at rest). That is what makes this read as a tuck rather than a sag. Left
+     in the flex flow they were shoved downward by the index growing above
+     them — its full height, some 290px, against only 80px of sideways travel,
+     so the dominant motion was vertical and the icons looked like they were
+     sliding out of the bottom of the rail. Out of flow they cannot be pushed
+     at all: they only ever move left. It also hands the index its space
+     immediately, which the index still eases into on its own flex-grow.
+
+     Keep --rail-nav-top in step with the logo block above it. It is only
+     load-bearing for the ~360ms of the exit, so a small drift is a nudge in
+     the animation rather than a broken layout. */
   .app.sheet-open .rail-nav {
-    max-height: 0; padding-top: 0; padding-bottom: 0;
+    position: absolute;
+    top: var(--rail-nav-top);
+    left: 0; right: 0;
+    max-height: 320px; padding-top: 0; padding-bottom: 0;
+    transform: translateX(calc(-1 * var(--chrome-size)));
     opacity: 0; pointer-events: none;
     visibility: hidden;
     transition:
-      max-height var(--rail-motion) var(--rail-ease),
-      padding var(--rail-motion) var(--rail-ease),
-      opacity var(--motion-fast) ease,
+      transform calc(var(--rail-motion) * 0.62) var(--rail-ease),
+      opacity calc(var(--rail-motion) * 0.5) var(--rail-ease),
       visibility 0s linear var(--rail-motion);
   }
   .rail-btn {
@@ -5087,18 +5110,28 @@
    *
    *    0ms   paper ground painted, glyph hidden
    *   80ms   outline traces the z contour, pen following the path
-   *  640ms   ink sweeps in along the writing direction — across the top
-   *          bar, down the diagonal, across the bottom bar
-   * 1620ms   hold
+   *  480ms   ink sweeps in along the writing direction — across the top
+   *          bar, down the diagonal, across the bottom bar. It starts while
+   *          the pen is still visibly travelling, so the ink chases the
+   *          contour instead of waiting for it.
+   * 1460ms   hold
    * 2200ms   layer lifts and fades to reveal the feed
    * 2680ms   layer removed; fires splash:done so the rail entry can run
+   *
+   * Two things make that overlap actually read. The outline's ease is heavily
+   * front-loaded — the pen is 90% round by 600ms even though its transition
+   * does not end until 900ms — so the *perceived* landing is ~600ms and any
+   * overlap scheduled into that last 300ms is invisible. And the ink's curve
+   * is close to linear at the head; the old ease-in loitered near zero, so the
+   * sweep was technically running while nothing was visibly filling. When
+   * retiming this, compare against the perceived landing, not draw + drawDur.
    *
    * Any deliberate input (pointer / key / wheel / touch) cuts to the lift.
    * ───────────────────────────────────────────────────────── */
   const SPLASH_TIMING = {
     draw:     80,
     drawDur:  820,
-    fill:     640,
+    fill:     480,
     fillDur:  980,
     exit:     2200,
     exitDur:  480,
@@ -5137,7 +5170,7 @@
       outline.style.strokeDashoffset = '0';
     });
     at(SPLASH_TIMING.fill, () => {
-      wipe.style.transition = 'stroke-dashoffset ' + SPLASH_TIMING.fillDur + 'ms cubic-bezier(0.45, 0.05, 0.35, 1)';
+      wipe.style.transition = 'stroke-dashoffset ' + SPLASH_TIMING.fillDur + 'ms cubic-bezier(0.22, 0.35, 0.3, 1)';
       wipe.style.strokeDashoffset = '0';
     });
     at(SPLASH_TIMING.exit, leave);
