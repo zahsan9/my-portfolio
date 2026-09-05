@@ -4265,10 +4265,16 @@
       padding: 0 18px;
       gap: 24px;
     }
-    .exp-card {
-      flex-basis: 264px;
-      margin-top: 0 !important;
-    }
+    .exp-card { flex-basis: 264px; }
+    /* Keep the alternating rise and fall — it's the timeline's signature, and
+       flattening it here made the swipe strip read as a plain carousel. The
+       amplitude comes down from the desktop 52px because the strip is
+       overflow-y: hidden and the cards are centred in it: a phone-height
+       offset that large clips the low card's footer. These selectors have to
+       match the desktop pair's specificity to win, which is why they aren't
+       just a margin on .exp-card. */
+    .exp-card:nth-of-type(odd) { margin-top: -20px; }
+    .exp-card:nth-of-type(even) { margin-top: 20px; }
     /* Cards + intro panel are all reachable by swipe now — the desktop
        track's scroll-driven reveal never runs here, so force them visible
        regardless of the storyboard stage. */
