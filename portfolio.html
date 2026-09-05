@@ -263,8 +263,14 @@
     margin-bottom: 34px; cursor: pointer;
     flex-shrink: 0;
     align-self: flex-start; margin-left: 16px;
-    color: var(--ink);
+    /* Same quiet ink as the Updated tag: the mark is a wayfinder, not a
+       call to action, and full ink made it the loudest thing in the rail.
+       It brightens on hover so it still reads as the way home. */
+    color: var(--ink-mid);
+    transition: color var(--motion-fast) ease;
   }
+  .rail .logo:hover,
+  .rail .logo:focus-visible { color: var(--ink); }
   .rail .logo .logo-mark { height: 28px; width: auto; display: block; }
   .rail-nav {
     display: flex; flex-direction: column; gap: 10px;
@@ -6694,7 +6700,7 @@
       // happened in between, a study is at its top when you first see it.
       sheet.scrollTo({ top: 0, behavior: 'auto' });
       sheet.classList.add('open');
-      setTimeout(() => document.getElementById('sheetClose').focus(), 80);
+      setTimeout(() => document.getElementById('sheetClose').focus({ preventScroll: true }), 80);
     });
   }
   function closeSheet() {
@@ -6725,7 +6731,10 @@
     });
     closeSheetTimer = setTimeout(() => {
       appEl.classList.remove('sheet-closing');
-      active?.focus();
+      // preventScroll, or this undoes the scroll restore above: returning
+      // focus to the card scrolls the card into view, so closing from the top
+      // of the board dropped you at the first row instead of where you were.
+      active?.focus({ preventScroll: true });
     }, motionDelay(540));
   }
   document.getElementById('sheetClose').addEventListener('click', closeSheet);
