@@ -1900,19 +1900,16 @@
      already uses it as a fill or border automatically becomes a glass panel
      here — no per-component rewrite needed for that part. */
   /* Premium-apple theme, following the site's own light/dark split rather
-     than forcing one mode: dark mode gets a page a touch lighter than the
-     site's own dark-mode gray (oklch 0.20) with translucent-white "frost"
-     glass; light mode gets the same relationship in the site's light-mode
-     gray family (page ~ the site's own --paper-2, cards near-white with a
-     soft lift shadow). --climate-accent-text carries the numbers/highlights
-     that need to be yellow on dark but dark-on-light instead, since pale
-     yellow text has no contrast on a light page. */
-  html[data-theme="dark"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"], .sheet[data-page="dreamcatcher"]) {
-    --paper: oklch(0.29 0 0);
-  }
-  html[data-theme="light"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"], .sheet[data-page="dreamcatcher"]) {
-    --paper: oklch(0.91 0 0);
-  }
+     than forcing one mode. The studies deliberately do NOT remap --paper:
+     a case study reads as the same surface the feed is on, so the panel
+     background is the site's own --paper in both modes and the border +
+     shadow on .sheet do the separating instead of a shade shift. Everything
+     below still remaps --paper-2 / --ink / --line per study, which is what
+     gives each one its character — translucent-white "frost" glass on dark,
+     near-white cards with a soft lift shadow on light.
+     --climate-accent-text carries the numbers/highlights that need to be
+     yellow on dark but dark-on-light instead, since pale yellow text has no
+     contrast on a light page. */
   html[data-theme="dark"] .sheet[data-page="climate"] {
     --paper-2: oklch(1 0 0 / 0.06);
     --ink: oklch(0.95 0 0);
@@ -1931,7 +1928,7 @@
     --line: oklch(0 0 0 / 0.1);
     --climate-accent-text: var(--ink);
     --climate-card-shadow: 0 1px 2px oklch(0 0 0 / 0.04), 0 10px 24px -14px oklch(0 0 0 / 0.16);
-    --climate-decision-fill: oklch(0.975 0 0);
+    --climate-decision-fill: oklch(0.945 0 0);
   }
   .sheet[data-page="climate"] .cs-section { padding-top: 66px; }
   .sheet[data-page="climate"] { scroll-behavior: smooth; }
@@ -2542,7 +2539,7 @@
     --line: oklch(0.2 0.012 70 / 0.12);
     --brew-cream: oklch(0.965 0.018 85);
     --brew-cream-ink: oklch(0.18 0.018 68);
-    --brew-panel: oklch(0.985 0.009 82);
+    --brew-panel: oklch(0.945 0.011 82);
     --brew-positive: oklch(0.48 0.11 151);
     --brew-negative: oklch(0.55 0.13 28);
   }
@@ -2949,7 +2946,7 @@
     --line: oklch(0.25 0.04 305 / 0.14);
     --crow-accent: var(--c-plum);
     --crow-accent-ink: oklch(0.19 0.035 305);
-    --crow-panel: oklch(0.965 0.014 305);
+    --crow-panel: oklch(0.94 0.014 305);
   }
   .sheet[data-page="crow"] .cs-hero--crow {
     background: var(--crow-accent);
@@ -3139,7 +3136,7 @@
     --line: oklch(0.2 0.02 230 / 0.12);
     --habitat-accent: oklch(0.56 0.11 243);
     --habitat-accent-ink: #EAE4DA;
-    --habitat-panel: oklch(0.97 0.008 230);
+    --habitat-panel: oklch(0.945 0.01 230);
   }
   .sheet[data-page="habitat"] .cs-hero--habitat {
     background: var(--habitat-accent);
@@ -3386,7 +3383,7 @@
     --dream-accent: var(--c-yellow);
     --dream-deep: oklch(0.26 0.05 90);
     --dream-cream: oklch(0.96 0.02 90);
-    --dream-panel: oklch(0.965 0.012 90);
+    --dream-panel: oklch(0.945 0.014 90);
   }
   .sheet[data-page="dreamcatcher"] .cs-hero--dreamcatcher {
     padding: 38px 36px 34px;
