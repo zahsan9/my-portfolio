@@ -1900,17 +1900,31 @@
      already uses it as a fill or border automatically becomes a glass panel
      here — no per-component rewrite needed for that part. */
   /* Premium-apple theme, following the site's own light/dark split rather
-     than forcing one mode. The studies deliberately do NOT remap --paper:
-     a case study reads as the same surface the feed is on, so the panel
-     background is the site's own --paper in both modes and the border +
-     shadow on .sheet do the separating instead of a shade shift. Everything
-     below still remaps --paper-2 / --ink / --line per study, which is what
-     gives each one its character — translucent-white "frost" glass on dark,
-     near-white cards with a soft lift shadow on light.
+     than forcing one mode. Each study sits on its own paper, a step off the
+     site's (0.29 against the site's 0.20 on dark, 0.91 against 0.965 on
+     light) — a case study is a long read and wants a surface of its own, not
+     the feed's.
+
+     That offset is per study and tinted rather than one shared neutral gray.
+     A near-miss gray reads as a rendering slip: every other token in a study
+     is hued, so a page that is almost-but-not-quite the site's looks like it
+     missed rather than chose. Carrying the study's own hue at the same
+     lightness makes the step legible as intent — brew's cream 72, crow's
+     plum 305, habitat's blue 230, dreamcatcher's pale yellow 100. Brew and
+     dreamcatcher are both warm, and hue alone left them near-identical, so
+     chroma separates them: brew commits to cream, dreamcatcher stays pale.
+     Climate keeps a
+     neutral page on purpose: chroma 0 is its entire identity, and being the
+     one study on plain gray is itself the decision.
+
+     Everything else follows from --paper: --paper-2 is translucent white on
+     dark (frost glass) and near-white on light (cards with a soft lift),
+     and the quiet --*-panel fills sit just above the page.
      --climate-accent-text carries the numbers/highlights that need to be
      yellow on dark but dark-on-light instead, since pale yellow text has no
      contrast on a light page. */
   html[data-theme="dark"] .sheet[data-page="climate"] {
+    --paper: oklch(0.29 0 0);
     --paper-2: oklch(1 0 0 / 0.06);
     --ink: oklch(0.95 0 0);
     --ink-mid: oklch(0.66 0 0);
@@ -1921,6 +1935,7 @@
     --climate-decision-fill: oklch(1 0 0 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="climate"] {
+    --paper: oklch(0.91 0 0);
     --paper-2: oklch(0.995 0 0);
     --ink: oklch(0.16 0 0);
     --ink-mid: oklch(0.45 0 0);
@@ -1928,7 +1943,7 @@
     --line: oklch(0 0 0 / 0.1);
     --climate-accent-text: var(--ink);
     --climate-card-shadow: 0 1px 2px oklch(0 0 0 / 0.04), 0 10px 24px -14px oklch(0 0 0 / 0.16);
-    --climate-decision-fill: oklch(0.945 0 0);
+    --climate-decision-fill: oklch(0.975 0 0);
   }
   .sheet[data-page="climate"] .cs-section { padding-top: 66px; }
   .sheet[data-page="climate"] { scroll-behavior: smooth; }
@@ -2520,6 +2535,7 @@
      its report styling. The warmer palette and product facts keep this page
      grounded in a designed-and-built product rather than an analysis deck. */
   html[data-theme="dark"] .sheet[data-page="brew"] {
+    --paper: oklch(0.29 0.020 72);
     --paper-2: oklch(0.255 0.012 72);
     --ink: oklch(0.95 0.012 82);
     --ink-mid: oklch(0.72 0.012 78);
@@ -2532,6 +2548,7 @@
     --brew-negative: oklch(0.74 0.1 28);
   }
   html[data-theme="light"] .sheet[data-page="brew"] {
+    --paper: oklch(0.91 0.026 72);
     --paper-2: oklch(0.985 0.009 82);
     --ink: oklch(0.19 0.014 68);
     --ink-mid: oklch(0.43 0.012 70);
@@ -2539,7 +2556,7 @@
     --line: oklch(0.2 0.012 70 / 0.12);
     --brew-cream: oklch(0.965 0.018 85);
     --brew-cream-ink: oklch(0.18 0.018 68);
-    --brew-panel: oklch(0.945 0.011 82);
+    --brew-panel: oklch(0.985 0.009 82);
     --brew-positive: oklch(0.48 0.11 151);
     --brew-negative: oklch(0.55 0.13 28);
   }
@@ -2929,6 +2946,7 @@
      framed figures, three-up principles). Its portfolio accent follows the
      shared plum card token so the feed identity carries into the study. */
   html[data-theme="dark"] .sheet[data-page="crow"] {
+    --paper: oklch(0.29 0.012 305);
     --paper-2: oklch(0.27 0.012 305);
     --ink: oklch(0.95 0.012 305);
     --ink-mid: oklch(0.72 0.025 305);
@@ -2939,6 +2957,7 @@
     --crow-panel: oklch(1 0.015 305 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="crow"] {
+    --paper: oklch(0.91 0.014 305);
     --paper-2: oklch(0.985 0.007 305);
     --ink: oklch(0.2 0.035 305);
     --ink-mid: oklch(0.44 0.03 305);
@@ -2946,7 +2965,7 @@
     --line: oklch(0.25 0.04 305 / 0.14);
     --crow-accent: var(--c-plum);
     --crow-accent-ink: oklch(0.19 0.035 305);
-    --crow-panel: oklch(0.94 0.014 305);
+    --crow-panel: oklch(0.965 0.014 305);
   }
   .sheet[data-page="crow"] .cs-hero--crow {
     background: var(--crow-accent);
@@ -3119,6 +3138,7 @@
      (--c-blue), a touch lighter so the hero doesn't read as flat, with
      the seashell cream the app itself uses for text-on-dark. */
   html[data-theme="dark"] .sheet[data-page="habitat"] {
+    --paper: oklch(0.29 0.011 230);
     --paper-2: oklch(0.27 0.014 230);
     --ink: oklch(0.95 0.008 230);
     --ink-mid: oklch(0.7 0.02 230);
@@ -3129,6 +3149,7 @@
     --habitat-panel: oklch(1 0.01 230 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="habitat"] {
+    --paper: oklch(0.91 0.012 230);
     --paper-2: oklch(0.985 0.006 230);
     --ink: oklch(0.19 0.02 230);
     --ink-mid: oklch(0.43 0.02 230);
@@ -3136,7 +3157,7 @@
     --line: oklch(0.2 0.02 230 / 0.12);
     --habitat-accent: oklch(0.56 0.11 243);
     --habitat-accent-ink: #EAE4DA;
-    --habitat-panel: oklch(0.945 0.01 230);
+    --habitat-panel: oklch(0.97 0.008 230);
   }
   .sheet[data-page="habitat"] .cs-hero--habitat {
     background: var(--habitat-accent);
@@ -3364,6 +3385,7 @@
      woven-circle motif belongs to the cover; content surfaces stay quiet
      so the story remains the focus. */
   html[data-theme="dark"] .sheet[data-page="dreamcatcher"] {
+    --paper: oklch(0.29 0.011 100);
     --paper-2: oklch(0.265 0.012 90);
     --ink: oklch(0.95 0.012 90);
     --ink-mid: oklch(0.72 0.018 90);
@@ -3375,6 +3397,7 @@
     --dream-panel: oklch(1 0.01 90 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="dreamcatcher"] {
+    --paper: oklch(0.91 0.014 100);
     --paper-2: oklch(0.985 0.008 90);
     --ink: oklch(0.2 0.025 90);
     --ink-mid: oklch(0.44 0.025 90);
@@ -3383,7 +3406,7 @@
     --dream-accent: var(--c-yellow);
     --dream-deep: oklch(0.26 0.05 90);
     --dream-cream: oklch(0.96 0.02 90);
-    --dream-panel: oklch(0.945 0.014 90);
+    --dream-panel: oklch(0.965 0.012 90);
   }
   .sheet[data-page="dreamcatcher"] .cs-hero--dreamcatcher {
     padding: 38px 36px 34px;
