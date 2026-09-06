@@ -267,9 +267,22 @@
      of the tokens — hard-coding a breakpoint here goes stale the moment the
      rail width, the column cap or the index width moves. */
   .app.sheet-open .sheet {
-    --sheet-inset-left: clamp(0px,
+    /* What the RAIL alone needs: only the shortfall, never more, so on a wide
+       window where the centred column already clears the rail this falls to 0. */
+    --sheet-rail-clear: clamp(0px,
       calc(2 * var(--rail-open-w) + var(--toc-reserve, 0px) + var(--cs-col) - var(--chrome-size) - 100vw),
       calc(var(--rail-open-w) - var(--chrome-size)));
+    /* ...but the panel's two sides have to MATCH for the reading column to sit
+       centred in the panel, and the right side is already spoken for by the
+       section index. Reserving the rail's shortfall on the left and the index's
+       gutter on the right made the two sides different — 94px against 224px at
+       1710 — and `margin: 0 auto` then centred the column inside that lopsided
+       box, landing it ~65px left of the panel's true centre. Taking the larger
+       of the two for both sides costs some column width at middling widths and
+       buys a column that is actually centred on the space beside the rail.
+       Both constraints still hold by construction: the left is never less than
+       the rail needs, the right never less than the index does. */
+    --sheet-inset-left: max(var(--sheet-rail-clear), var(--toc-reserve, 0px));
     padding-left: var(--sheet-inset-left);
   }
   .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) {
@@ -6724,6 +6737,13 @@
       srcEl?.classList.add('pin-active');
       sheet.dataset.page = key;
       syncRailIndex(key, indexId);
+      // Switching studies replays the rail's own entry beat, exactly as a
+      // first open does: expanded for a moment so the rest of the work stays
+      // visible, then it hands the width back. Without it the rail only ever
+      // collapsed on the pointer leaving, with no pause — and if the switch
+      // came from the index, the row's focus meant it never collapsed at all
+      // (see the focus hand-off in buildRailIndexItem).
+      playSheetRailEntry();
       sheetMeta.textContent = p.meta || '';
       setSheetLabel(key, srcEl, p);
       switchSheetTimer = setTimeout(() => {
@@ -7144,8 +7164,14 @@
     dreamcatcher: '<path d="M7 19.1h10.1a4.1 4.1 0 0 0 .6-8.1 5.8 5.8 0 0 0-11.1-1.4A4.8 4.8 0 0 0 7 19.1z"/>',
     // WIIRED Studio — the studio mark: bolt
     wiired: '<path d="M13.7 2.6 6 13.3c-.3.4 0 1 .5 1h4.1l-.8 7c-.1.6.7.9 1 .4l7.4-10.4c.3-.4 0-1-.5-1h-4l.9-7c.1-.6-.7-.9-1-.4z"/>',
-    // Habitat — habit goals: target
-    habitat: '<path fill-rule="evenodd" d="M12 3.1a8.9 8.9 0 1 0 0 17.8 8.9 8.9 0 0 0 0-17.8zm0 2.3a6.6 6.6 0 1 1 0 13.2 6.6 6.6 0 0 1 0-13.2z"/><path fill-rule="evenodd" d="M12 7.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9zm0 2.3a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4z"/><circle cx="12" cy="12" r="1.5"/>',
+    // Habitat — habit goals: a flame, for the streak. A target read as "aim
+    // at a goal", which is every habit app; the streak is the thing Habitat
+    // is actually built around. Drawn to the set's own metrics — solid, tip
+    // at y 2.4, base at y 21 (7.2 radius about cy 13.8), 4.8-19.2 across —
+    // so it carries the same ~2px padding and optical size as the others.
+    // The notch on the left is the inner lick; without it a solid flame
+    // reads as a teardrop at 22px.
+    habitat: '<path d="M12 2.4c0 0 .6 3.7 2.6 6.2 2.2 2.6 4.6 3.4 4.6 5.2a7.2 7.2 0 0 1-14.4 0c0-2.2 1.5-3.6 2.9-4.9.3 1.8 1.2 2.8 2.3 3.1.8.2 1.2-.5 1-1.4-.6-3-.2-5.7 1-8.2z"/>',
     // Daily type & motion — letterforms: type mark
     daily: '<path d="M4.8 4.2h14.4c.6 0 1 .5 1 1v2c0 .6-.4 1-1 1s-1-.4-1-1V6.3h-4.2v11.4H15c.6 0 1 .5 1 1s-.4 1-1 1H9c-.6 0-1-.4-1-1s.4-1 1-1h1.1V6.3H5.8v.9c0 .6-.4 1-1 1s-1-.4-1-1v-2c0-.5.4-1 1-1z"/>',
     default: '<circle cx="12" cy="12" r="7"/>',
@@ -7226,7 +7252,21 @@
     title.textContent = pin.dataset.title || pin.dataset.page;
 
     item.append(icon, title);
-    item.addEventListener('click', () => openSheet(pin.dataset.page, pin, { indexId: item.dataset.indexId }));
+    item.addEventListener('click', event => {
+      openSheet(pin.dataset.page, pin, { indexId: item.dataset.indexId });
+      // A POINTER click leaves focus sitting on this row, and .rail:focus-within
+      // then pins the rail open for good — neither the collapse timer nor the
+      // pointer leaving can win against it, so the rail simply never closed
+      // again after switching studies. Hand focus to the study's own way out,
+      // which is what a first open already does.
+      //
+      // Keyboard activation (event.detail === 0) deliberately keeps its place:
+      // holding the rail open is correct while the visitor is genuinely focused
+      // inside it, and moving focus would strand someone browsing the index.
+      if (event.detail > 0) {
+        document.getElementById('sheetClose')?.focus({ preventScroll: true });
+      }
+    });
     return item;
   }
 
