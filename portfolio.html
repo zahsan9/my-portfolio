@@ -245,8 +245,22 @@
       box-shadow var(--rail-motion) var(--rail-ease);
   }
   .rail.is-intro-expanded,
-  .rail:has(.rail-nav:hover),
   .rail:has(.rail-nav:focus-within) { width: 168px; }
+  /* Hover opens the rail only where hovering is a thing. A touch browser
+     applies :hover on tap and holds it until something else is tapped, so on
+     a tablet — the rail is display:none at 800px and under, so that is the
+     whole exposure — tapping a route left the rail stuck open at 168px with
+     the tapped button stuck in its pressed fill. blur() on the click handler
+     releases :focus-within, but nothing releases :hover.
+
+     Only the resting rail needs this. While a study is open, the storyboard
+     already pins .is-sheet-expanded on for the whole visit on a device that
+     cannot hover (see playSheetRailEntry), so the index's own hover rules are
+     redundant there rather than wrong, and splitting them would duplicate
+     nine declaration blocks to change nothing. */
+  @media (hover: hover) {
+    .rail:has(.rail-nav:hover) { width: 168px; }
+  }
   /* Sheet open: the rail stays instead of sliding away — it is now the only
      way to reach the other case studies. It rests COMPACT, showing the index
      as a column of card-colored swatches, and expands to the full index for a
@@ -419,10 +433,18 @@
     color: var(--ink); overflow: hidden;
     transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
   }
-  .rail-btn:hover { background: var(--control-soft); }
-  .app:has(.page-back:is(:hover, :focus-visible))
+  .app:has(.page-back:focus-visible)
     .rail-btn[data-route="feed"]:not(.active) {
     background: var(--control-soft);
+  }
+  /* Before .rail-btn.active on purpose: same weight, so the active fill only
+     keeps winning while these stay above it. */
+  @media (hover: hover) {
+    .rail-btn:hover { background: var(--control-soft); }
+    .app:has(.page-back:hover)
+      .rail-btn[data-route="feed"]:not(.active) {
+      background: var(--control-soft);
+    }
   }
   .rail-btn.active {
     background: var(--ink);
@@ -437,8 +459,10 @@
     transition: max-width var(--rail-motion) var(--ease-out), opacity var(--motion-fast) ease 0.1s;
   }
   .rail.is-intro-expanded .rail-label,
-  .rail:has(.rail-nav:hover) .rail-label,
   .rail:has(.rail-nav:focus-within) .rail-label { max-width: 140px; opacity: 1; }
+  @media (hover: hover) {
+    .rail:has(.rail-nav:hover) .rail-label { max-width: 140px; opacity: 1; }
+  }
   /* Sheet open: every label in the rail reveals together, and only while the
      rail is expanded — auto-expanded for a beat after a study opens, hovered,
      or keyboard-focused. Compact, the index reads as its color swatches. */
