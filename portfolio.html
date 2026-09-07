@@ -2118,17 +2118,11 @@
      light) — a case study is a long read and wants a surface of its own, not
      the feed's.
 
-     That offset is per study and tinted rather than one shared neutral gray.
-     A near-miss gray reads as a rendering slip: every other token in a study
-     is hued, so a page that is almost-but-not-quite the site's looks like it
-     missed rather than chose. Carrying the study's own hue at the same
-     lightness makes the step legible as intent — brew's cream 72, crow's
-     plum 305, habitat's blue 230, dreamcatcher's pale yellow 100. Brew and
-     dreamcatcher are both warm, and hue alone left them near-identical, so
-     chroma separates them: brew commits to cream, dreamcatcher stays pale.
-     Climate keeps a
-     neutral page on purpose: chroma 0 is its entire identity, and being the
-     one study on plain gray is itself the decision.
+     That paper stays neutral gray for every study. The studies already carry
+     their identity in the hero, the accent and the tinted --paper-2 / --ink /
+     --line below; tinting the page as well made the panel itself read as a
+     colour swatch rather than a sheet the work sits on. One gray for all five
+     keeps the reading surface out of the way.
 
      Everything else follows from --paper: --paper-2 is translucent white on
      dark (frost glass) and near-white on light (cards with a soft lift),
@@ -2136,8 +2130,13 @@
      --climate-accent-text carries the numbers/highlights that need to be
      yellow on dark but dark-on-light instead, since pale yellow text has no
      contrast on a light page. */
-  html[data-theme="dark"] .sheet[data-page="climate"] {
+  html[data-theme="dark"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"], .sheet[data-page="dreamcatcher"]) {
     --paper: oklch(0.29 0 0);
+  }
+  html[data-theme="light"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"], .sheet[data-page="dreamcatcher"]) {
+    --paper: oklch(0.91 0 0);
+  }
+  html[data-theme="dark"] .sheet[data-page="climate"] {
     --paper-2: oklch(1 0 0 / 0.06);
     --ink: oklch(0.95 0 0);
     --ink-mid: oklch(0.66 0 0);
@@ -2148,7 +2147,6 @@
     --climate-decision-fill: oklch(1 0 0 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="climate"] {
-    --paper: oklch(0.91 0 0);
     --paper-2: oklch(0.995 0 0);
     --ink: oklch(0.16 0 0);
     --ink-mid: oklch(0.45 0 0);
@@ -2748,7 +2746,6 @@
      its report styling. The warmer palette and product facts keep this page
      grounded in a designed-and-built product rather than an analysis deck. */
   html[data-theme="dark"] .sheet[data-page="brew"] {
-    --paper: oklch(0.29 0.020 72);
     --paper-2: oklch(0.255 0.012 72);
     --ink: oklch(0.95 0.012 82);
     --ink-mid: oklch(0.72 0.012 78);
@@ -2761,7 +2758,6 @@
     --brew-negative: oklch(0.74 0.1 28);
   }
   html[data-theme="light"] .sheet[data-page="brew"] {
-    --paper: oklch(0.91 0.026 72);
     --paper-2: oklch(0.985 0.009 82);
     --ink: oklch(0.19 0.014 68);
     --ink-mid: oklch(0.43 0.012 70);
@@ -3159,7 +3155,6 @@
      framed figures, three-up principles). Its portfolio accent follows the
      shared plum card token so the feed identity carries into the study. */
   html[data-theme="dark"] .sheet[data-page="crow"] {
-    --paper: oklch(0.29 0.012 305);
     --paper-2: oklch(0.27 0.012 305);
     --ink: oklch(0.95 0.012 305);
     --ink-mid: oklch(0.72 0.025 305);
@@ -3170,7 +3165,6 @@
     --crow-panel: oklch(1 0.015 305 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="crow"] {
-    --paper: oklch(0.91 0.014 305);
     --paper-2: oklch(0.985 0.007 305);
     --ink: oklch(0.2 0.035 305);
     --ink-mid: oklch(0.44 0.03 305);
@@ -3351,7 +3345,6 @@
      (--c-blue), a touch lighter so the hero doesn't read as flat, with
      the seashell cream the app itself uses for text-on-dark. */
   html[data-theme="dark"] .sheet[data-page="habitat"] {
-    --paper: oklch(0.29 0.011 230);
     --paper-2: oklch(0.27 0.014 230);
     --ink: oklch(0.95 0.008 230);
     --ink-mid: oklch(0.7 0.02 230);
@@ -3362,7 +3355,6 @@
     --habitat-panel: oklch(1 0.01 230 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="habitat"] {
-    --paper: oklch(0.91 0.012 230);
     --paper-2: oklch(0.985 0.006 230);
     --ink: oklch(0.19 0.02 230);
     --ink-mid: oklch(0.43 0.02 230);
@@ -3598,7 +3590,6 @@
      woven-circle motif belongs to the cover; content surfaces stay quiet
      so the story remains the focus. */
   html[data-theme="dark"] .sheet[data-page="dreamcatcher"] {
-    --paper: oklch(0.29 0.011 100);
     --paper-2: oklch(0.265 0.012 90);
     --ink: oklch(0.95 0.012 90);
     --ink-mid: oklch(0.72 0.018 90);
@@ -3610,7 +3601,6 @@
     --dream-panel: oklch(1 0.01 90 / 0.05);
   }
   html[data-theme="light"] .sheet[data-page="dreamcatcher"] {
-    --paper: oklch(0.91 0.014 100);
     --paper-2: oklch(0.985 0.008 90);
     --ink: oklch(0.2 0.025 90);
     --ink-mid: oklch(0.44 0.025 90);
