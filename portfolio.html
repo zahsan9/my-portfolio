@@ -81,9 +81,24 @@
     --panel-w: 68vw;
     --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-soft: cubic-bezier(0.19, 1, 0.22, 1);
+    /* Both eases above are heavily front-loaded — --ease-out is ~90% of the
+       way there in the first quarter of its duration, which is right for
+       something arriving into place but reads as a snap when the thing being
+       animated is a shape growing under a stationary cursor. --ease-morph
+       ramps in instead, so a size change starts from rest. */
+    --ease-morph: cubic-bezier(0.33, 0, 0.15, 1);
     --motion-fast: 180ms;
     --motion-med: 420ms;
     --motion-slow: 480ms;
+    /* ── Copy-email glyph swap ──
+       Its own pair rather than --motion-fast/-slow, because this control
+       answers a press and the site's slower gestures are paced for panels
+       and routes. .theme-btn runs the same split at 260/520, which is right
+       for a toggle that repaints the whole page and too long for a copy.
+       Tokens rather than literals so they still collapse under
+       prefers-reduced-motion with everything else. */
+    --email-swap: 200ms;  /* the scale behind the swap */
+    --email-fade: 110ms;  /* the opacity that leads it */
     /* ── Route transition tokens (tunable via DialKit) ── */
     --rt-fade-out:    200ms;
     --rt-slide-y:      14px;
@@ -153,6 +168,8 @@
       --motion-med:  0.01ms;
       --motion-slow: 0.01ms;
       --rail-motion: 0.01ms;
+      --email-swap: 0.01ms;
+      --email-fade: 0.01ms;
     }
   }
 
@@ -1504,7 +1521,13 @@
     background: transparent;
     color: var(--ink);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    /* On the tokens like everything else. These were hardcoded at 0.15s,
+       which is close enough to --motion-fast to look identical but sits
+       outside the reduced-motion override — so the one row of controls in
+       the header kept animating for a visitor who asked it not to. */
+    transition:
+      background var(--motion-fast) ease,
+      color var(--motion-fast) ease;
   }
   .topbar-social-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
   /* Quiet metadata, not a control: same mono the rail's section labels use,
@@ -1534,6 +1557,123 @@
   .topbar-social-btn:hover,
   .topbar-social-btn:focus-visible {
     background: var(--control-soft);
+  }
+
+  /* ── Copy email ──
+     Email is a copy action in both places it appears rather than a mailto:.
+     A mailto: hands the visitor to whatever client the OS decides to open,
+     which on a borrowed or locked-down machine is a dead end; copying keeps
+     them on the page with the address in hand.
+
+     The header control never changes shape. It is the same 48px circle as
+     the LinkedIn and GitHub buttons beside it, at rest and under the pointer
+     and while confirming, so the icon row never reflows and the target never
+     moves out from under the cursor.
+
+     The glyph runs the three beats — envelope at rest, the copy mark under
+     the pointer, a tick once the address is on the clipboard — and the words
+     ride the cursor, as they already do over the Elsewhere tiles. All three
+     header controls carry a data-cursor-link now, so the row reads the same
+     way that row does.
+
+     The cursor is not decoration here, it is the only confirmation a mouse
+     user gets. The site hides the native pointer (`* { cursor: none }` on
+     fine pointers) and grows the custom one to an opaque 24px dot over any
+     button — dead centre on a 20px glyph, which it covers completely. So the
+     tick fires underneath the very thing the visitor is looking at. The pill
+     is what carries "Copied" out from under it. #copyStatus says the same to
+     assistive tech, which never sees the cursor at all. */
+
+  /* Three glyphs share one cell and cross-fade in place. Size comes from the
+     context rules (.topbar-social-btn svg / .social-tile svg), which are more
+     specific — the tile's 26px and the header's 20px both still hold. */
+  .email-glyphs {
+    display: grid;
+    place-items: center;
+    width: 48px; height: 48px;
+    transition:
+      opacity var(--email-fade) var(--ease-out),
+      transform var(--email-swap) var(--ease-soft);
+  }
+  /* The dip under the finger, at .theme-btn's own values, on the stack rather
+     than on the glyphs. :active outranks the state rules, so pressing a
+     per-glyph dip drove all three to 0.55 at once — the envelope, the copy
+     mark and the tick superimposed for as long as the button was held, which
+     is the one frame of the interaction a visitor is guaranteed to be looking
+     at. Moving it up a level means the press moves the stack as one object
+     and the states underneath stay untouched. */
+  .topbar-email-btn:active .email-glyphs,
+  .social-tile--email:active .email-glyphs {
+    opacity: 0.55;
+    transform: scale(0.86);
+  }
+  /* The split is .theme-btn's, which is the press this should feel like:
+     opacity moves first so the swap reads at once, while the scale rides a
+     softer curve behind it. The toggle runs 260/520; this is the same shape
+     on the faster pair, because a copy answers a press where a theme change
+     repaints the page. */
+  /* The swap is a hand-off, not a cross-fade. Three line icons share one
+     cell, and dissolving them through each other put an envelope and a copy
+     mark on screen at half strength at the same time — two rectangles and
+     two strokes tangling inside a 20px box, which is what made the change
+     read as a smudge rather than a swap.
+
+     So leaving is the default here and carries no delay, and every arrival
+     waits exactly one fade before it starts: the cell is only ever showing
+     one glyph. The rise is small on purpose — enough to give the swap a
+     direction, not enough to read as a slide. */
+  .email-glyph {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(2px) scale(0.92);
+    transition:
+      opacity var(--email-fade) var(--ease-out),
+      transform var(--email-swap) var(--ease-soft);
+  }
+  /* Whichever glyph the current state puts up: the envelope at rest, the copy
+     mark under the pointer, the tick once the address is on the clipboard.
+     Both controls run all three beats, so the header button and the Elsewhere
+     tile answer a hover and a press the same way. */
+  .email-glyph--idle,
+  .topbar-email-btn:hover .email-glyph--copy,
+  .topbar-email-btn:focus-visible .email-glyph--copy,
+  .social-tile--email:hover .email-glyph--copy,
+  .social-tile--email:focus-visible .email-glyph--copy,
+  .is-copied .email-glyph--check {
+    opacity: 1;
+    transform: none;
+    transition-delay: var(--email-fade);
+  }
+  /* ...and whichever it takes back down. After the block above rather than
+     merely beside it, because the press lands with the pointer still on the
+     button: the confirmation and the hover swap both want the copy mark at
+     the same weight, and the confirmation has to win. */
+  .topbar-email-btn:hover .email-glyph--idle,
+  .topbar-email-btn:focus-visible .email-glyph--idle,
+  .social-tile--email:hover .email-glyph--idle,
+  .social-tile--email:focus-visible .email-glyph--idle,
+  .is-copied .email-glyph--idle,
+  .topbar-email-btn.is-copied .email-glyph--copy,
+  .social-tile--email.is-copied .email-glyph--copy {
+    opacity: 0;
+    transform: translateY(2px) scale(0.92);
+    transition-delay: 0s;
+  }
+
+  /* Confirmation keeps the hover fill so the circle still reads as a state
+     once the pointer has moved on, and so does the failure it corrects to. */
+  .topbar-email-btn.is-copied,
+  .topbar-email-btn.is-failed { background: var(--control-soft); }
+  .social-tile--email { cursor: pointer; }
+  /* Announced-only; never painted. */
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
   /* Experience board */
   .page.active.exp-page { max-width: none; padding: 0; }
@@ -1743,16 +1883,59 @@
   #site-cursor.is-hover { min-width: 24px; max-width: 24px; height: 24px; }
   #site-cursor.is-on-dark-surface { background: oklch(0.97 0 0); }
   #site-cursor.is-on-light-surface { background: oklch(0.13 0 0); }
+  /* Frosted, not solid. The dot above stays opaque — it is standing in for
+     the pointer and has to read as an object — but the pill is a label, and a
+     full slab was the heaviest thing on screen at the moment it appeared.
+
+     A plain transparent fill was tried first and failed for a specific
+     reason: the pill sits centred on the pointer, which over the copy button
+     means directly on top of the glyph, so the tick showed straight through
+     the label and tangled with it. The blur is what fixes that — it destroys
+     the shape behind the pill while the alpha keeps enough body for the text
+     to sit on, so the pill reads as glass over the page rather than a hole in
+     it. 88% leaves just enough of the surface underneath showing to read as
+     glass rather than paint, while keeping the label sitting on body rather
+     than on whatever happens to be behind it.
+
+     Each surface variant carries its own frost: the alpha has to be mixed
+     into whichever colour that state was already using, because the mix is
+     what makes it translucent, not a separate opacity. */
   #site-cursor.is-pill {
     min-width: 0;
     max-width: 200px;
     height: 26px;
     padding: 0 12px;
+    background: color-mix(in oklch, var(--ink) 88%, transparent);
+    backdrop-filter: blur(10px) saturate(1.1);
+    -webkit-backdrop-filter: blur(10px) saturate(1.1);
     color: var(--paper);
     text-transform: uppercase;
   }
-  #site-cursor.is-pill.is-on-dark-surface { color: oklch(0.13 0 0); font-weight: 700; }
-  #site-cursor.is-pill.is-on-light-surface { color: oklch(0.97 0 0); font-weight: 700; }
+  #site-cursor.is-pill.is-on-dark-surface {
+    background: color-mix(in oklch, oklch(0.97 0 0) 88%, transparent);
+    color: oklch(0.13 0 0);
+    font-weight: 700;
+  }
+  #site-cursor.is-pill.is-on-light-surface {
+    background: color-mix(in oklch, oklch(0.13 0 0) 88%, transparent);
+    color: oklch(0.97 0 0);
+    font-weight: 700;
+  }
+  /* The leading mark carries the meaning — ⧉ is copy, ↗ is leaves the page —
+     so it is sized as a glyph rather than as another letter of a 10px label.
+     Its own weight too: these are drawn symbols, and the 700 the pill puts on
+     its text thickens them into blobs at this size. line-height:0 keeps the
+     taller box from reflowing the pill, so it grows without moving the text. */
+  #site-cursor .cursor-glyph {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 0;
+    vertical-align: -1px;
+    /* The split ate the literal space, so this is the whole gap. 5px reads as
+       the space that was there at 10px plus the air a 14px mark wants. */
+    margin-right: 5px;
+  }
+
   @media (pointer: coarse) { #site-cursor { display: none; } }
   .exp-card.art-charcoal { color: oklch(0.94 0.005 80); }
 
@@ -4657,16 +4840,30 @@
         </button>
       </div>
       <div class="page-actions topbar-social" id="topbarSocial">
-        <a class="topbar-social-btn" aria-label="Email" href="mailto:zahsan9@uw.edu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="5.5" width="18" height="13" rx="2.2"/>
-            <path d="m3.6 6.4 8.4 6.6 8.4-6.6"/>
-          </svg>
-        </a>
-        <a class="topbar-social-btn" aria-label="LinkedIn" href="https://www.linkedin.com/in/ahsanzainab" target="_blank" rel="noopener noreferrer">
+        <button class="topbar-social-btn topbar-email-btn" type="button" id="copyEmailBtn" data-copy-email="zahsan9@uw.edu" data-cursor-link="⧉ Copy email" aria-label="Copy email address zahsan9@uw.edu">
+          <span class="email-glyphs" aria-hidden="true">
+            <svg class="email-glyph email-glyph--idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5.5" width="18" height="13" rx="2.2"/>
+              <path d="m3.6 6.4 8.4 6.6 8.4-6.6"/>
+            </svg>
+            <!-- The ⧉ the cursor pill is showing at the same moment, drawn to
+                 match its neighbours: front sheet as a rect, back
+                 sheet as an open L behind it, on the 1.8 stroke and round
+                 joins the LinkedIn and GitHub marks use. Squared on 12,12 so
+                 it optically centres in the 48px well like the rest. -->
+            <svg class="email-glyph email-glyph--copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="8.5" y="8.5" width="11" height="11" rx="2.4"/>
+              <path d="M14.5 4.5H6.3A1.8 1.8 0 0 0 4.5 6.3v8.2"/>
+            </svg>
+            <svg class="email-glyph email-glyph--check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m4.5 12.5 5 5 10-11"/>
+            </svg>
+          </span>
+        </button>
+        <a class="topbar-social-btn" aria-label="LinkedIn" data-cursor-link="↗ LinkedIn" href="https://www.linkedin.com/in/ahsanzainab" target="_blank" rel="noopener noreferrer">
           <span class="social-glyph" aria-hidden="true">in</span>
         </a>
-        <a class="topbar-social-btn" aria-label="GitHub" href="https://github.com/zahsan9" target="_blank" rel="noopener noreferrer">
+        <a class="topbar-social-btn" aria-label="GitHub" data-cursor-link="↗ GitHub" href="https://github.com/zahsan9" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M9 8 5 12l4 4M15 8l4 4-4 4"/>
           </svg>
@@ -4741,11 +4938,20 @@
               <div class="contact-content">
                 <h3 class="social-intro">Find me elsewhere</h3>
                 <div class="social-tiles">
-                  <div class="social-tile" role="link" tabindex="0" aria-label="Email" data-cursor-link="↗ Email" data-href="mailto:zahsan9@uw.edu">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <div class="social-tile social-tile--email" role="button" tabindex="0" aria-label="Copy email address zahsan9@uw.edu" data-cursor-link="⧉ Copy email" data-copy-email="zahsan9@uw.edu">
+                    <span class="email-glyphs" aria-hidden="true">
+                    <svg class="email-glyph email-glyph--idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <rect x="3" y="5.5" width="18" height="13" rx="2.2"/>
                       <path d="m3.6 6.4 8.4 6.6 8.4-6.6"/>
                     </svg>
+                    <svg class="email-glyph email-glyph--copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="8.5" y="8.5" width="11" height="11" rx="2.4"/>
+                      <path d="M14.5 4.5H6.3A1.8 1.8 0 0 0 4.5 6.3v8.2"/>
+                    </svg>
+                    <svg class="email-glyph email-glyph--check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="m4.5 12.5 5 5 10-11"/>
+                    </svg>
+                    </span>
                   </div>
                   <div class="social-tile" role="link" tabindex="0" aria-label="LinkedIn" data-cursor-link="↗ LinkedIn" data-href="https://www.linkedin.com/in/ahsanzainab">
                     <span class="social-glyph" aria-hidden="true">in</span>
@@ -7735,10 +7941,49 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
 
     document.addEventListener('mouseleave', () => cursor.classList.remove('is-visible'));
 
+    /* Pill labels are "<mark> <words>" — "⧉ Copy email", "↗ LinkedIn". Split
+       the mark off so it can be sized on its own; built with DOM nodes rather
+       than innerHTML so the data attribute is never parsed as markup. A label
+       whose first token is a word ("Coming soon") has no mark and is left
+       whole. */
+    const setPillText = text => {
+      const gap = text.indexOf(' ');
+      const mark = gap > 0 ? text.slice(0, gap) : '';
+      cursor.textContent = '';
+      if (mark && !/[A-Za-z0-9]/.test(mark)) {
+        const el = document.createElement('span');
+        el.className = 'cursor-glyph';
+        el.textContent = mark;
+        cursor.append(el, text.slice(gap + 1));
+      } else {
+        cursor.textContent = text;
+      }
+    };
+
+    /* A copy dismisses the pill instead of retitling it. The pill is centred
+       on the pointer, which over either copy control means squarely on top of
+       the glyph — so the tick was firing behind the very thing the visitor is
+       looking at. Standing the cursor down uncovers it. .is-hover goes with
+       it, dropping the cursor to its smallest resting dot rather than leaving
+       a 24px one parked on the tick. */
+    document.addEventListener('cursor:dismiss', () => {
+      cursor.textContent = '';
+      cursor.classList.remove('is-pill', 'is-hover');
+    });
+
+    // A copy confirmation retitles the pill where it stands, so the cursor
+    // stops offering an action that has already happened.
+    document.addEventListener('cursor:label', e => {
+      setPillText(e.detail);
+      cursor.classList.add('is-pill');
+      cursor.classList.remove('is-hover');
+    });
+
+
     // Pill cards
-    document.querySelectorAll('[data-cursor-link][data-href]').forEach(card => {
+    document.querySelectorAll('[data-cursor-link]').forEach(card => {
       card.addEventListener('mouseenter', () => {
-        cursor.textContent = card.dataset.cursorLink;
+        setPillText(card.dataset.cursorLink);
         cursor.classList.add('is-pill');
         cursor.classList.remove('is-hover');
       });
@@ -7746,6 +7991,8 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
         cursor.textContent = '';
         cursor.classList.remove('is-pill');
       });
+      // Copy actions carry a pill but no destination — they wire their own click.
+      if (!card.dataset.href) return;
       card.addEventListener('click', () => window.open(card.dataset.href, '_blank', 'noopener,noreferrer'));
       card.addEventListener('keydown', e => {
         if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -7757,7 +8004,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     // Coming soon cards
     document.querySelectorAll('[data-cursor-label]').forEach(el => {
       el.addEventListener('mouseenter', () => {
-        cursor.textContent = el.dataset.cursorLabel;
+        setPillText(el.dataset.cursorLabel);
         cursor.classList.add('is-pill');
         cursor.classList.remove('is-hover');
       });
@@ -8010,7 +8257,140 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     });
   })();
 
+  /* ── Copy email ──
+     Both email controls copy the address rather than opening a mail client.
+     One handler drives both: neither carries a label of its own any more, so
+     they share the .is-copied state outright and both say what happened in
+     the cursor pill and the live region. */
+  (() => {
+    const HOLD = 1900;
+    /* The live region sits after this script in the document, so it cannot be
+       resolved at parse time — look it up when there is something to say. */
+    const announce = message => {
+      const region = document.getElementById('copyStatus');
+      if (region) region.textContent = message;
+    };
+
+    async function writeClipboard(text) {
+      /* The async clipboard needs a secure context, and this page is opened
+         from file:// about as often as it is served, where it is missing.
+         Fall back to a throwaway field so the copy still lands. */
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (err) { /* fall through to the legacy path */ }
+      }
+      try {
+        const field = document.createElement('textarea');
+        field.value = text;
+        field.setAttribute('readonly', '');
+        field.style.cssText = 'position:fixed;top:0;left:-9999px;opacity:0;';
+        document.body.appendChild(field);
+        field.select();
+        const copied = document.execCommand('copy');
+        field.remove();
+        return copied;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    document.querySelectorAll('[data-copy-email]').forEach(control => {
+      /* Both controls confirm with the glyph and the pill now; the label
+         lookup stays because the failure path still has an address to put
+         somewhere if a control ever carries text again. */
+      const doneWord = control.querySelector('.email-word--done');
+      const doneLabel = doneWord ? doneWord.textContent : '';
+      const idlePill = control.dataset.cursorLink || '';
+      /* Only retitle a pill the pointer is actually over. The hold outlives
+         the hover by design, so without this the revert fires "Copy email"
+         into the cursor wherever it has since travelled — a pill offering an
+         action for whatever the visitor is now pointing at. Re-entering the
+         control sets the pill from data-cursor-link anyway, and a keyboard
+         press has no cursor to speak to. */
+      const pill = detail => {
+        if (idlePill && control.matches(':hover')) {
+          document.dispatchEvent(new CustomEvent('cursor:label', { detail }));
+        }
+      };
+      /* Same guard: only stand down a cursor that is actually over this
+         control. A keyboard press leaves the pointer wherever it was, quite
+         possibly on some other control holding a pill of its own. */
+      const dismissPill = () => {
+        if (idlePill && control.matches(':hover')) {
+          document.dispatchEvent(new CustomEvent('cursor:dismiss'));
+        }
+      };
+      /* Every press takes a ticket. A result whose ticket is stale — because
+         a newer press superseded it, or because the hold already expired —
+         is dropped, so a burst of clicks can never let an old answer paint
+         over the current state. */
+      let seq = 0;
+      let revert;
+
+      function rest() {
+        control.classList.remove('is-copied', 'is-failed');
+        if (doneWord) doneWord.textContent = doneLabel;
+        announce('');
+        pill(idlePill);
+      }
+
+      async function copy() {
+        const address = control.dataset.copyEmail;
+        const ticket = ++seq;
+        clearTimeout(revert);
+
+        /* Confirm on the press, not on the clipboard's answer: writeText is a
+           round-trip through the browser, and awaiting it before showing
+           anything is what made the button feel delayed. The hold starts here
+           too, so the confirmation lasts the same time however long the
+           clipboard takes. The rare failure corrects itself below. */
+        rest();
+        control.classList.add('is-copied');
+        announce('Email address copied: ' + address);
+        /* The pill goes away rather than being retitled: the glyph carries
+           the confirmation, and the pill was covering it. rest() brings it
+           back at the end of the hold if the pointer is still here. Failure
+           still speaks up below, because there the visitor needs the address
+           itself and nothing else on screen is holding it. */
+        dismissPill();
+        revert = setTimeout(() => {
+          if (ticket !== seq) return;
+          seq += 1;
+          rest();
+        }, HOLD);
+
+        const copied = await writeClipboard(address);
+        if (ticket !== seq) return;
+        if (copied) return;
+
+        /* Never leave a check standing over a copy that did not happen. The
+           check comes off before the address goes on — showing both at once
+           is what put a stray email address next to a tick. */
+        control.classList.remove('is-copied');
+        control.classList.add('is-failed');
+        if (doneWord) doneWord.textContent = address;
+        announce('Could not copy. The address is ' + address);
+        pill(address);
+      }
+
+      control.addEventListener('click', copy);
+      /* A real <button> already turns Enter and Space into a click; only the
+         tile, which is a div with role="button", needs the keys wired. */
+      if (control.tagName !== 'BUTTON') {
+        control.addEventListener('keydown', e => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
+          copy();
+        });
+      }
+    });
+  })();
+
 </script>
+
+<div class="sr-only" role="status" aria-live="polite" id="copyStatus"></div>
 
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
