@@ -1554,9 +1554,18 @@
   .topbar-social-btn .social-glyph {
     font-family: var(--sans); font-weight: 700; font-size: 16px; letter-spacing: -0.02em;
   }
-  .topbar-social-btn:hover,
   .topbar-social-btn:focus-visible {
     background: var(--control-soft);
+  }
+  /* The fill is gated the same way the copy glyph's hover beat is, and for the
+     same reason: a touch browser applies :hover on tap and holds it until
+     something else is tapped. Ungated, the control you just used stayed in
+     the pressed gray — and on the copy button that gray outlived the tick and
+     the confirmation both, so the button sat lit next to two unlit ones with
+     nothing left to signal. :focus-visible stays outside the gate; keyboard
+     focus is a state that should show on any device. */
+  @media (hover: hover) {
+    .topbar-social-btn:hover { background: var(--control-soft); }
   }
 
   /* ── Copy email ──
