@@ -378,6 +378,40 @@
     top: var(--rail-nav-top);
     left: 0; right: 0;
   }
+  /* The index needs the identical pin, for the identical reason. Its rows
+     already animate back out to the right on their own transform, but while
+     they do it the box underneath them is collapsing its flex-grow through
+     the full height of the list — so the rows were dragged up several hundred
+     pixels against 22px of sideways travel, and the tuck-right was buried in
+     a vertical collapse. Out of flow the collapse has nothing to move: the
+     rows hold their line and the only thing that reads is the slide.
+
+     Pinned to the same --rail-nav-top the routes are, which is exactly where
+     the index's first row already sits while open — the comment on
+     .app.sheet-open .rail-index calls that shared baseline out. So the two
+     lists cross on one line, the rows leaving rightward as the routes arrive
+     rightward behind them: the open gesture run backwards. .rail-nav is later
+     in the DOM, so the arriving routes paint over the leaving rows.
+
+     Nothing snaps at the hand-off. flex-grow is inert on an absolute box, and
+     by the time .sheet-closing lifts at 540ms the rows are already at opacity
+     0 and the box is visibility:hidden (--rail-motion, 480ms), so returning
+     to `flex: 0 1 0` and zero height is invisible.
+
+     Pinning the box is only half of it: the rows also have to stop being
+     rearranged inside it. Dropping .sheet-open re-expands every duplicate the
+     compact stack was collapsing — a project listed under two disciplines
+     springs its second copy back to full height and shoves everything below
+     it down, well over a hundred pixels of it — and collapses the category
+     labels under a rail that is still hovered. So the index's internal layout
+     rules run on .sheet-closing too (grep :is(.sheet-open, .sheet-closing));
+     only the row's own opacity and transform are left to change, which is
+     exactly the pair that carries it out to the right. */
+  .app.sheet-closing .rail-index {
+    position: absolute;
+    top: var(--rail-nav-top);
+    left: 0; right: 0;
+  }
   .rail-btn {
     width: 100%; height: 48px; border-radius: 999px;
     display: flex; align-items: center;
@@ -574,7 +608,7 @@
   /* A repeat row unfolding on hover is part of the same move as everything
      else, so it drops the per-item entry stagger the open storyboard sets —
      that delay is what made the second copy of a study arrive after the rest. */
-  .app.sheet-open .rail-index-item.is-compact-hidden {
+  .app:is(.sheet-open, .sheet-closing) .rail-index-item.is-compact-hidden {
     height: 0; margin-bottom: 0;
     opacity: 0; pointer-events: none;
     transition-delay: 0s;
@@ -585,18 +619,18 @@
   .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-index-item {
     padding-right: 8px;
   }
-  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-index-item.is-compact-hidden {
+  .app:is(.sheet-open, .sheet-closing) .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-index-item.is-compact-hidden {
     height: 48px; margin-bottom: 10px;
     opacity: 1; pointer-events: auto;
     transition-delay: 0s;
   }
-  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-index-label {
+  .app:is(.sheet-open, .sheet-closing) .rail:is(.is-sheet-expanded, :hover, :focus-within) .rail-index-label {
     /* 22 = the 10px line plus 10px of air before the first pill. Height is
        border-box here, so the padding has to be paid for in the height or the
        label crops itself. */
     height: 22px; padding-bottom: 10px; opacity: 1;
   }
-  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within)
+  .app:is(.sheet-open, .sheet-closing) .rail:is(.is-sheet-expanded, :hover, :focus-within)
     .rail-index-group + .rail-index-group { margin-top: 10px; }
   .rail-index-item:hover,
   .rail-index-item:focus-visible { background: var(--control-soft); }
