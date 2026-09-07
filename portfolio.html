@@ -1635,22 +1635,43 @@
      Both controls run all three beats, so the header button and the Elsewhere
      tile answer a hover and a press the same way. */
   .email-glyph--idle,
-  .topbar-email-btn:hover .email-glyph--copy,
   .topbar-email-btn:focus-visible .email-glyph--copy,
-  .social-tile--email:hover .email-glyph--copy,
   .social-tile--email:focus-visible .email-glyph--copy,
   .is-copied .email-glyph--check {
     opacity: 1;
     transform: none;
     transition-delay: var(--email-fade);
   }
+  /* The middle beat belongs to pointers that can actually hover. A touch
+     browser applies :hover on tap and holds it until something else is
+     tapped, so ungated this left the copy mark showing after the tick had
+     come and gone — a control resting on the wrong glyph until the visitor
+     happened to touch elsewhere. On a phone the beat is not missed: there is
+     no pointer to signal to, and the tick is fully visible there precisely
+     because no cursor is sitting on it.
+
+     Between the two state blocks on purpose. Later than the resting glyph so
+     hover wins over it, earlier than the confirmation below so the tick wins
+     over hover — the press lands with the pointer still on the control. */
+  @media (hover: hover) {
+    .topbar-email-btn:hover .email-glyph--copy,
+    .social-tile--email:hover .email-glyph--copy {
+      opacity: 1;
+      transform: none;
+      transition-delay: var(--email-fade);
+    }
+    .topbar-email-btn:hover .email-glyph--idle,
+    .social-tile--email:hover .email-glyph--idle {
+      opacity: 0;
+      transform: translateY(2px) scale(0.92);
+      transition-delay: 0s;
+    }
+  }
   /* ...and whichever it takes back down. After the block above rather than
      merely beside it, because the press lands with the pointer still on the
      button: the confirmation and the hover swap both want the copy mark at
      the same weight, and the confirmation has to win. */
-  .topbar-email-btn:hover .email-glyph--idle,
   .topbar-email-btn:focus-visible .email-glyph--idle,
-  .social-tile--email:hover .email-glyph--idle,
   .social-tile--email:focus-visible .email-glyph--idle,
   .is-copied .email-glyph--idle,
   .topbar-email-btn.is-copied .email-glyph--copy,
@@ -6941,6 +6962,39 @@
     measure();
   }
 
+  /* ── Root paper, phone widths ──
+     At <=800px the sheet is the whole screen, so the page behind it is never
+     seen as a page. The only places it still shows are the ones the browser
+     paints from the document's own background rather than from the sheet:
+     the overscroll gutter at the ends of a scroll, and the strip under the
+     address bar that Safari and Chrome tint from the root. Both were taking
+     the site's --paper while the study paints its own, so a full-screen study
+     sat inside a frame a shade off itself.
+
+     Mirrored from the sheet's own computed --paper rather than read from a
+     shared token, because each study still sets its own and they are tinted
+     per study — a neutral token would paint a near-miss gray behind four of
+     the five, which is the exact rendering-slip look the studies' own paper
+     comment warns about. Reading the computed value keeps this correct
+     whatever the paper system is, tinted now or collapsed to one gray later.
+
+     Desktop is deliberately untouched: there the sheet is a panel and the
+     page beside it is meant to read as the page. */
+  const phoneSheet = matchMedia('(max-width: 800px)');
+  function syncRootPaper() {
+    const open = appEl.classList.contains('sheet-open');
+    document.documentElement.style.backgroundColor =
+      open && phoneSheet.matches
+        ? getComputedStyle(sheet).getPropertyValue('--paper').trim()
+        : '';
+  }
+  phoneSheet.addEventListener('change', syncRootPaper);
+  /* The toggle rewrites --paper under an open sheet, and the mirrored value
+     is a resolved colour, not a live reference — so it has to be re-read. */
+  new MutationObserver(syncRootPaper).observe(document.documentElement, {
+    attributes: true, attributeFilter: ['data-theme'],
+  });
+
   function openSheet(key, srcEl, { indexId } = {}) {
     const p = PAGES[key]; if (!p) return;
 
@@ -6962,6 +7016,8 @@
       document.querySelectorAll('.pin').forEach(pin => pin.classList.remove('pin-active'));
       srcEl?.classList.add('pin-active');
       sheet.dataset.page = key;
+      /* Switching studies swaps the paper under an open sheet too. */
+      syncRootPaper();
       syncRailIndex(key, indexId);
       // Switching studies replays the rail's own entry beat, exactly as a
       // first open does: expanded for a moment so the rest of the work stays
@@ -6998,6 +7054,7 @@
     sheet.scrollTo({ top: 0, behavior: 'auto' });
     appEl.classList.remove('sheet-closing');
     appEl.classList.add('sheet-open');
+    syncRootPaper();
     feedEl.classList.add('has-open');
     document.querySelectorAll('.pin').forEach(pin => pin.classList.remove('pin-active'));
     srcEl?.classList.add('pin-active');
@@ -7035,6 +7092,7 @@
       resetFeedPosition();
       syncRailIndex(null);
       appEl.classList.remove('sheet-open');
+      syncRootPaper();
       main.scrollTop = feedScrollBeforeOpen;
       lockFeedHeight();
       updateFeedScrollbar();
