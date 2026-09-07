@@ -359,6 +359,25 @@
       opacity calc(var(--rail-motion) * 0.5) var(--rail-ease),
       visibility 0s linear var(--rail-motion);
   }
+  /* Coming back, the routes have to stay out of flow too, or the tuck only
+     works in one direction. Dropping .sheet-open hands .rail-nav straight
+     back to the flex column, and position is not animatable — so it lands in
+     flow on the first frame, underneath an index that is still collapsing
+     through its own height. The routes get dragged up that whole distance
+     while their transform carries them only --chrome-size sideways, and the
+     vertical again wins: they rise out of the bottom of the rail instead of
+     sliding in from the left.
+
+     Holding them pinned for the length of the close leaves the transform as
+     the only thing that moves, so they return the way they left. --rail-nav-top
+     is where they rest statically, so the hand-off back to flow is a no-op:
+     .sheet-closing outlives the slide (264ms against 540) and by then the
+     index is at zero height and the pin already matches the flow position. */
+  .app.sheet-closing .rail-nav {
+    position: absolute;
+    top: var(--rail-nav-top);
+    left: 0; right: 0;
+  }
   .rail-btn {
     width: 100%; height: 48px; border-radius: 999px;
     display: flex; align-items: center;
