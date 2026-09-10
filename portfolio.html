@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 6 7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M1.692 6.276C1.188 6.276 0.780001 6.152 0.468001 5.904C0.156001 5.656 7.37607e-07 5.316 7.37607e-07 4.884C7.37607e-07 4.444 0.112001 4.116 0.336001 3.9C0.560001 3.684 0.804001 3.528 1.068 3.432L3.84 2.4V2.352H1.404C1.044 2.352 0.744001 2.256 0.504001 2.064C0.272001 1.864 0.156001 1.568 0.156001 1.176C0.156001 0.776001 0.272001 0.480001 0.504001 0.288001C0.744001 0.0960009 1.044 9.53674e-07 1.404 9.53674e-07H4.344C4.728 9.53674e-07 5.052 0.092001 5.316 0.276001C5.588 0.460001 5.724 0.788001 5.724 1.26C5.724 1.62 5.612 1.924 5.388 2.172C5.172 2.42 4.856 2.624 4.44 2.784L2.16 3.648V3.696H4.608C5 3.696 5.324 3.804 5.58 4.02C5.836 4.236 5.964 4.56 5.964 4.992C5.964 5.432 5.836 5.756 5.58 5.964C5.324 6.172 5 6.276 4.608 6.276H1.692Z'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet" />
 <script>
   /* Runs before first paint: apply the stored theme (kills the light-mode
      FOUC) and decide whether the splash mounts. It plays on every load that
@@ -28,13 +28,13 @@
   /* ── Tokens ── */
   :root {
     --paper:       oklch(0.965 0 0);
-    --paper-2:     oklch(0.93  0 0);
+    --paper-2:     oklch(0.93  0.005 262);
     --ink:         oklch(0.18  0 0);
-    --ink-mid:     oklch(0.45  0 0);
-    --ink-low:     oklch(0.65  0 0);
-    --line:        oklch(0.88  0 0);
-    --control-soft:oklch(0.90  0 0);
-    --control-muted:oklch(0.50 0 0);
+    --ink-mid:     oklch(0.45  0.008 262);
+    --ink-low:     oklch(0.65  0.006 262);
+    --line:        oklch(0.88  0.005 262);
+    --control-soft:oklch(0.90  0.005 262);
+    --control-muted:oklch(0.50 0.007 262);
     --accent:      oklch(0.42  0.14  262);
     --accent-soft: oklch(0.93  0.035 262);
 
@@ -45,12 +45,19 @@
     --c-sage:    oklch(0.74 0.065 152);
     --c-plum:    oklch(0.71 0.06  305);
     --c-sand:    oklch(0.88 0.022 72);
-    --c-charcoal:oklch(0.27 0.010 60);
-    --c-noir:    oklch(0.15 0.006 60);
-    --c-noir-2:  oklch(0.235 0.007 60);
+    --c-charcoal:oklch(0.27 0.008 60);
+    --c-noir:    oklch(0.15 0.006 240);
+    --c-noir-2:  oklch(0.235 0.007 240);
 
+    /* ── Typography ──
+       Three-face system: Instrument Serif (primary editorial/heroes), Inter
+       (structure, UI), Fraunces (expressive moments, warmth).
+       Fraunces is a soft-serif superfamily with optical sizing—wonky, warm,
+       characterful. Used for case study questions, reflections, About principles.
+       Set at lower optical sizes (9–72) for that softer, editorial quality. */
     --serif: 'Instrument Serif', Georgia, serif;
     --sans:  'Inter', -apple-system, sans-serif;
+    --serif-display: 'Fraunces', Georgia, serif;
     --mono:  'Inter', -apple-system, sans-serif;
     --chrome-size: 80px;
     /* Expanded rail: the narrowest width that still fits every study label on
@@ -121,12 +128,18 @@
     --control-muted:oklch(0.58 0 0);
     --accent-soft: oklch(0.24  0.06  262);
     --sub-color: #fff;
-    /* Feed card palette (--c-*) is intentionally NOT overridden here —
-       cards should look identical in light and dark mode. */
+  }
+  /* Dark mode: only lighten case study cards and About stack cards for visibility.
+     Static components (skills, contact) stay noir/charcoal for visual impact. */
+  [data-theme="dark"] .pin[data-page] .art-charcoal,
+  [data-theme="dark"] .ab-stack-card.art-charcoal,
+  [data-theme="dark"] .exp-card.art-charcoal {
+    background: oklch(0.38 0.015 60);
   }
 
   /* ── Reset ── */
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  img { max-width: 100%; height: auto; display: block; }
   html { color-scheme: light; }
   html[data-theme="dark"] { color-scheme: dark; }
   html.theme-transitioning,
@@ -199,6 +212,7 @@
     margin-top: -40px;
     padding: 0 24px 44px;
     text-align: center;
+    font-family: var(--mono);
     font-size: 10px; letter-spacing: 0.02em;
     color: color-mix(in oklch, var(--ink) 44%, var(--paper));
     pointer-events: none;
@@ -1819,8 +1833,8 @@
     height: calc(100vh - var(--chrome-size));
     overflow: hidden;
     display: flex;
-    align-items: flex-start;
-    padding-top: 22vh;
+    align-items: center;
+    /* Remove padding-top - centering does this now */
   }
   .exp-track {
     display: flex;
@@ -1829,6 +1843,7 @@
     width: max-content;
     padding: 0 140px;
     transform: translateX(var(--exp-track-x));
+    transition: transform 0.15s linear;
     will-change: transform;
   }
   .exp-intro-panel {
@@ -1868,6 +1883,7 @@
   }
   .exp-card {
     --scroll-reveal-opacity: 0;
+    --scroll-reveal-y: 20px;
     --hover-tilt: 0deg;
     flex: 0 0 clamp(260px, 24vw, 340px);
     aspect-ratio: 4 / 5;
@@ -1882,14 +1898,14 @@
     box-shadow: 0 18px 44px -24px oklch(0.08 0.005 60 / 0.5);
     transform-origin: center 70%;
     transition:
-      opacity 700ms var(--ease-soft),
-      transform 560ms var(--ease-soft),
-      box-shadow 560ms var(--ease-soft);
+      opacity 400ms ease-out,
+      transform 400ms ease-out,
+      box-shadow 400ms ease-out;
     opacity: var(--scroll-reveal-opacity);
-    transform: translateY(0);
+    transform: translateY(var(--scroll-reveal-y));
   }
-  .exp-card:nth-of-type(odd) { margin-top: -52px; }
-  .exp-card:nth-of-type(even) { margin-top: 52px; }
+  .exp-card:nth-of-type(odd) { margin-top: -32px; }
+  .exp-card:nth-of-type(even) { margin-top: 32px; }
   .exp-card:hover {
     transform: translateY(-8px) rotate(var(--hover-tilt));
     box-shadow: 0 26px 62px -34px oklch(0.08 0.005 60 / 0.56);
@@ -2073,7 +2089,17 @@
     min-height: var(--chrome-size);
   }
   .sheet-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-mid); text-transform: uppercase; letter-spacing: 0.08em; }
-  .sheet-actions { display: flex; gap: 8px; align-items: center; }
+  .sheet-actions { display: flex; gap: 12px; align-items: center; }
+  .sheet-work-link {
+    font-family: var(--sans); font-size: 13px; font-weight: 500;
+    color: var(--ink-mid); opacity: 0.85;
+    background: none; border: none; padding: 0; cursor: pointer;
+    text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+    transition: color 0.15s, opacity 0.15s;
+  }
+  .sheet-work-link:hover, .sheet-work-link:focus-visible {
+    color: var(--ink); opacity: 1;
+  }
   /* .sheet-close is .page-back and nothing more at rest (see Header pills):
      the same transparent pill About and Experience use, so every Back to Work
      on the site is one control. It carried a hairline for a while to separate
@@ -2102,7 +2128,10 @@
   .cs-cta-btn:hover { background: var(--ink); color: var(--paper); box-shadow: 0 0 0 1px var(--ink); }
   .sheet {
     position: fixed; right: 0; top: 0; bottom: 0;
-    width: var(--panel-w); overflow-y: auto; overscroll-behavior: contain;
+    width: var(--panel-w);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background: var(--paper);
     border-left: 1px solid var(--line);
     box-shadow: -10px 0 40px oklch(0.05 0.005 60 / 0.14);
@@ -2550,9 +2579,15 @@
   }
   .ab-principles { display: flex; flex-direction: column; }
   .ab-principle {
-    font-family: var(--serif); font-size: 18px; font-style: italic;
-    line-height: 1.4; color: var(--ink);
-    padding: 14px 0; border-bottom: 1px solid var(--line);
+    font-family: var(--serif-display);
+    font-size: 18px;
+    font-weight: 300;
+    font-style: italic;
+    font-variation-settings: 'opsz' 16;
+    line-height: 1.4;
+    color: var(--ink);
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
   }
   .ab-principle:last-child { border-bottom: none; padding-bottom: 0; }
 
@@ -2676,12 +2711,12 @@
      card can be two different elements, lifting both at once. Keyboard focus still gets
      its own indicator from the global :focus-visible outline rule above. */
   .ab-stack:not(.is-busy) .ab-stack-card.is-hovered {
-    --lift-y: -16px;
-    --hover-r: -1.5deg;
+    --lift-y: -12px;
+    --hover-r: -1deg;
     transition:
-      transform 260ms cubic-bezier(0.34, 1.18, 0.64, 1),
-      box-shadow 260ms ease;
-    box-shadow: 0 22px 54px -34px oklch(0.08 0.005 60 / 0.64), inset 0 0 0 1px oklch(0 0 0 / 0.08);
+      transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 180ms ease;
+    box-shadow: 0 18px 44px -28px oklch(0.08 0.005 60 / 0.58), inset 0 0 0 1px oklch(0 0 0 / 0.08);
   }
   .ab-stack-header {
     display: flex;
@@ -2718,11 +2753,17 @@
   }
   .ab-stack-list.is-lined li::before { content: none; }
   .ab-stack-list.is-lined li {
-    padding-left: 0; padding-top: 10px; padding-bottom: 10px;
+    padding: 14px 0;
     border-top: 1px solid color-mix(in oklch, currentColor 10%, transparent);
   }
-  .ab-stack-list.is-lined li:first-child { padding-top: 0; border-top: none; }
-  .ab-stack-list.is-lined li:last-child { padding-bottom: 0; }
+  .ab-stack-list.is-lined li:nth-child(even) {
+    background: color-mix(in oklch, currentColor 6%, transparent);
+    margin-left: -16px; margin-right: -16px;
+    padding-left: 16px; padding-right: 16px;
+    border-radius: 6px;
+  }
+  .ab-stack-list.is-lined li:first-child { padding-top: 14px; border-top: none; }
+  .ab-stack-list.is-lined li:last-child { padding-bottom: 14px; }
   .ab-stack-list.is-compact li { font-size: 12px; line-height: 1.4; }
   .ab-stack-item-label {
     display: block; font-family: var(--mono); font-size: 10px;
@@ -2741,6 +2782,21 @@
   .ab-stack-narrative {
     font-family: var(--sans); font-size: 13px;
     line-height: 1.48; opacity: 0.86; margin: 0;
+  }
+  /* Responsive: reduce fan spread on narrow viewports to prevent cards escaping */
+  @media (max-width: 600px) {
+    .ab-stack {
+      --stack-tilt: 2.5deg;
+      --stack-peek: clamp(60px, 8vw, 94px);
+      margin-right: calc(var(--stack-peek) * 1.5);
+    }
+  }
+  @media (max-width: 400px) {
+    .ab-stack {
+      --stack-tilt: 2deg;
+      --stack-peek: 50px;
+      margin-right: var(--stack-peek);
+    }
   }
   .ab-stack-narrative a,
   .ab-stack-list a {
@@ -4133,13 +4189,18 @@
     margin: 0 12px 12px;
   }
   .cs-question {
-    font-family: var(--serif);
+    font-family: var(--serif-display);
     font-size: clamp(30px, 4vw, 44px);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0;
+    font-weight: 300;
+    font-variation-settings: 'opsz' 72;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
     color: var(--ink);
     margin-bottom: 14px;
+  }
+  [data-theme="dark"] .cs-question {
+    font-weight: 400;
+    letter-spacing: -0.005em;
   }
   .cs-copy {
     display: grid;
@@ -4937,7 +4998,7 @@
         </button>
       </div>
       <div class="page-actions topbar-social" id="topbarSocial">
-        <button class="topbar-social-btn topbar-email-btn" type="button" id="copyEmailBtn" data-copy-email="zahsan9@uw.edu" data-cursor-link="⧉ Copy email" aria-label="Copy email address zahsan9@uw.edu">
+        <button class="topbar-social-btn topbar-email-btn" type="button" id="copyEmailBtn" data-copy-email="zahsan9@uw.edu" data-cursor-link="⧉ copy email" aria-label="Copy email address zahsan9@uw.edu">
           <span class="email-glyphs" aria-hidden="true">
             <svg class="email-glyph email-glyph--idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="5.5" width="18" height="13" rx="2.2"/>
@@ -4957,10 +5018,10 @@
             </svg>
           </span>
         </button>
-        <a class="topbar-social-btn" aria-label="LinkedIn" data-cursor-link="↗ LinkedIn" href="https://www.linkedin.com/in/ahsanzainab" target="_blank" rel="noopener noreferrer">
+        <a class="topbar-social-btn" aria-label="LinkedIn" data-cursor-link="↗ linkedin" href="https://www.linkedin.com/in/ahsanzainab" target="_blank" rel="noopener noreferrer">
           <span class="social-glyph" aria-hidden="true">in</span>
         </a>
-        <a class="topbar-social-btn" aria-label="GitHub" data-cursor-link="↗ GitHub" href="https://github.com/zahsan9" target="_blank" rel="noopener noreferrer">
+        <a class="topbar-social-btn" aria-label="GitHub" data-cursor-link="↗ github" href="https://github.com/zahsan9" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M9 8 5 12l4 4M15 8l4 4-4 4"/>
           </svg>
@@ -5025,7 +5086,7 @@
           <article class="pin" data-cat="ux studio" data-page="crow" data-title="The CROW" data-year="2026" data-sub="WIIRED Studio, 2026" aria-label="Open the CROW journal redesign case study">
             <div class="art art-plum art-crow ar-45">
               <div class="pin-meta">Case Study</div>
-              <h3>The<br>CROW.</h3>
+              <h3>The<br>CROW</h3>
             </div>
           </article>
 
@@ -5035,7 +5096,7 @@
               <div class="contact-content">
                 <h3 class="social-intro">Find me elsewhere</h3>
                 <div class="social-tiles">
-                  <div class="social-tile social-tile--email" role="button" tabindex="0" aria-label="Copy email address zahsan9@uw.edu" data-cursor-link="⧉ Copy email" data-copy-email="zahsan9@uw.edu">
+                  <div class="social-tile social-tile--email" role="button" tabindex="0" aria-label="Copy email address zahsan9@uw.edu" data-cursor-link="⧉ copy email" data-copy-email="zahsan9@uw.edu">
                     <span class="email-glyphs" aria-hidden="true">
                     <svg class="email-glyph email-glyph--idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <rect x="3" y="5.5" width="18" height="13" rx="2.2"/>
@@ -5050,10 +5111,10 @@
                     </svg>
                     </span>
                   </div>
-                  <div class="social-tile" role="link" tabindex="0" aria-label="LinkedIn" data-cursor-link="↗ LinkedIn" data-href="https://www.linkedin.com/in/ahsanzainab">
+                  <div class="social-tile" role="link" tabindex="0" aria-label="LinkedIn" data-cursor-link="↗ linkedin" data-href="https://www.linkedin.com/in/ahsanzainab">
                     <span class="social-glyph" aria-hidden="true">in</span>
                   </div>
-                  <div class="social-tile" role="link" tabindex="0" aria-label="GitHub" data-cursor-link="↗ GitHub" data-href="https://github.com/zahsan9">
+                  <div class="social-tile" role="link" tabindex="0" aria-label="GitHub" data-cursor-link="↗ github" data-href="https://github.com/zahsan9">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <path d="M9 8 5 12l4 4M15 8l4 4-4 4"/>
                     </svg>
@@ -5108,7 +5169,7 @@
             <div class="art art-charcoal art-dreamcatcher ar-45">
               <div class="pin-meta">Case Study</div>
               <div class="dream-mark">
-                <h3>Dream<br>Catcher.</h3>
+                <h3>Dream<br>Catcher</h3>
                 <span class="dream-caption">FigBuild 2026</span>
               </div>
             </div>
@@ -5118,7 +5179,7 @@
           <article class="pin" data-cat="studio" data-page="wiired" data-title="WIIRED Studio." data-year="2026" data-cursor-label="Under construction" aria-label="WIIRED Studio, work in progress">
             <div class="art art-cream ar-1">
               <div class="pin-meta">WIP</div>
-              <h3 style="font-size:34px; margin-top:auto;">WIIRED<br><em style="font-style:italic;">Studio.</em></h3>
+              <h3 style="font-size:34px; margin-top:auto;">WIIRED<br><em style="font-style:italic;">Studio</em></h3>
             </div>
           </article>
         </div>
@@ -5169,7 +5230,7 @@
           <article class="pin" data-cat="misc" data-page="daily" data-title="Daily type &amp; motion" data-year="Ongoing" data-cursor-label="Under construction">
             <div class="art art-clay ar-45">
               <div class="pin-meta">WIP</div>
-              <h3 style="font-size:28px;">Daily type<br>&amp; motion.</h3>
+              <h3 style="font-size:28px;">Daily type<br>&amp; motion</h3>
             </div>
           </article>
         </div>
@@ -5198,27 +5259,29 @@
       <div class="ab-stack">
         <div class="ab-stack-card art-blue" role="button" tabindex="0">
           <div class="ab-stack-tab" aria-hidden="true"><span>Currently</span></div>
-          <div class="ab-stack-header">
-            <div class="ab-card-eyebrow" style="position:absolute;top:24px;right:24px;">Updated July 2026</div>
-            <div class="ab-stack-title">Currently.</div>
-            <ul class="ab-stack-list is-lined is-compact" style="margin-top:14px;gap:0;">
-              <li><span class="ab-stack-item-label">Building brew.</span>I'm designing and building <strong>brew.</strong>, a café discovery app for finding places based on what you actually need, whether that is somewhere quiet to work, good for photos, or worth trying for the coffee alone.</li>
-              <li><span class="ab-stack-item-label">Designing the experience</span>Features include personalized café recommendations, custom mug onboarding, maps and directions, saved lists for <em>want to go</em>, <em>been</em>, and <em>favorites</em>, plus reviews, profiles, and ways to see what friends are exploring.</li>
-              <li><span class="ab-stack-item-label">Interning at GoDaddy</span>I'm also interning in data analytics and storytelling at GoDaddy, working with SQL, Python, Redshift, QuickSight, and AI tools to automate pipelines for biweekly reporting and turn business data into clear, useful recommendations.</li>
-              <li><span class="ab-stack-item-label">& Building this portfolio</span>This portfolio has been another summer project in the making (and maybe my favorite): designed, coded, written, and probably adjusted one too many times until it finally felt like me.</li>
-            </ul>
+          <div class="ab-stack-header" style="display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;flex:1;">
+            <div class="ab-card-eyebrow" style="position:absolute;top:24px;right:24px;">Updated Sep 2026</div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding-top:32px;">
+              <img src="assets/images/brew-mug-icon.svg" alt="brew." style="width:88px;height:88px;opacity:0.95;filter:brightness(0) invert(1);object-fit:contain;object-position:center;">
+              <div style="max-width:440px;">
+                <div class="ab-stack-title" style="font-size:26px;margin-bottom:14px;">Currently Building <a href="#" data-open-case="brew" data-cursor-link="↗ brew. case study" style="text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;color:inherit;">Brew.</a></div>
+                <p style="font-size:14px;line-height:1.65;opacity:0.9;">For finding your third space—whether you need a quiet spot to work, a photo-worthy café, or just great coffee.</p>
+              </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:10px;opacity:0.85;justify-content:center;width:100%;max-width:440px;padding-bottom:24px;">
+              <span style="background:oklch(1 0 0 / 0.88);color:var(--c-blue);padding:5px 10px;border-radius:11px;">Personalized recommendations</span>
+              <span style="background:oklch(1 0 0 / 0.88);color:var(--c-blue);padding:5px 10px;border-radius:11px;">Custom mug onboarding</span>
+              <span style="background:oklch(1 0 0 / 0.88);color:var(--c-blue);padding:5px 10px;border-radius:11px;">Maps & directions</span>
+              <span style="background:oklch(1 0 0 / 0.88);color:var(--c-blue);padding:5px 10px;border-radius:11px;"><em>want to go</em> / <em>been</em> / <em>favorites</em></span>
+              <span style="background:oklch(1 0 0 / 0.88);color:var(--c-blue);padding:5px 10px;border-radius:11px;">Reviews & profiles</span>
+            </div>
           </div>
           <div class="ab-stack-body">
-            <div class="ab-stack-tags">
-              <span class="pill">Building Brew.</span>
-              <span class="pill">Data + Automation</span>
-              <span class="pill">Portfolio WIP</span>
-            </div>
           </div>
         </div>
 
         <div class="ab-stack-card art-charcoal" role="button" tabindex="0">
-          <div class="ab-stack-tab" aria-hidden="true"><span>About</span></div>
+          <div class="ab-stack-tab" aria-hidden="true"><span>About Me</span></div>
           <div class="ab-stack-header" style="flex:1;gap:0;position:relative;">
             <div class="ab-about-photo" style="position:absolute;top:-80px;right:-80px;width:348px;height:348px;border-radius:50%;overflow:hidden;">
               <img src="assets/images/about-me.jpg" alt="Zainab Ahsan" style="width:100%;height:100%;object-fit:cover;object-position:50% 18%;transform:scale(1.45);">
@@ -5266,7 +5329,7 @@
               <li><span class="ab-stack-item-label">Start with the idea</span>I use AI once I know what I am trying to make. The concept, product direction, and final decisions stay mine. AI helps me explore more possibilities and reach a working version faster.</li>
               <li><span class="ab-stack-item-label">Rapid prototype</span>I use <em>Figma Make</em> and <em>Claude Design</em> to turn rough ideas into testable interfaces quickly. This lets me pressure-test flows, interactions, and edge cases before polishing the wrong direction.</li>
               <li><span class="ab-stack-item-label">Build with AI</span><em>Claude Code</em> helps me move from mockup to real product, especially when I am scaffolding, debugging, or testing interactions that need actual state. I still review the logic, make the tradeoffs, and shape how the experience feels.</li>
-              <li><span class="ab-stack-item-label">Keep human judgment (!!)</span>I treat AI as a collaborator, not an autopilot. I question its output, rewrite anything generic, and keep only what supports the problem and the people I am designing for. Speed creates quickly, but care makes it worth keeping, and people can tell.</li>
+              <li><span class="ab-stack-item-label">Keep human judgment (!!)</span>I treat AI as a collaborator, not an autopilot. I question its output, rewrite anything generic, and keep only what supports the problem. Speed creates quickly, but care makes it worth keeping.</li>
             </ul>
           </div>
           <div class="ab-stack-body">
@@ -5318,7 +5381,7 @@
                 </ul>
                 <div class="place">Internship</div>
               </article>
-              <article class="exp-card art-sage exp-link-card" role="link" tabindex="0" aria-label="Open WIIRED Studio on Instagram" data-cursor-link="↗︎ @wiiredstudio" data-href="https://www.instagram.com/wiiredstudio/">
+              <article class="exp-card art-sage exp-link-card" role="link" tabindex="0" aria-label="Open WIIRED Studio on Instagram" data-cursor-link="↗ @wiiredstudio" data-href="https://www.instagram.com/wiiredstudio/">
                 <div class="exp-card-header">
                   <div class="yr">Apr 2026 – Present</div>
                 </div>
@@ -6269,7 +6332,7 @@
               <a class="cs-cta-btn" href="https://zahsan9.github.io/the-crow/" target="_blank" rel="noopener noreferrer">Try it out ↗</a>
             </div>
           </div>
-          <h2 class="cs-hero-title">The CROW.</h2>
+          <h2 class="cs-hero-title">The CROW</h2>
           <p class="cs-hero-sub">UW Bothell's student research journal, ten volumes and counting. The original site ran on generic template styling with no real identity and buried its submission rules in walls of text. WIIRED Studio rebuilt it end to end, from an unbranded template into a journal worth submitting to.</p>
           <div class="cs-hero-byline cs-crow-byline" aria-label="Project details">
             <span>Visual design + front-end build</span>
@@ -7104,6 +7167,7 @@
       playSheetRailEntry();
       sheetMeta.textContent = p.meta || '';
       setSheetLabel(key, srcEl, p);
+      updateSheetBackButton(); // Update back button when switching studies
       switchSheetTimer = setTimeout(() => {
         sheetBody.innerHTML = buildSheetHTML(p, srcEl);
         initializeIterationPlayers(sheetBody);
@@ -7127,6 +7191,7 @@
     sheetBody.innerHTML = buildSheetHTML(p, srcEl);
     initializeIterationPlayers(sheetBody);
     buildSheetToc();
+    updateSheetBackButton(); // Update back button based on source
     sheet.scrollTo({ top: 0, behavior: 'auto' });
     appEl.classList.remove('sheet-closing');
     appEl.classList.add('sheet-open');
@@ -7146,6 +7211,38 @@
       setTimeout(() => document.getElementById('sheetClose').focus({ preventScroll: true }), 80);
     });
   }
+  function updateSheetBackButton() {
+    const sheetClose = document.getElementById('sheetClose');
+    const sheetActions = document.querySelector('.sheet-actions');
+    const source = sheetOpenedFrom || 'feed';
+
+    // Update back button text
+    if (source === 'about') {
+      sheetClose.innerHTML = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>Back to About`;
+      sheetClose.setAttribute('aria-label', 'Back to About');
+
+      // Add secondary Work link if not already present
+      if (!document.getElementById('sheetWorkLink')) {
+        const workLink = document.createElement('button');
+        workLink.id = 'sheetWorkLink';
+        workLink.className = 'page-back sheet-work-link';
+        workLink.type = 'button';
+        workLink.innerHTML = 'Work';
+        workLink.addEventListener('click', () => {
+          closeSheet();
+          setRoute('feed');
+        });
+        sheetActions.appendChild(workLink);
+      }
+    } else {
+      sheetClose.innerHTML = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>Back to Work`;
+      sheetClose.setAttribute('aria-label', 'Back to Work');
+
+      // Remove secondary link if present
+      document.getElementById('sheetWorkLink')?.remove();
+    }
+  }
+
   function closeSheet() {
     if (!sheet.classList.contains('open') && !appEl.classList.contains('sheet-open')) return;
     clearTimeout(closeSheetTimer);
@@ -7154,6 +7251,7 @@
     sheetBody.style.opacity = '';
     clearSheetToc();
     const active = document.querySelector('.pin.pin-active');
+    const sourceRoute = sheetOpenedFrom || 'feed';
     requestAnimationFrame(() => {
       sheet.classList.remove('open');
       delete sheet.dataset.page;
@@ -7172,6 +7270,11 @@
       main.scrollTop = feedScrollBeforeOpen;
       lockFeedHeight();
       updateFeedScrollbar();
+      // Navigate back to source route
+      if (sourceRoute !== 'feed') {
+        setRoute(sourceRoute);
+      }
+      sheetOpenedFrom = null; // Reset
     });
     closeSheetTimer = setTimeout(() => {
       appEl.classList.remove('sheet-closing');
@@ -7193,9 +7296,9 @@
     const label = el.querySelector('h3, .title')?.textContent?.trim().replace(/\s+/g, ' ');
     if (label) el.setAttribute('aria-label', label);
     const isUnderConstruction = () => el.dataset.cursorLabel === 'Under construction';
-    el.addEventListener('click', () => { if (!isUnderConstruction()) openSheet(el.dataset.page, el); });
+    el.addEventListener('click', () => { if (!isUnderConstruction()) { sheetOpenedFrom = 'feed'; openSheet(el.dataset.page, el); } });
     el.addEventListener('keydown', e => {
-      if ((e.key === 'Enter' || e.key === ' ') && !isUnderConstruction()) { e.preventDefault(); openSheet(el.dataset.page, el); }
+      if ((e.key === 'Enter' || e.key === ' ') && !isUnderConstruction()) { e.preventDefault(); sheetOpenedFrom = 'feed'; openSheet(el.dataset.page, el); }
     });
   });
 
@@ -7231,53 +7334,42 @@
     let aboutOrder = [1, 2, 3, 0];
     let aboutStackBusy = false;
     let aboutStackMetrics = null;
-    let aboutHoverLeaveTimer = null;
-    let aboutHoverSwitchTimer = null;
     let aboutHoveredCard = null;
-    let aboutPendingCard = null;
     let aboutMotionTimers = [];
+    let lastSelectTime = 0;
+    const MIN_SELECT_INTERVAL = 100; // Prevent spam clicks
 
-    const ABOUT_HOVER = {
-      leaveDelay:  70,  // grace period before a card drops hover once the pointer is fully off the deck
-      switchDelay: 90,  // dwell time required to hand hover to a *different* card off the same seam
-    };
+    // Direct hover tracking using RAF-batched mousemove for seamless gliding.
+    // No debouncing, no timers - just track which card the pointer is actually over.
+    let hoverCheckFrame = 0;
+    let lastMouseX = -9999;
+    let lastMouseY = -9999;
 
-    // Fanned cards are overlapping rotated rectangles, so adjacent tabs meet along a
-    // near-vertical seam. Hit-testing at any single pixel is unambiguous, but natural
-    // mouse jitter straddling that seam still fires real, alternating enter/leave pairs
-    // on two different cards — each one restarting the lift animation, which reads as
-    // the deck "not knowing" which card is meant. Committing a hand-off to a new card
-    // only after it wins a short dwell (aboutHoverSwitchTimer) absorbs that jitter; the
-    // very first hover onto an empty deck still commits instantly so entry stays snappy.
-    function commitAboutHover(card) {
-      if (aboutHoverLeaveTimer) { clearTimeout(aboutHoverLeaveTimer); aboutHoverLeaveTimer = null; }
-      if (aboutHoverSwitchTimer) { clearTimeout(aboutHoverSwitchTimer); aboutHoverSwitchTimer = null; }
-      aboutPendingCard = null;
-      if (aboutHoveredCard === card) return;
-      aboutCards.forEach(c => c.classList.toggle('is-hovered', c === card));
-      aboutHoveredCard = card;
-    }
-
-    function setAboutHovered(card) {
-      if (aboutHoverLeaveTimer) { clearTimeout(aboutHoverLeaveTimer); aboutHoverLeaveTimer = null; }
-
-      if (card === aboutHoveredCard) {
-        aboutPendingCard = null;
-        if (aboutHoverSwitchTimer) { clearTimeout(aboutHoverSwitchTimer); aboutHoverSwitchTimer = null; }
+    function updateHoveredCard() {
+      hoverCheckFrame = 0;
+      if (aboutStackBusy) {
+        // Don't update hover during selection animation
         return;
       }
-      if (!card || !aboutHoveredCard) {
-        // clearing entirely, or the deck was idle — nothing to debounce against
-        commitAboutHover(card);
-        return;
+
+      // Find which card the pointer is actually over using elementFromPoint
+      const target = document.elementFromPoint(lastMouseX, lastMouseY);
+      const hoveredCard = target?.closest('.ab-stack-card');
+
+      // Only non-front cards can be hovered
+      const validHover = hoveredCard && !hoveredCard.classList.contains('is-front')
+                         && aboutCards.includes(hoveredCard);
+
+      const newHoveredCard = validHover ? hoveredCard : null;
+
+      // Update if changed
+      if (aboutHoveredCard !== newHoveredCard) {
+        aboutCards.forEach(c => c.classList.remove('is-hovered'));
+        if (newHoveredCard) {
+          newHoveredCard.classList.add('is-hovered');
+        }
+        aboutHoveredCard = newHoveredCard;
       }
-      if (aboutPendingCard === card) return;
-      aboutPendingCard = card;
-      if (aboutHoverSwitchTimer) clearTimeout(aboutHoverSwitchTimer);
-      aboutHoverSwitchTimer = setTimeout(() => {
-        aboutHoverSwitchTimer = null;
-        if (aboutPendingCard === card) commitAboutHover(card);
-      }, ABOUT_HOVER.switchDelay);
     }
 
     function measureAboutStack() {
@@ -7322,6 +7414,11 @@
     }
 
     function selectAboutCard(index) {
+      // Throttle rapid selections to prevent animation pile-up
+      const now = Date.now();
+      if (now - lastSelectTime < MIN_SELECT_INTERVAL) return;
+      lastSelectTime = now;
+
       // A new choice always wins: finish any intro/selection at its current
       // logical order, then immediately retarget the deck to the latest card.
       if (aboutStackBusy) {
@@ -7343,7 +7440,9 @@
 
       aboutStackBusy = true;
       aboutStackMetrics = measureAboutStack();
-      setAboutHovered(null);
+      // Clear hover state during animation
+      aboutCards.forEach(c => c.classList.remove('is-hovered'));
+      aboutHoveredCard = null;
       const card = aboutCards[index];
       const depth = aboutOrder.indexOf(index);
       const angle = depth * aboutStackMetrics.tilt;
@@ -7370,18 +7469,30 @@
     }
 
     aboutCards.forEach((card, index) => {
-      card.addEventListener('click', () => selectAboutCard(index));
-      card.addEventListener('mouseenter', () => {
-        if (aboutStackBusy || card.classList.contains('is-front')) return;
-        setAboutHovered(card);
-      });
-      card.addEventListener('mouseleave', () => {
-        if (aboutPendingCard === card) {
-          // pointer bounced off before the switch-in dwell committed — just drop the candidate
-          if (aboutHoverSwitchTimer) { clearTimeout(aboutHoverSwitchTimer); aboutHoverSwitchTimer = null; }
-          aboutPendingCard = null;
+      // Unified handler for click and touch - prevents double-fire on touch devices
+      const handleActivation = (e) => {
+        // Don't interfere with drag gestures
+        if (e.type === 'touchend' && card._touchMoved) {
+          card._touchMoved = false;
+          return;
         }
-      });
+        selectAboutCard(index);
+      };
+
+      card.addEventListener('click', handleActivation);
+
+      // Touch handling for mobile
+      card.addEventListener('touchstart', () => {
+        card._touchMoved = false;
+        card._touchStartTime = Date.now();
+      }, { passive: true });
+
+      card.addEventListener('touchmove', () => {
+        card._touchMoved = true;
+      }, { passive: true });
+
+      card.addEventListener('touchend', handleActivation);
+
       card.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -7390,24 +7501,24 @@
       });
     });
 
-    // "Pointer left the deck" is decided by the container, not any one card. A
-    // per-card check here previously caused a stuck-hover bug: hover A, glance
-    // toward B (which cancels A's leave grace so B can contend for the dwell),
-    // then leave from B before B's dwell commits — B's mouseleave doesn't match
-    // A (the still-committed card), so nothing was scheduled and A stayed lifted
-    // forever. mouseleave on .ab-stack itself only fires once the pointer exits
-    // every descendant (including the overflowing fanned tabs), so it can't be
-    // fooled by a handoff between two child cards the way a per-card check can.
-    aboutStack.addEventListener('mouseleave', () => {
-      if (aboutHoverLeaveTimer) clearTimeout(aboutHoverLeaveTimer);
-      aboutHoverLeaveTimer = setTimeout(() => {
-        aboutHoverLeaveTimer = null;
-        commitAboutHover(null);
-      }, ABOUT_HOVER.leaveDelay);
-    });
-    aboutStack.addEventListener('mouseenter', () => {
-      if (aboutHoverLeaveTimer) { clearTimeout(aboutHoverLeaveTimer); aboutHoverLeaveTimer = null; }
-    });
+    // Use mousemove on container for seamless hover tracking (hover: hover devices only)
+    if (window.matchMedia('(hover: hover)').matches) {
+      aboutStack.addEventListener('mousemove', (e) => {
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        if (!hoverCheckFrame) {
+          hoverCheckFrame = requestAnimationFrame(updateHoveredCard);
+        }
+      });
+
+      aboutStack.addEventListener('mouseleave', () => {
+        lastMouseX = -9999;
+        lastMouseY = -9999;
+        if (!hoverCheckFrame) {
+          hoverCheckFrame = requestAnimationFrame(updateHoveredCard);
+        }
+      });
+    }
 
     renderAboutStack();
     reducedMotionQuery.addEventListener('change', event => {
@@ -7447,8 +7558,18 @@
         aboutMotionTimers = [];
       }, totalMs));
     };
+    let resizeTimer;
     window.addEventListener('resize', () => {
-      refreshAboutStack();
+      // Debounce resize to avoid thrashing during window drag
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        // If animating, force-finish then remeasure with new dimensions
+        if (aboutStackBusy) {
+          finishAboutMotion();
+          void aboutStack.offsetWidth;
+        }
+        refreshAboutStack();
+      }, 150);
     });
   }
 
@@ -7887,8 +8008,12 @@ const expScroll   = document.getElementById('expScroll');
       const fromRight = Math.min(Math.max((rightStart - rect.left) / Math.max(1, rightStart - rightEnd), 0), 1);
       const fromLeft = Math.min(Math.max((rect.right - leftStart) / Math.max(1, leftEnd - leftStart), 0), 1);
       const t = Math.min(fromRight, fromLeft);
-      const eased = t * t * (3 - 2 * t);
+      // Smoother easing with less aggressive smoothstep
+      const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
       card.style.setProperty('--scroll-reveal-opacity', String(eased));
+      // Add subtle Y movement as card fades in
+      const yOffset = 20 * (1 - eased);
+      card.style.setProperty('--scroll-reveal-y', yOffset.toFixed(1) + 'px');
     });
   }
 
@@ -8020,12 +8145,22 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
   });
   // Inline case-study mentions in prose (e.g. About's "How I work" narrative) —
   // jump to Feed, then open the referenced sheet once the route settles.
+  let sheetOpenedFrom = null; // Track where the sheet was opened from
   document.querySelectorAll('[data-open-case]').forEach(link => {
     link.addEventListener('click', e => {
       e.preventDefault();
       const key = link.dataset.openCase;
-      setRoute('feed');
-      setTimeout(() => openSheet(key), motionDelay(ROUTE_TIMING.fadeOut + 80));
+      // Remember current route before opening
+      const activePage = document.querySelector('.page.is-active');
+      if (activePage?.id === 'aboutView') {
+        sheetOpenedFrom = 'about';
+      } else if (activePage?.id === 'expView') {
+        sheetOpenedFrom = 'experience';
+      } else {
+        sheetOpenedFrom = 'feed';
+      }
+      // Open directly without routing to feed first
+      openSheet(key);
     });
   });
   document.getElementById('logoBtn').addEventListener('click', () => { closeSheet(); setRoute('feed'); });
@@ -8195,15 +8330,15 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     const pills = Array.from(cloud.querySelectorAll('.skill-pill'));
     const state = pills.map(() => ({ ox: 0, oy: 0, vx: 0, vy: 0, homeX: 0, homeY: 0, w: 0, h: 0 }));
 
-    /* Repulsion + return spring — the only place these values live */
+    /* Repulsion + return spring — tuned for premium, slower feel */
     const PHYSICS = {
-      repelRadius: 100,        // px — how close the cursor must be to push a pill
-      maxPush: 30,             // px — furthest a pill gets shoved from its rest spot
-      springK: 0.05,           // gentler pull gives the pills a slower, weightier response
-      damping: 0.8,            // stronger velocity decay removes excess spring overshoot
+      repelRadius: 120,        // px — larger zone for earlier, more graceful response
+      maxPush: 38,             // px — more dramatic displacement
+      springK: 0.028,          // much softer spring = slower, weightier return
+      damping: 0.88,           // higher damping = less bounce, more controlled
       collisionIterations: 3,  // separation passes per frame for stable packing
-      collisionDamp: 0.45,     // softer collisions keep neighboring pills from bouncing
-      sleepEps: 0.05,          // px — below this, treat a pill as at rest
+      collisionDamp: 0.38,     // very soft collisions = gentle, luxurious interactions
+      sleepEps: 0.08,          // slightly higher threshold for quicker sleep
     };
 
     let mouseX = null, mouseY = null;
