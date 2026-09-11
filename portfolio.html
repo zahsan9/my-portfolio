@@ -400,11 +400,48 @@
      the only thing that moves, so they return the way they left. --rail-nav-top
      is where they rest statically, so the hand-off back to flow is a no-op:
      .sheet-closing outlives the slide (264ms against 540) and by then the
-     index is at zero height and the pin already matches the flow position. */
+     index is at zero height and the pin already matches the flow position.
+
+     pointer-events: none for the same reason. .app.sheet-open .rail-nav
+     carries it, but that rule stops applying the instant .sheet-open is
+     removed — the same frame .sheet-closing is added — and this rule never
+     restated it, so the routes were clickable and, worse, HOVERABLE the
+     moment they reached their resting position, well before the close had
+     actually finished. If the cursor closed the sheet from on the rail — the
+     one case that's expanded and worth closing cleanly — it was already
+     sitting where a route was about to land, so the bare, always-on
+     `.rail:has(.rail-nav:hover) { width: 168px }` a few rules up fired mid
+     -collapse and pulled the rail back out to 168px instead of letting it
+     finish at compact. Closing from anywhere else on the page never hit
+     this, which is what made it look like two different closing mechanisms
+     rather than one with a leak.
+
+     The transform/opacity factors are .app.sheet-open .rail-nav's OWN
+     tuck-away factors (0.62 / 0.5), not the base rule's 0.55 / 0.45 — closing
+     is the tuck, played backwards, so it takes the tuck's own numbers rather
+     than a separately-tuned pair that happened to look similar. That match
+     is also what fixes the other half of why the close used to read as
+     messy: the routes arriving were finishing well before the index — which
+     is fading out of the exact same rectangle, both pinned to
+     --rail-nav-top — had gotten out of the way, so fully-opaque route
+     glyphs sat over a still-visible index for the back half of the close
+     (.rail-btn has no background except on the active route, so nothing
+     masked the overlap). Two changes fix it together, not either alone:
+     matching these factors keeps the routes arriving at the tuck's own
+     pace, and .app.sheet-closing .rail-index-item (below) reverses the
+     index's own entrance stagger so the rows are actually gone, in roughly
+     the same window, rather than fading in place for the full close. */
   .app.sheet-closing .rail-nav {
     position: absolute;
     top: var(--rail-nav-top);
     left: 0; right: 0;
+    pointer-events: none;
+    transition:
+      max-height var(--rail-motion) var(--rail-ease),
+      padding var(--rail-motion) var(--rail-ease),
+      transform calc(var(--rail-motion) * 0.62) var(--rail-ease),
+      opacity calc(var(--rail-motion) * 0.5) var(--rail-ease),
+      visibility 0s;
   }
   /* The index needs the identical pin, for the identical reason. Its rows
      already animate back out to the right on their own transform, but while
@@ -642,6 +679,37 @@
     transition-delay: 0s, 0s,
       calc(140ms + var(--i, 0) * 22ms), calc(140ms + var(--i, 0) * 22ms),
       0s, 0s, 0s;
+  }
+  /* Closing runs that cascade backwards: the row that arrived LAST (highest
+     --i) is the first to leave, the row that arrived FIRST (--i: 0) is the
+     last — reversing the stagger, not just reverting the opacity, is what
+     makes the close read as the open played backwards instead of a
+     differently-choreographed fade. --n (row count, set alongside --i in
+     buildRailIndex) is what makes that reversal possible — a per-row --i
+     alone has no idea how many rows there are to count down from.
+
+     Both numbers are deliberately NOT the entrance's own 140ms/22ms/
+     --rail-item-motion: closing runs on the panel's clock (--rail-motion
+     retimed to --motion-slow by .sheet-closing), a fixed 480ms envelope,
+     while the entrance's cascade has no such ceiling and can take however
+     long 140ms plus up to a dozen rows at 22ms each adds up to. Reversing
+     that exact spacing into a fixed envelope would push early-arriving rows
+     well past when the routes have already finished arriving — the same
+     overlap this whole thing exists to avoid, just moved to a different row.
+     14ms and half of --rail-item-motion keep the whole cascade, worst case,
+     comfortably inside the envelope: this is the same reversal in shape, not
+     in exact timing. */
+  .app.sheet-closing .rail-index-item {
+    transition-delay: 0s, 0s,
+      calc((var(--n, 1) - 1 - var(--i, 0)) * 14ms),
+      calc((var(--n, 1) - 1 - var(--i, 0)) * 14ms),
+      0s, 0s, 0s;
+    transition-duration: var(--motion-fast), var(--motion-fast),
+      calc(var(--rail-item-motion) * 0.5), calc(var(--rail-item-motion) * 0.5),
+      var(--rail-motion), var(--rail-motion), var(--rail-motion);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .app.sheet-closing .rail-index-item { transition-delay: 0s; }
   }
   /* A repeat row unfolding on hover is part of the same move as everything
      else, so it drops the per-item entry stagger the open storyboard sets —
@@ -2090,16 +2158,6 @@
   }
   .sheet-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-mid); text-transform: uppercase; letter-spacing: 0.08em; }
   .sheet-actions { display: flex; gap: 12px; align-items: center; }
-  .sheet-work-link {
-    font-family: var(--sans); font-size: 13px; font-weight: 500;
-    color: var(--ink-mid); opacity: 0.85;
-    background: none; border: none; padding: 0; cursor: pointer;
-    text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
-    transition: color 0.15s, opacity 0.15s;
-  }
-  .sheet-work-link:hover, .sheet-work-link:focus-visible {
-    color: var(--ink); opacity: 1;
-  }
   /* .sheet-close is .page-back and nothing more at rest (see Header pills):
      the same transparent pill About and Experience use, so every Back to Work
      on the site is one control. It carried a hairline for a while to separate
@@ -7213,33 +7271,15 @@
   }
   function updateSheetBackButton() {
     const sheetClose = document.getElementById('sheetClose');
-    const sheetActions = document.querySelector('.sheet-actions');
     const source = sheetOpenedFrom || 'feed';
 
     // Update back button text
     if (source === 'about') {
       sheetClose.innerHTML = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>Back to About`;
       sheetClose.setAttribute('aria-label', 'Back to About');
-
-      // Add secondary Work link if not already present
-      if (!document.getElementById('sheetWorkLink')) {
-        const workLink = document.createElement('button');
-        workLink.id = 'sheetWorkLink';
-        workLink.className = 'page-back sheet-work-link';
-        workLink.type = 'button';
-        workLink.innerHTML = 'Work';
-        workLink.addEventListener('click', () => {
-          closeSheet();
-          setRoute('feed');
-        });
-        sheetActions.appendChild(workLink);
-      }
     } else {
       sheetClose.innerHTML = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>Back to Work`;
       sheetClose.setAttribute('aria-label', 'Back to Work');
-
-      // Remove secondary link if present
-      document.getElementById('sheetWorkLink')?.remove();
     }
   }
 
@@ -7703,8 +7743,15 @@
       group.forEach(pin => section.appendChild(buildRailIndexItem(pin, cat)));
       railIndex.appendChild(section);
     });
-    railIndex.querySelectorAll('.rail-index-item')
-      .forEach((item, i) => item.style.setProperty('--i', i));
+    const indexItems = railIndex.querySelectorAll('.rail-index-item');
+    // --n alongside --i: closing runs the entrance stagger backwards (last
+    // row in is first row out), which needs the row count, not just each
+    // row's own position, to compute from. See .app.sheet-closing
+    // .rail-index-item.
+    indexItems.forEach((item, i) => {
+      item.style.setProperty('--i', i);
+      item.style.setProperty('--n', indexItems.length);
+    });
     // Sets which entry represents each project in the compact stack.
     syncRailIndex(null);
   }
@@ -8150,15 +8197,18 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     link.addEventListener('click', e => {
       e.preventDefault();
       const key = link.dataset.openCase;
-      // Remember current route before opening
-      const activePage = document.querySelector('.page.is-active');
-      if (activePage?.id === 'aboutView') {
-        sheetOpenedFrom = 'about';
-      } else if (activePage?.id === 'expView') {
-        sheetOpenedFrom = 'experience';
-      } else {
-        sheetOpenedFrom = 'feed';
-      }
+      // Remember current route before opening. This used to re-derive it by
+      // querying for `.page.is-active` — a class that doesn't exist anywhere
+      // in this file; a .page's active state is plain `.active` (set by
+      // setRoute() below), so that query always returned null and this
+      // silently fell to the 'feed' branch every time, regardless of where
+      // the link actually was. currentRouteName is the same state setRoute()
+      // already tracks for itself, so reading it directly can't drift from
+      // what route is actually showing the way re-deriving it from a wrong
+      // selector did.
+      sheetOpenedFrom = currentRouteName === 'about' ? 'about'
+        : currentRouteName === 'experience' ? 'experience'
+        : 'feed';
       // Open directly without routing to feed first
       openSheet(key);
     });
