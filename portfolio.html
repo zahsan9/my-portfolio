@@ -3286,6 +3286,7 @@
   /* Keep the previous screenshot opaque underneath the incoming frame:
      no scale, slide, or dip through the black phone background. */
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-slide {
+    object-fit: contain;
     transform: none;
     transition: opacity var(--flow-image-fade) linear;
     z-index: 0;
@@ -4575,7 +4576,10 @@
     .sheet[data-page="brew"] .cs-decision-block { padding: 20px; }
     .sheet[data-page="brew"] .cs-iteration-player {
       grid-template-columns: 1fr;
-      padding-top: 58px;
+      padding: 58px 0 20px;
+    }
+    .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-copy h3 {
+      max-width: none;
     }
     .sheet[data-page="brew"] .cs-flow-track.is-pinned .cs-scroll-flow {
       gap: 18px;
@@ -7283,14 +7287,14 @@
       if (destroyed) return;
       distance = 0;
       track.style.height = '';
-      track.classList.toggle('is-pinned', !prefersReducedMotion());
-      if (prefersReducedMotion()) return;
+      const stacked = matchMedia('(max-width: 720px)').matches;
+      track.classList.toggle('is-pinned', !prefersReducedMotion() && !stacked);
+      if (prefersReducedMotion() || stacked) return;
       const headerHeight = sheet.querySelector('.sheet-head').getBoundingClientRect().height;
       const available = sheet.clientHeight - headerHeight - FLOW_SCROLL.edgeGap * 2;
       const style = getComputedStyle(player);
-      const stacked = matchMedia('(max-width: 720px)').matches;
       const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
-      const imageHeight = available - padding - (stacked ? copy.offsetHeight + parseFloat(style.rowGap) : 0);
+      const imageHeight = available - padding;
       if (imageHeight < FLOW_SCROLL.minImageHeight) {
         track.classList.remove('is-pinned');
         return;
