@@ -3259,13 +3259,16 @@
     content: '−';
     color: var(--brew-negative);
   }
+  @keyframes brew-flow-title-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
   /* Flow captions share one text edge and reserve the tallest step's space. */
   .sheet[data-page="brew"] .cs-scroll-flow {
     --flow-image-fade: 180ms;
-    --flow-copy-out: 100ms;
-    --flow-copy-in: 260ms;
-    --flow-copy-overlap: 60ms;
-    --flow-copy-shift: 4px;
+    --flow-copy-out: 140ms;
+    --flow-copy-in: 180ms;
+    --flow-copy-overlap: 0ms;
     --flow-copy-ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
   .sheet[data-page="brew"] .cs-flow-track { margin-bottom: 28px; }
@@ -3298,9 +3301,18 @@
   }
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-copy h3 {
     max-width: 18ch;
+    min-height: 2.3em;
     line-height: 1.15;
     text-wrap: balance;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
+  .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-copy h3[data-iteration-title].is-changing {
+    animation: brew-flow-title-fade var(--flow-copy-in) ease-out both;
+  }
+  .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-note h4 { display: none; }
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-controls {
     flex-wrap: wrap;
     align-items: center;
@@ -3312,7 +3324,7 @@
     height: 20px;
     border-color: transparent;
     background: transparent;
-    color: var(--ink);
+    color: oklch(0.44 0.012 70);
     font-size: 0;
   }
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-control::before {
@@ -3324,12 +3336,11 @@
     border-radius: 50%;
     background: currentColor;
     opacity: 1;
-    transition: width var(--motion-fast) ease, background var(--motion-fast) ease, opacity var(--motion-fast) ease;
+    transition: background var(--motion-fast) ease;
   }
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-control[aria-pressed="true"]::before {
-    width: 14px;
+    width: 6px;
     height: 6px;
-    border-radius: 999px;
     background: var(--brew-cream);
     opacity: 1;
   }
@@ -3354,33 +3365,28 @@
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-note {
     display: block;
     grid-area: 1 / 1;
-    visibility: hidden;
+    visibility: visible;
     opacity: 0;
-    transform: translateY(var(--flow-copy-shift));
-    transition: none;
+    transform: none;
+    transition: opacity var(--flow-copy-in) ease-out;
     pointer-events: none;
   }
-  /* Caption handoff: 0–100ms the previous thought clears; at 60ms
-     the new heading and bullets settle together over 260ms. Keep the
-     shared grid's height fixed and let rapid input replace the transition. */
+  /* Caption handoff: keep every note mounted in the same grid slot and
+     crossfade opacity so rapid scroll never produces a blank gap. */
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-note.is-leaving {
-    transform: translateY(calc(var(--flow-copy-shift) * -1));
-    transition:
-      opacity var(--flow-copy-out) ease-out,
-      transform var(--flow-copy-out) ease-out,
-      visibility 0s linear var(--flow-copy-out);
+    transform: none;
+    transition: opacity var(--flow-copy-out) ease-out;
   }
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-note.is-active {
-    visibility: visible;
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
     pointer-events: auto;
-    transition:
-      opacity var(--flow-copy-in) var(--flow-copy-ease) var(--flow-copy-overlap),
-      transform var(--flow-copy-in) var(--flow-copy-ease) var(--flow-copy-overlap),
-      visibility 0s;
+    transition: opacity var(--flow-copy-in) var(--flow-copy-ease);
   }
   @media (prefers-reduced-motion: reduce) {
+    .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-copy h3[data-iteration-title].is-changing {
+      animation: none;
+    }
     .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-note,
     .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-note.is-active,
     .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-note.is-leaving {
@@ -5955,7 +5961,7 @@
             </div>
             <div class="cs-iteration-copy">
               <div class="cs-iteration-eyebrow">Reviews + ratings</div>
-              <h3>One composer for comments and reviews</h3>
+              <h3 data-iteration-title>Keep feedback close to the cafe</h3>
               <div class="cs-iteration-controls" role="group" aria-label="Choose a step in the review flow">
                 <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show step 1 of the review flow">1</button>
                 <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show step 2 of the review flow">2</button>
@@ -6039,7 +6045,7 @@
             </div>
             <div class="cs-iteration-copy">
               <div class="cs-iteration-eyebrow">Directions</div>
-              <h3>Choose how to get there</h3>
+              <h3 data-iteration-title>Choose how to get there</h3>
               <div class="cs-iteration-controls" role="group" aria-label="Choose a step in the directions flow">
                 <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show step 1 of the directions flow">1</button>
                 <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show step 2 of the directions flow">2</button>
@@ -6086,7 +6092,7 @@
             </div>
             <div class="cs-iteration-copy">
               <div class="cs-iteration-eyebrow">Save</div>
-              <h3>Save for now, update after a visit</h3>
+              <h3 data-iteration-title>Save for now, update after a visit</h3>
               <div class="cs-iteration-controls" role="group" aria-label="Choose a step in the save flow">
                 <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show step 1 of the save flow">1</button>
                 <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show step 2 of the save flow">2</button>
@@ -7203,11 +7209,11 @@
     const controls = [...player.querySelectorAll('[data-iteration-control]')];
     const slides = [...player.querySelectorAll('[data-iteration-slide]')];
     const notes = [...player.querySelectorAll('[data-iteration-note]')];
+    const title = player.querySelector('[data-iteration-title]');
     const boundedIndex = Math.max(0, Math.min(controls.length - 1, Number(nextIndex)));
     const previousIndex = Number(player.dataset.activeIteration ?? boundedIndex);
     if (previousIndex !== boundedIndex && player.classList.contains('cs-scroll-flow')) {
       slides.forEach((slide, index) => slide.classList.toggle('is-previous', index === previousIndex));
-      player.style.setProperty('--flow-copy-shift', boundedIndex > previousIndex ? '4px' : '-4px');
       notes.forEach((note, index) => note.classList.toggle('is-leaving', index === previousIndex));
     }
 
@@ -7225,6 +7231,16 @@
       note.classList.toggle('is-active', index === boundedIndex);
       note.setAttribute('aria-hidden', String(index !== boundedIndex));
     });
+    const nextTitle = notes[boundedIndex]?.querySelector('h4')?.textContent.trim();
+    if (title && nextTitle && title.textContent.trim() !== nextTitle) {
+      const animateTitle = player.dataset.activeIteration !== undefined;
+      title.textContent = nextTitle;
+      if (animateTitle) {
+        title.classList.remove('is-changing');
+        void title.offsetWidth;
+        title.classList.add('is-changing');
+      }
+    }
     player.dataset.activeIteration = String(boundedIndex);
     if (moveFocus) controls[boundedIndex]?.focus({ preventScroll: true });
   }
