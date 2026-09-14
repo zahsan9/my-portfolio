@@ -200,10 +200,8 @@
   .app.sheet-open .main { overflow: hidden; }
   .main {
     height: 100vh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
-    /* Without this, Chrome's scroll-anchoring silently nudges scrollTop to
-       compensate whenever a card's hover-expanded .sub changes layout height
-       near the scroll boundary — visible as every card jumping on hover when
-       scrolled to the bottom of the feed. */
+    /* Keep the feed's scroll position stable while card visibility and filter
+       states change near the scroll boundary. */
     overflow-anchor: none;
   }
   .main::-webkit-scrollbar { display: none; }
@@ -1139,9 +1137,8 @@
     margin: 0 auto;
     display: flex; gap: var(--card-gap);
     /* Extra bottom room gives lockFeedHeight() (see the Filter + FLIP script
-       section) headroom: it pins .feed to a fixed height at rest so a card's
-       hover .sub growth (~22px) can push the card below it without ever
-       growing .feed's own box and bouncing the in-flow copyright footer. */
+       section) headroom while filter states settle without crowding the
+       in-flow copyright footer. */
     padding: 8px 0 120px;
   }
   .feed-col {
@@ -1217,31 +1214,6 @@
     transform: translateY(-2px);
     transition-duration: 120ms;
   }
-  .pin .sub {
-    display: block; max-height: 0; margin-top: 0; padding-left: 24px; overflow: hidden;
-    font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em;
-    color: var(--sub-color); opacity: 0; white-space: nowrap;
-    text-overflow: ellipsis; pointer-events: none;
-    transition: max-height 0.22s var(--ease-out), margin-top 0.22s var(--ease-out), opacity 0.18s ease;
-  }
-  .feed:not(.has-open) .pin:hover .sub,
-  .feed:not(.has-open) .pin:focus-visible .sub { max-height: 13px; margin-top: 6px; opacity: 1; }
-
-  /* A pin directly above a static component keeps its own hover subtitle,
-     but as an overlay instead of an in-flow block, so revealing it never
-     pushes the component below out of place — components stay fully static
-     regardless of what's hovered around them. */
-  .pin[data-page]:has(+ .pin:not([data-page])) .sub {
-    position: absolute; left: 0; top: 100%; margin-top: 6px;
-    max-height: none; overflow: visible;
-    transform: translateY(-4px);
-    transition: opacity 0.18s ease, transform 0.22s var(--ease-out);
-  }
-  .feed:not(.has-open) .pin[data-page]:has(+ .pin:not([data-page])):hover .sub,
-  .feed:not(.has-open) .pin[data-page]:has(+ .pin:not([data-page])):focus-visible .sub {
-    transform: translateY(0);
-  }
-
   /* Aspect ratios */
   .ar-1  { aspect-ratio: 1; }
   .ar-45 { aspect-ratio: 4 / 5; }
@@ -5307,7 +5279,7 @@
 
         <div class="feed-col">
           <!-- brew. -->
-          <article class="pin" data-cat="ux swe" data-page="brew" data-title="brew." data-year="2026" data-sub="SWE &amp; Product / UX, Currently" aria-label="Open the brew product case study">
+          <article class="pin" data-cat="ux swe" data-page="brew" data-title="brew." data-year="2026" aria-label="Open the brew product case study">
             <div class="art art-cream art-brew ar-45">
               <div class="pin-meta">Case Study</div>
               <img class="brew-illustration" src="assets/images/brew-mug-icon.svg" alt="">
@@ -5319,7 +5291,7 @@
           </article>
 
           <!-- The CROW redesign -->
-          <article class="pin" data-cat="ux studio" data-page="crow" data-title="The CROW" data-year="2026" data-sub="WIIRED Studio, 2026" aria-label="Open the CROW journal redesign case study">
+          <article class="pin" data-cat="ux studio" data-page="crow" data-title="The CROW" data-year="2026" aria-label="Open the CROW journal redesign case study">
             <div class="art art-plum art-crow ar-45">
               <div class="pin-meta">Case Study</div>
               <h3>The<br>CROW</h3>
@@ -5401,7 +5373,7 @@
           </article>
 
           <!-- DreamCatcher -->
-          <article class="pin" data-cat="ux" data-page="dreamcatcher" data-title="DreamCatcher" data-year="2026" data-sub="Product / UX, FigBuild 2026" aria-label="Open the DreamCatcher product case study">
+          <article class="pin" data-cat="ux" data-page="dreamcatcher" data-title="DreamCatcher" data-year="2026" aria-label="Open the DreamCatcher product case study">
             <div class="art art-charcoal art-dreamcatcher ar-45">
               <div class="pin-meta">Case Study</div>
               <div class="dream-mark">
@@ -5452,7 +5424,7 @@
           </article>
 
           <!-- Habitat -->
-          <article class="pin" data-cat="ux swe" data-page="habitat" data-title="Habitat" data-year="2026" data-sub="Product / UX &amp; SWE, Hackathon 2026" aria-label="Open the Habitat habit-tracker case study">
+          <article class="pin" data-cat="ux swe" data-page="habitat" data-title="Habitat" data-year="2026" aria-label="Open the Habitat habit-tracker case study">
             <div class="art art-blue art-habitat ar-45">
               <div class="pin-meta">Case Study</div>
               <div class="habitat-mark">
@@ -7288,13 +7260,13 @@
       distance = 0;
       track.style.height = '';
       const stacked = matchMedia('(max-width: 720px)').matches;
-      track.classList.toggle('is-pinned', !prefersReducedMotion() && !stacked);
-      if (prefersReducedMotion() || stacked) return;
+      track.classList.toggle('is-pinned', !prefersReducedMotion());
+      if (prefersReducedMotion()) return;
       const headerHeight = sheet.querySelector('.sheet-head').getBoundingClientRect().height;
       const available = sheet.clientHeight - headerHeight - FLOW_SCROLL.edgeGap * 2;
       const style = getComputedStyle(player);
       const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
-      const imageHeight = available - padding;
+      const imageHeight = available - padding - (stacked ? copy.offsetHeight + parseFloat(style.rowGap) : 0);
       if (imageHeight < FLOW_SCROLL.minImageHeight) {
         track.classList.remove('is-pinned');
         return;
@@ -8014,15 +7986,6 @@
     misc: 'Misc'
   };
 
-  pins.forEach(pin => {
-    if (!pin.dataset.page) return; // component/widget cards don't link anywhere — skip the hover subtitle
-    const sub = document.createElement('div');
-    sub.className = 'sub';
-    const category = CAT_LABELS[pin.dataset.cat] || pin.dataset.cat || '';
-    sub.textContent = pin.dataset.sub || (pin.dataset.year ? `${category}, ${pin.dataset.year}` : category);
-    pin.appendChild(sub);
-  });
-
   // ── Rail index ──
   // With a sheet open the feed fades out behind the panel and the rail is the
   // browsing surface: every case-study card, listed under each DISCIPLINE it
@@ -8216,12 +8179,8 @@
 
   buildRailIndex();
 
-  // Cards push the card below them on hover (see .pin .sub), which would
-  // otherwise also grow .feed's own auto height and bounce the in-flow
-  // copyright footer. Locking .feed to its at-rest height (with generous
-  // bottom padding already reserved for exactly this) lets that growth
-  // happen without ever moving anything below the feed. Only re-measure at
-  // moments layout actually changes for real — not on every hover.
+  // Keep the feed at its settled height while filters and view changes move
+  // cards around, so the in-flow copyright footer does not jump.
   function lockFeedHeight() {
     if (feedView.style.display === 'none') return;
     feed.style.height = 'auto';
