@@ -2259,6 +2259,17 @@
     .app.sheet-open .sheet {
       --toc-reserve: calc(var(--toc-w) + var(--toc-gap) + var(--toc-edge));
       padding-right: var(--toc-reserve);
+      /* Measured from the RAIL'S OWN OPEN EDGE (--rail-open-w, not the
+         compact --chrome-size) to the column, this should read the same as
+         the column's own edge to the TOC's rule line — that's the symmetry
+         a reader actually sees, since the rail sits open (auto-expanded or
+         hovered) at least as often as it sits compact here. Solving
+         column-left − rail-open-w = toc-line-left − column-right for the
+         inset gives --toc-gap + (--rail-open-w − --chrome-size): always at
+         least as large as --sheet-rail-clear's own ceiling, so the compact
+         rail clears too, and constant because both sides of that equation
+         only depend on fixed tokens once the TOC is showing. */
+      --sheet-inset-left: calc(var(--toc-gap) + var(--rail-open-w) - var(--chrome-size));
     }
     .cs-toc.has-sections { display: block; }
   }
