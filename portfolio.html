@@ -3303,9 +3303,48 @@
   }
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-controls {
     flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
   }
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-control {
-    flex: 0 0 36px;
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    border-color: transparent;
+    background: transparent;
+    font-size: 0;
+  }
+  .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-control::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    margin: auto;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.55;
+    transition: width var(--motion-fast) ease, background var(--motion-fast) ease, opacity var(--motion-fast) ease;
+  }
+  .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-control[aria-pressed="true"]::before {
+    width: 20px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--brew-cream);
+    opacity: 1;
+  }
+  .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-control[aria-pressed="true"] {
+    border-color: transparent;
+    background: transparent;
+    color: var(--brew-cream);
+  }
+  .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-control:hover,
+  .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-control:focus-visible {
+    border-color: transparent;
+    background: transparent;
+  }
+  .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-control:focus-visible {
+    outline: 2px solid var(--brew-cream);
+    outline-offset: 3px;
   }
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-notes {
     display: grid;
