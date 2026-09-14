@@ -3150,7 +3150,7 @@
     aspect-ratio: 426 / 800;
     margin: 0 auto;
     overflow: hidden;
-    border-radius: 28px;
+    border-radius: 48px;
     background: oklch(0.08 0.004 70);
   }
   .sheet[data-page="brew"] .cs-iteration-slide {
@@ -3259,6 +3259,113 @@
     content: '−';
     color: var(--brew-negative);
   }
+  /* Flow captions share one text edge and reserve the tallest step's space. */
+  .sheet[data-page="brew"] .cs-rating-flow {
+    --rating-image-fade: 180ms;
+    --rating-copy-out: 100ms;
+    --rating-copy-in: 260ms;
+    --rating-copy-overlap: 60ms;
+    --rating-copy-shift: 4px;
+    --rating-copy-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .sheet[data-page="brew"] .cs-rating-track { margin-bottom: 28px; }
+  .sheet[data-page="brew"] .cs-rating-track .cs-rating-flow { margin-bottom: 0; }
+  .sheet[data-page="brew"] .cs-rating-track.is-pinned .cs-rating-flow {
+    position: sticky;
+    top: var(--rating-pin-top);
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-visual {
+    aspect-ratio: 940 / 1746;
+  }
+  .sheet[data-page="brew"] .cs-rating-track.is-pinned .cs-iteration-visual {
+    width: min(100%, 390px, var(--rating-image-width));
+  }
+  /* Keep the previous screenshot opaque underneath the incoming frame:
+     no scale, slide, or dip through the black phone background. */
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-slide {
+    transform: none;
+    transition: opacity var(--rating-image-fade) linear;
+    z-index: 0;
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-slide.is-previous {
+    opacity: 1;
+    z-index: 1;
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-slide.is-active { z-index: 2; }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-copy {
+    min-width: 0;
+    text-align: left;
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-copy h3 {
+    max-width: 18ch;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-controls {
+    flex-wrap: wrap;
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-control {
+    flex: 0 0 36px;
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-notes {
+    display: grid;
+    max-width: 44ch;
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note {
+    display: block;
+    grid-area: 1 / 1;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(var(--rating-copy-shift));
+    transition: none;
+    pointer-events: none;
+  }
+  /* Caption handoff: 0–100ms the previous thought clears; at 60ms
+     the new heading and bullets settle together over 260ms. Keep the
+     shared grid's height fixed and let rapid input replace the transition. */
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note.is-leaving {
+    transform: translateY(calc(var(--rating-copy-shift) * -1));
+    transition:
+      opacity var(--rating-copy-out) ease-out,
+      transform var(--rating-copy-out) ease-out,
+      visibility 0s linear var(--rating-copy-out);
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note.is-active {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition:
+      opacity var(--rating-copy-in) var(--rating-copy-ease) var(--rating-copy-overlap),
+      transform var(--rating-copy-in) var(--rating-copy-ease) var(--rating-copy-overlap),
+      visibility 0s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note,
+    .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note.is-active,
+    .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note.is-leaving {
+      transform: none;
+      transition: none;
+    }
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note h4 {
+    margin: 0 0 10px;
+    line-height: 1.4;
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note ul {
+    margin: 0;
+    padding: 0 0 0 17px;
+    gap: 12px;
+    list-style: disc;
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note li {
+    padding: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note li::before { content: none; }
+  .sheet[data-page="brew"] .cs-rating-flow .cs-iteration-note li::marker { color: var(--ink-mid); }
   .sheet[data-page="brew"] .cs-flow-placeholder {
     display: grid;
     grid-template-columns: minmax(0, 0.8fr) minmax(280px, 1.2fr);
@@ -4424,6 +4531,16 @@
       grid-template-columns: 1fr;
       padding-top: 58px;
     }
+    .sheet[data-page="brew"] .cs-rating-track.is-pinned .cs-rating-flow {
+      gap: 18px;
+      padding: 48px 18px 20px;
+    }
+    .sheet[data-page="brew"] .cs-rating-track.is-pinned .cs-iteration-copy { padding-top: 0; }
+    .sheet[data-page="brew"] .cs-rating-track.is-pinned .cs-iteration-copy h3 {
+      max-width: none;
+      font-size: 24px;
+    }
+    .sheet[data-page="brew"] .cs-rating-track.is-pinned .cs-iteration-controls { margin: 16px 0; }
     .sheet[data-page="brew"] .cs-flow-placeholder { grid-template-columns: 1fr; }
     .sheet[data-page="brew"] .cs-flow-placeholder-stage { min-height: 190px; }
     .sheet[data-page="brew"] .cs-brew-topline {
@@ -5859,38 +5976,77 @@
             </div>
           </div>
 
-          <div class="cs-iteration-player" data-iteration-player data-iteration-rank="1">
+          <div class="cs-iteration-player cs-rating-flow" data-iteration-player data-iteration-rank="1">
             <div class="cs-iteration-visual" aria-live="polite">
-              <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-review-v1.png" alt="Review flow before a rating is selected, labeled step one of two" loading="lazy">
-              <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-review-v2.png" alt="Review flow with a two and a half cup rating selected and displayed numerically" loading="lazy">
-              <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-review-v3.png" alt="Review flow step two with selected cafe-experience tags" loading="lazy">
-              <img class="cs-iteration-slide" data-iteration-slide="3" src="assets/images/brew-review-v4.png" alt="Completed review posted to the thread with the updated cafe average" loading="lazy">
+              <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-review-v1.jpg" alt="Comment sheet at rest, before a review has started, showing no comments yet" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-review-v2.jpg" alt="Comment composer with Had a great time typed, before a rating is attached" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-review-v3.jpg" alt="Rating step one of two with unselected cups and the written comment preserved" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="3" src="assets/images/brew-review-v4.jpg" alt="Rating step one with three and a half cups selected and the numeric score 3.5" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="4" src="assets/images/brew-review-v5.jpg" alt="Rating step two with cafe-experience tags before any are selected" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="5" src="assets/images/brew-review-v6.jpg" alt="Has outlets, Good WiFi, and Great for groups selected above the written review" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="6" src="assets/images/brew-review-v7.jpg" alt="Zainab A.'s posted review with a 3.5 cup rating, one comment, and the cafe rating count increased to 140" loading="lazy">
             </div>
             <div class="cs-iteration-copy">
-              <div class="cs-iteration-eyebrow">Comment Types</div>
-              <h3>Preventing accidental 0/5 ratings and duplicate reviews</h3>
-              <div class="cs-iteration-controls" role="group" aria-label="Choose a review-flow version">
-                <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show review-flow version 1">V1</button>
-                <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show review-flow version 2">V2</button>
-                <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show review-flow version 3">V3</button>
-                <button class="cs-iteration-control" type="button" data-iteration-control="3" aria-pressed="false" aria-label="Show review-flow version 4">V4</button>
+              <div class="cs-iteration-eyebrow">Reviews + ratings</div>
+              <h3>One composer for comments and reviews</h3>
+              <div class="cs-iteration-controls" role="group" aria-label="Choose a step in the review flow">
+                <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show step 1 of the review flow">1</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show step 2 of the review flow">2</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show step 3 of the review flow">3</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="3" aria-pressed="false" aria-label="Show step 4 of the review flow">4</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="4" aria-pressed="false" aria-label="Show step 5 of the review flow">5</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="5" aria-pressed="false" aria-label="Show step 6 of the review flow">6</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="6" aria-pressed="false" aria-label="Show step 7 of the review flow">7</button>
               </div>
               <div class="cs-iteration-notes">
                 <div class="cs-iteration-note is-active" data-iteration-note="0">
-                  <h4>Start with an explicit first step</h4>
-                  <ul><li class="is-plus">Improved the guiding text and labeled the flow “1/2” so another step is expected.</li><li class="is-plus">Removed the silent 0/5 default. Progress depends on an intentional rating selection.</li></ul>
+                  <h4>Keep feedback close to the cafe</h4>
+                  <ul>
+                    <li><strong>Shared entry point:</strong> comments and reviews start in the same sheet, beside the cafe being discussed.</li>
+                    <li><strong>Optional rating:</strong> someone can join the conversation without scoring the cafe.</li>
+                  </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="1">
-                  <h4>Show the rating, not just the fill</h4>
-                  <ul><li class="is-plus">Displayed the numeric rating alongside the cup fill so the value is unambiguous.</li><li class="is-plus">The previous white send action becomes a yellow next button, signaling movement rather than submission.</li></ul>
+                  <h4>Preserve the work already done</h4>
+                  <ul>
+                    <li><strong>Keep the draft:</strong> attaching a rating carries the existing comment into the review flow.</li>
+                    <li><strong>No restart:</strong> someone can add detail as they go, without choosing a different form or retyping.</li>
+                  </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="2">
-                  <h4>Add structured context in step two</h4>
-                  <ul><li class="is-plus">Concrete tags such as Quiet, Has outlets, and Good WiFi make the review useful to Brew's intent filters.</li><li class="is-plus">Yellow selections keep review mode visually distinct from ordinary commenting.</li></ul>
+                  <h4>Separate selection from submission</h4>
+                  <ul>
+                    <li><strong>No default score:</strong> cups start empty; opening the rating flow does not assign a zero.</li>
+                    <li><strong>Two stages:</strong> the first arrow advances to cafe details, giving the reviewer another step before publishing.</li>
+                  </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="3">
-                  <h4>Prevent duplicate reviews</h4>
-                  <ul><li class="is-plus">After submission, the review appears in the shared thread and the summary updates.</li><li class="is-plus">The review control becomes inactive once someone has reviewed the cafe.</li><li class="is-plus">Changing a review requires deleting the original first rather than silently overwriting it.</li></ul>
+                  <h4>Make the selected score explicit</h4>
+                  <ul>
+                    <li><strong>Half-cup increments:</strong> allow a score between whole numbers, such as 3.5 out of 5.</li>
+                    <li><strong>Numeric confirmation:</strong> show the exact value beside the cups so the score is readable beyond the icon fill.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="4">
+                  <h4>Capture what a rating leaves out</h4>
+                  <ul>
+                    <li><strong>Practical context:</strong> tags describe WiFi, outlets, noise, and price alongside the overall score.</li>
+                    <li><strong>Intent matters:</strong> these details speak to what someone needs from a cafe, such as working or meeting friends.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="5">
+                  <h4>Keep choices visible before posting</h4>
+                  <ul>
+                    <li><strong>Visible selections:</strong> highlighted tags show which details will accompany the review.</li>
+                    <li><strong>Room for context:</strong> the original note stays editable, keeping structured tags and personal feedback in one place.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="6">
+                  <h4>Confirm the contribution and its limits</h4>
+                  <ul>
+                    <li><strong>Visible result:</strong> the posted note and 3.5-cup rating appear together; the rating count rises from 139 to 140.</li>
+                    <li><strong>One rating per person:</strong> the cup dims after posting, while the comment field remains available for conversation.</li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -6958,6 +7114,12 @@
     const slides = [...player.querySelectorAll('[data-iteration-slide]')];
     const notes = [...player.querySelectorAll('[data-iteration-note]')];
     const boundedIndex = Math.max(0, Math.min(controls.length - 1, Number(nextIndex)));
+    const previousIndex = Number(player.dataset.activeIteration ?? boundedIndex);
+    if (previousIndex !== boundedIndex && player.classList.contains('cs-rating-flow')) {
+      slides.forEach((slide, index) => slide.classList.toggle('is-previous', index === previousIndex));
+      player.style.setProperty('--rating-copy-shift', boundedIndex > previousIndex ? '4px' : '-4px');
+      notes.forEach((note, index) => note.classList.toggle('is-leaving', index === previousIndex));
+    }
 
     controls.forEach((control, index) => {
       const active = index === boundedIndex;
@@ -6969,25 +7131,126 @@
       slide.classList.toggle('is-active', active);
       slide.setAttribute('aria-hidden', String(!active));
     });
-    notes.forEach((note, index) => note.classList.toggle('is-active', index === boundedIndex));
+    notes.forEach((note, index) => {
+      note.classList.toggle('is-active', index === boundedIndex);
+      note.setAttribute('aria-hidden', String(index !== boundedIndex));
+    });
     player.dataset.activeIteration = String(boundedIndex);
-    if (moveFocus) controls[boundedIndex]?.focus();
+    if (moveFocus) controls[boundedIndex]?.focus({ preventScroll: true });
+  }
+
+  /* RATING SCROLL STORYBOARD
+   * Enter     the walkthrough settles beneath the sticky sheet header.
+   * 0–1540px  seven stages, 220px each; screenshots crossfade in 180ms.
+   * Exit      the final review scrolls away with the rest of the study.
+   * Reverse   scrolling back retraces the same stages. Native scroll owns
+   *           the distance; no wheel interception, snapping, or scroll lock.
+   */
+  const RATING_SCROLL = { stepDistance: 220, edgeGap: 16, minImageHeight: 180, imageRatio: 940 / 1746 };
+  let ratingScroll = null;
+  function clearRatingScroll() {
+    ratingScroll?.destroy();
+    ratingScroll = null;
+  }
+  function initializeRatingScroll(root) {
+    const player = root.querySelector('.cs-rating-flow');
+    if (!player) return;
+    const track = document.createElement('div');
+    track.className = 'cs-rating-track';
+    player.before(track);
+    track.append(player);
+    const copy = player.querySelector('.cs-iteration-copy');
+    const count = player.querySelectorAll('[data-iteration-control]').length;
+    let pinTop = 0, distance = 0, frame = 0, measureFrame = 0, destroyed = false;
+    // Read the origin from layout, including late image loads and the
+    // sheet's entrance transform, rather than caching a stale scroll offset.
+    const getStart = () => track.getBoundingClientRect().top - sheet.getBoundingClientRect().top + sheet.scrollTop - pinTop;
+    const update = () => {
+      frame = 0;
+      if (!distance || destroyed) return;
+      const progress = sheet.scrollTop - getStart();
+      const index = Math.max(0, Math.min(count - 1, Math.floor(progress / RATING_SCROLL.stepDistance)));
+      if (Number(player.dataset.activeIteration) !== index) setIterationPlayerStep(player, index);
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    const measure = () => {
+      measureFrame = 0;
+      if (destroyed) return;
+      distance = 0;
+      track.style.height = '';
+      track.classList.toggle('is-pinned', !prefersReducedMotion());
+      if (prefersReducedMotion()) return;
+      const headerHeight = sheet.querySelector('.sheet-head').getBoundingClientRect().height;
+      const available = sheet.clientHeight - headerHeight - RATING_SCROLL.edgeGap * 2;
+      const style = getComputedStyle(player);
+      const stacked = matchMedia('(max-width: 720px)').matches;
+      const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+      const imageHeight = available - padding - (stacked ? copy.offsetHeight + parseFloat(style.rowGap) : 0);
+      if (imageHeight < RATING_SCROLL.minImageHeight) {
+        track.classList.remove('is-pinned');
+        return;
+      }
+      track.style.setProperty('--rating-image-width', `${imageHeight * RATING_SCROLL.imageRatio}px`);
+      const height = player.getBoundingClientRect().height;
+      if (height > available + 1) {
+        track.classList.remove('is-pinned');
+        return;
+      }
+      pinTop = headerHeight + RATING_SCROLL.edgeGap + (available - height) / 2;
+      distance = count * RATING_SCROLL.stepDistance;
+      track.style.setProperty('--rating-pin-top', `${pinTop}px`);
+      track.style.height = `${height + distance}px`;
+      update();
+    };
+    const scheduleMeasure = () => {
+      if (!measureFrame && !destroyed) measureFrame = requestAnimationFrame(measure);
+    };
+    const observer = new ResizeObserver(scheduleMeasure);
+    observer.observe(sheet);
+    observer.observe(copy);
+    sheet.addEventListener('scroll', onScroll, { passive: true });
+    reducedMotionQuery.addEventListener('change', scheduleMeasure);
+    // Decode every frame before the reader reaches this section.
+    player.querySelectorAll('img').forEach(img => { img.loading = 'eager'; img.decode().catch(() => {}); });
+    document.fonts.ready.then(scheduleMeasure);
+    ratingScroll = {
+      player,
+      select(index, moveFocus) {
+        if (distance) sheet.scrollTo({ top: getStart() + (index + 0.5) * RATING_SCROLL.stepDistance, behavior: 'instant' });
+        setIterationPlayerStep(player, index, moveFocus);
+      },
+      destroy() {
+        destroyed = true;
+        observer.disconnect();
+        sheet.removeEventListener('scroll', onScroll);
+        reducedMotionQuery.removeEventListener('change', scheduleMeasure);
+        cancelAnimationFrame(frame);
+        cancelAnimationFrame(measureFrame);
+      },
+    };
+    scheduleMeasure();
+  }
+  function selectIterationPlayerStep(player, index, moveFocus = false) {
+    if (ratingScroll?.player === player) ratingScroll.select(Number(index), moveFocus);
+    else setIterationPlayerStep(player, index, moveFocus);
   }
 
   function initializeIterationPlayers(root) {
+    clearRatingScroll();
     root.querySelectorAll('.cs-iterations-section').forEach(section => {
       const orderedPlayers = [...section.querySelectorAll(':scope > [data-iteration-player]')]
         .sort((a, b) => Number(a.dataset.iterationRank) - Number(b.dataset.iterationRank));
       orderedPlayers.forEach(player => section.append(player));
     });
     root.querySelectorAll('[data-iteration-player]').forEach(player => setIterationPlayerStep(player, 0));
+    initializeRatingScroll(root);
   }
 
   sheetBody.addEventListener('click', event => {
     const control = event.target.closest('[data-iteration-control]');
     if (!control) return;
     const player = control.closest('[data-iteration-player]');
-    if (player) setIterationPlayerStep(player, control.dataset.iterationControl);
+    if (player) selectIterationPlayerStep(player, control.dataset.iterationControl);
   });
 
   sheetBody.addEventListener('keydown', event => {
@@ -6999,7 +7262,7 @@
     const direction = event.key === 'ArrowRight' ? 1 : -1;
     const nextIndex = (currentIndex + direction + controls.length) % controls.length;
     event.preventDefault();
-    setIterationPlayerStep(player, nextIndex, true);
+    selectIterationPlayerStep(player, nextIndex, true);
   });
 
 
@@ -7304,6 +7567,7 @@
     cancelAnimationFrame(scrollTweenFrame);
     sheetBody.style.opacity = '';
     clearSheetToc();
+    clearRatingScroll();
     const active = document.querySelector('.pin.pin-active');
     const sourceRoute = sheetOpenedFrom || 'feed';
     requestAnimationFrame(() => {
