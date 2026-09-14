@@ -2949,15 +2949,6 @@
     border-radius: 18px;
     padding: 38px 36px 34px;
   }
-  .sheet[data-page="brew"] .cs-brew-kicker {
-    display: block;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: oklch(0.34 0.018 70);
-  }
   .sheet[data-page="brew"] .cs-brew-topline {
     display: flex;
     align-items: flex-start;
@@ -2968,8 +2959,10 @@
   .sheet[data-page="brew"] .cs-brew-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 8px;
     margin-top: -5px;
+    margin-left: auto;
   }
   .sheet[data-page="brew"] .cs-brew-actions .cs-cta-btn {
     border: 0;
@@ -3016,6 +3009,14 @@
     margin: 0;
     color: oklch(0.38 0.016 70);
   }
+  .sheet[data-page="brew"] .cs-brew-byline span {
+    padding: 7px 11px;
+    border: 1px solid color-mix(in oklab, var(--brew-cream-ink) 28%, transparent);
+    border-radius: 999px;
+    background: transparent;
+    white-space: nowrap;
+  }
+  .sheet[data-page="brew"] .cs-brew-byline span:not(:last-child)::after { content: none; }
   .sheet[data-page="brew"] .cs-section { padding-top: 66px; }
   .sheet[data-page="brew"] .cs-label {
     display: inline-block;
@@ -3251,6 +3252,7 @@
   }
   .sheet[data-page="brew"] .cs-scroll-flow .cs-iteration-visual {
     aspect-ratio: 940 / 1746;
+    border-radius: 24px;
   }
   .sheet[data-page="brew"] .cs-flow-track.is-pinned .cs-iteration-visual {
     width: min(100%, 390px, var(--flow-image-width));
@@ -3508,15 +3510,6 @@
     border-radius: 18px;
     padding: 38px 36px 34px;
   }
-  .sheet[data-page="crow"] .cs-crow-kicker {
-    display: block;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    opacity: 0.7;
-  }
   .sheet[data-page="crow"] .cs-crow-topline {
     display: flex;
     align-items: flex-start;
@@ -3527,8 +3520,10 @@
   .sheet[data-page="crow"] .cs-crow-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 8px;
     margin-top: -5px;
+    margin-left: auto;
   }
   .sheet[data-page="crow"] .cs-crow-actions .cs-cta-btn {
     border: 0;
@@ -3698,15 +3693,6 @@
     border-radius: 18px;
     padding: 38px 36px 34px;
   }
-  .sheet[data-page="habitat"] .cs-habitat-kicker {
-    display: block;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    opacity: 0.7;
-  }
   .sheet[data-page="habitat"] .cs-habitat-topline {
     display: flex;
     align-items: flex-start;
@@ -3717,8 +3703,10 @@
   .sheet[data-page="habitat"] .cs-habitat-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 8px;
     margin-top: -5px;
+    margin-left: auto;
   }
   .sheet[data-page="habitat"] .cs-habitat-actions .cs-cta-btn {
     border: 0;
@@ -3958,9 +3946,13 @@
     display: flex; align-items: flex-start; justify-content: space-between;
     gap: 24px; margin-bottom: 28px;
   }
-  .sheet[data-page="dreamcatcher"] .cs-dream-kicker {
-    font-family: var(--mono); font-size: 10px; font-weight: 700;
-    letter-spacing: .09em; text-transform: uppercase; opacity: .7;
+  .sheet[data-page="dreamcatcher"] .cs-dream-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: -5px;
+    margin-left: auto;
+    justify-content: flex-end;
   }
   .sheet[data-page="dreamcatcher"] .cs-dream-actions .cs-cta-btn {
     border: 0; background: var(--dream-deep); color: var(--dream-cream);
@@ -3968,6 +3960,7 @@
   }
   .sheet[data-page="dreamcatcher"] .cs-dream-actions .cs-cta-btn:hover,
   .sheet[data-page="dreamcatcher"] .cs-dream-actions .cs-cta-btn:focus-visible { opacity: .84; box-shadow: none; }
+  .sheet[data-page="dreamcatcher"] .cs-dream-actions { justify-content: flex-end; }
   .sheet[data-page="dreamcatcher"] .cs-hero--dreamcatcher .cs-hero-title em {
     display: block; margin-top: 8px; color: var(--dream-deep);
     font-family: var(--serif); font-weight: 400; opacity: .72;
@@ -4571,6 +4564,12 @@
       gap: 18px;
     }
     .sheet[data-page="brew"] .cs-brew-actions { margin-top: 0; }
+    .sheet[data-page="brew"] .cs-brew-actions,
+    .sheet[data-page="crow"] .cs-crow-actions,
+    .sheet[data-page="habitat"] .cs-habitat-actions,
+    .sheet[data-page="dreamcatcher"] .cs-dream-actions {
+      align-self: flex-end;
+    }
   }
   .cs-anno-diagram { display: flex; gap: 10px; flex: none; }
   .cs-anno-schema {
@@ -5863,7 +5862,6 @@
       custom: `
         <div class="cs-hero cs-hero--brew">
           <div class="cs-brew-topline">
-            <span class="cs-brew-kicker">Product case study · Mobile build in progress</span>
             <div class="cs-brew-actions" aria-label="Project links">
               <a class="cs-cta-btn" href="https://www.figma.com/design/fRDum7bCiXLQUExZ5Kdqx8/brew.?node-id=76-4&amp;p=f&amp;t=LZwBOvpgaqXkDuEh-0" target="_blank" rel="noopener noreferrer">Figma ↗</a>
             </div>
@@ -6386,7 +6384,6 @@
       custom: `
         <div class="cs-hero cs-hero--dreamcatcher">
           <div class="cs-dream-topline">
-            <span class="cs-dream-kicker">Mobile product concept · FigBuild 2026</span>
             <div class="cs-dream-actions" aria-label="Project links">
               <a class="cs-cta-btn" href="https://devpost.com/software/dreamcatcher-ao67xw" target="_blank" rel="noopener noreferrer">View on Devpost ↗</a>
               <a class="cs-cta-btn" href="https://www.figma.com/proto/vHJ25w47NgOn0DFI0FzIOq/DreamCatcher---FigBuild2026?node-id=1-2&amp;p=f&amp;t=khsu4fLn9IcupSgL-1&amp;scaling=scale-down&amp;content-scaling=fixed&amp;page-id=0%3A1" target="_blank" rel="noopener noreferrer">Open Figma ↗</a>
@@ -6626,7 +6623,6 @@
       custom: `
         <div class="cs-hero cs-hero--crow">
           <div class="cs-crow-topline">
-            <span class="cs-crow-kicker">Website redesign · Shipped</span>
             <div class="cs-crow-actions" aria-label="Project links">
               <a class="cs-cta-btn" href="https://github.com/zahsan9/the-crow" target="_blank" rel="noopener noreferrer">Repo ↗</a>
               <a class="cs-cta-btn" href="https://zahsan9.github.io/the-crow/" target="_blank" rel="noopener noreferrer">Try it out ↗</a>
@@ -6888,7 +6884,6 @@
       custom: `
         <div class="cs-hero cs-hero--habitat">
           <div class="cs-habitat-topline">
-            <span class="cs-habitat-kicker">Hackathon product case study · UWB Hacks: The Future!, Apr 2026</span>
             <div class="cs-habitat-actions" aria-label="Project links">
               <a class="cs-cta-btn" href="https://github.com/zahsan9/uwbhacks26" target="_blank" rel="noopener noreferrer">Repo ↗</a>
             </div>
@@ -7397,7 +7392,6 @@
       return html;
     }
     if (p.custom) {
-      if (p.eyebrow) html += `<div class="eyebrow">${p.eyebrow}</div>`;
       html += p.custom;
     } else {
       if (p.eyebrow) html += `<div class="eyebrow">${p.eyebrow}</div>`;
