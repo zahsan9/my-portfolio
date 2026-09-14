@@ -3515,7 +3515,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 24px;
-    margin-bottom: 28px;
+    margin-bottom: 18px;
   }
   .sheet[data-page="crow"] .cs-crow-actions {
     display: flex;
@@ -3558,6 +3558,14 @@
     color: var(--crow-accent-ink);
     opacity: 0.7;
   }
+  .sheet[data-page="crow"] .cs-crow-byline span {
+    display: inline-flex;
+    padding: 7px 11px;
+    border: 1px solid color-mix(in oklab, currentColor 34%, transparent);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .sheet[data-page="crow"] .cs-crow-byline span:not(:last-child)::after { content: none; }
   .sheet[data-page="crow"] .cs-section { padding-top: 66px; }
   .sheet[data-page="crow"] .cs-label {
     display: inline-block;
@@ -3698,7 +3706,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 24px;
-    margin-bottom: 28px;
+    margin-bottom: 18px;
   }
   .sheet[data-page="habitat"] .cs-habitat-actions {
     display: flex;
@@ -3750,6 +3758,14 @@
     color: var(--habitat-accent-ink);
     opacity: 0.7;
   }
+  .sheet[data-page="habitat"] .cs-habitat-byline span {
+    display: inline-flex;
+    padding: 7px 11px;
+    border: 1px solid color-mix(in oklab, currentColor 34%, transparent);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .sheet[data-page="habitat"] .cs-habitat-byline span:not(:last-child)::after { content: none; }
   .sheet[data-page="habitat"] .cs-section { padding-top: 66px; }
   .sheet[data-page="habitat"] .cs-label {
     display: inline-block;
@@ -3944,7 +3960,7 @@
   }
   .sheet[data-page="dreamcatcher"] .cs-dream-topline {
     display: flex; align-items: flex-start; justify-content: space-between;
-    gap: 24px; margin-bottom: 28px;
+    gap: 24px; margin-bottom: 18px;
   }
   .sheet[data-page="dreamcatcher"] .cs-dream-actions {
     display: flex;
@@ -3967,6 +3983,14 @@
   }
   .sheet[data-page="dreamcatcher"] .cs-hero-sub { max-width: 730px; color: var(--dream-deep); opacity: .76; }
   .sheet[data-page="dreamcatcher"] .cs-dream-byline { margin: 0; color: var(--dream-deep); opacity: .62; }
+  .sheet[data-page="dreamcatcher"] .cs-dream-byline span {
+    display: inline-flex;
+    padding: 7px 11px;
+    border: 1px solid color-mix(in oklab, currentColor 34%, transparent);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .sheet[data-page="dreamcatcher"] .cs-dream-byline span:not(:last-child)::after { content: none; }
   .sheet[data-page="dreamcatcher"] .cs-section { padding-top: 66px; }
   .sheet[data-page="dreamcatcher"] .cs-copy { max-width: 66ch; }
   .sheet[data-page="dreamcatcher"] .cs-copy p { text-wrap: pretty; }
@@ -4536,6 +4560,21 @@
   @media (max-width: 720px) {
     .cs-decision-row { grid-template-columns: 1fr; }
     .cs-hero-stats { grid-template-columns: repeat(2, 1fr); }
+    .cs-hero-topline {
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .cs-hero-topline .cs-cta-btn {
+      align-self: flex-end;
+      margin-top: 0;
+    }
+    .sheet[data-page="crow"] .cs-crow-topline,
+    .sheet[data-page="habitat"] .cs-habitat-topline,
+    .sheet[data-page="dreamcatcher"] .cs-dream-topline {
+      flex-direction: column;
+      gap: 14px;
+    }
     .sheet[data-page="brew"] .cs-two-col { grid-template-columns: 1fr; }
     .sheet[data-page="brew"] .cs-product-principles { grid-template-columns: 1fr; }
     .sheet[data-page="brew"] .cs-decision-block { padding: 20px; }
@@ -4569,6 +4608,7 @@
     .sheet[data-page="habitat"] .cs-habitat-actions,
     .sheet[data-page="dreamcatcher"] .cs-dream-actions {
       align-self: flex-end;
+      flex-wrap: wrap;
     }
   }
   .cs-anno-diagram { display: flex; gap: 10px; flex: none; }
