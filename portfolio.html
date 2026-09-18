@@ -522,8 +522,17 @@
   /* One delay, one duration, for every label in the index — names and section
      headings land together, just behind the geometry. */
   .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within)
-    .rail-index-title {
+    .rail-index-title,
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within)
+    .rail-index-wip {
     opacity: 1;
+    transition: opacity var(--motion-fast) ease 80ms;
+  }
+  /* The corner dot is the compact-rail stand-in for the WIP tag — same beat,
+     inverse direction, so the two never show at once mid-transition. */
+  .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within)
+    .rail-index-wip-dot {
+    opacity: 0;
     transition: opacity var(--motion-fast) ease 80ms;
   }
   .app.sheet-open .rail:is(.is-sheet-expanded, :hover, :focus-within)
@@ -631,6 +640,7 @@
      same circle a route button is, on the same axis and the same pitch — the
      two rail states line up row for row. */
   .rail-index-item {
+    position: relative;
     width: 100%; height: 48px; border-radius: 999px;
     display: flex; align-items: center; flex-shrink: 0;
     padding-left: 13px; padding-right: 0; gap: 10px;
@@ -776,6 +786,30 @@
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     max-width: 140px; opacity: 0;
     transition: opacity var(--motion-fast) ease;
+  }
+  /* Marks a rail-index row whose discipline has no write-up yet (currently
+     brew/Habitat's SWE row) — mirrors the feed's own .pin-meta "WIP" text.
+     Text tag for the expanded rail; a small dot standing in for it in the
+     compact circle state where there's no room for a word. Both live in the
+     row's own box (see .rail-index-item's position:relative) rather than as
+     children of .rail-index-icon, so applyRailIndexIcon's innerHTML swap
+     can never wipe them regardless of call order. */
+  .rail-index-wip {
+    font-family: var(--mono); font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-left: 6px; flex-shrink: 0; opacity: 0;
+    transition: opacity var(--motion-fast) ease;
+  }
+  .rail-index-wip-dot {
+    position: absolute; left: 31px; top: 9px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--ink-mid);
+    box-shadow: 0 0 0 2px var(--paper);
+    transition: opacity var(--motion-fast) ease, background var(--motion-fast) ease;
+  }
+  .rail-index-item.active .rail-index-wip-dot {
+    background: var(--card-on, var(--paper));
+    box-shadow: 0 0 0 2px var(--card-color, var(--paper));
   }
   @media (prefers-reduced-motion: reduce) {
     .app.sheet-open .rail-index-item { transition-delay: 0s; }
@@ -1074,8 +1108,10 @@
   .banner .bio { font-size: 16px; line-height: 1.65; max-width: 520px; margin: 0 auto; }
   .banner .bio em { font-style: italic; color: var(--accent); }
   .banner .meta {
-    margin-top: 20px; font-size: 13px; color: var(--ink-mid);
+    margin-top: 20px; color: var(--ink-mid);
     text-align: center;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.06em; text-transform: uppercase;
   }
   .banner .meta-sep { font-weight: 700; padding: 0 5px; }
   .feed {
@@ -1598,15 +1634,28 @@
     line-height: 1;
     padding: 0 18px;
     border-radius: 999px;
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
     text-decoration: none;
     cursor: pointer;
     background: transparent;
     color: var(--ink);
     transition: background 0.15s, color 0.15s;
+  }
+  .page-resume-btn {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  /* Same type as .cs-cta-btn (the Figma/Repo pills) and the mode toggle's
+     options — mono, sentence case, light tracking. These are actionable
+     controls, not quiet metadata, so they get the CTA pill's lighter touch
+     rather than the all-caps eyebrow treatment used for things like the
+     Updated tag. */
+  .page-back {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
   }
   /* Resume stays permanently filled, the same treatment .rail-btn.active
      uses for the current route — it's the one header pill meant to read
@@ -1641,7 +1690,8 @@
   }
   .topbar-page-actions[hidden],
   .topbar-social[hidden],
-  .page-resume-btn[hidden] { display: none; }
+  .page-resume-btn[hidden],
+  .sheet-mode-toggle[hidden] { display: none; }
   .topbar-social-btn {
     display: inline-flex;
     align-items: center;
@@ -2129,6 +2179,53 @@
     min-height: var(--chrome-size);
   }
   .sheet-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-mid); text-transform: uppercase; letter-spacing: 0.08em; }
+  /* Product/SWE mode toggle — replaces .sheet-meta for a study with an
+     .altMode (brew, Habitat). Both options sit in view at once with a pill
+     that slides to whichever is active, so the control reads as a two-state
+     switch at a glance rather than a single relabeling badge. Uses the same
+     repainted tokens .sheet-close does (--ink/--ink-mid/--line/--paper), so
+     it matches each study's own palette automatically with no per-study CSS. */
+  /* Same box as .page-back/.sheet-close (48px tall) so the two header pills
+     read as one family of controls rather than two different scales. */
+  .sheet-mode-toggle {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 2px;
+    height: 48px; padding: 4px;
+    border-radius: 999px; border: 1px solid var(--line);
+    background: transparent;
+    cursor: pointer;
+    transition: border-color var(--motion-fast) ease;
+  }
+  .sheet-mode-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  /* The sliding fill — sized and positioned from JS-measured option rects
+     (their widths differ, so a 50/50 split would leave "SWE" swimming in
+     padding), moving on the same track width/ease as the old toggle did.
+     Same mix .sheet-close:hover uses, not --control-soft: that token isn't
+     repainted per case study, so inside a study with its own palette it
+     either vanishes into the canvas or clashes with it (see the comment on
+     .sheet-close:hover above). Mixing the study's own ink into its own
+     paper stays a visible step away from whatever it's sitting on. */
+  .smt-fill {
+    position: absolute; top: 4px; bottom: 4px; left: 0;
+    width: var(--fill-w, 0px);
+    transform: translateX(var(--fill-x, 0px));
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--ink) 18%, var(--paper));
+    transition: transform var(--motion-med) var(--ease-soft), width var(--motion-med) var(--ease-soft);
+  }
+  .smt-option {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    height: 40px; padding: 0 16px;
+    border-radius: 999px;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em;
+    color: var(--ink-mid); white-space: nowrap;
+    transition: color var(--motion-fast) ease;
+  }
+  .sheet-mode-toggle[data-mode="ux"] .smt-option[data-mode-option="ux"],
+  .sheet-mode-toggle[data-mode="swe"] .smt-option[data-mode-option="swe"] {
+    color: var(--ink);
+  }
   .sheet-actions { display: flex; gap: 12px; align-items: center; }
   /* .sheet-close is .page-back and nothing more at rest (see Header pills):
      the same transparent pill About and Experience use, so every Back to Work
@@ -5677,6 +5774,14 @@
 <div class="sheet" id="sheet" role="dialog" aria-label="Case study">
   <div class="sheet-head">
     <span class="sheet-meta" id="sheetMeta"></span>
+    <!-- Only shown for a study whose PAGES entry carries .altMode (brew,
+         Habitat) — replaces #sheetMeta for those two; every other study's
+         meta renders exactly as plain text, unaffected. -->
+    <button class="sheet-mode-toggle" id="sheetModeToggle" type="button" hidden aria-pressed="false">
+      <span class="smt-fill" aria-hidden="true"></span>
+      <span class="smt-option" data-mode-option="ux">Product / UX</span>
+      <span class="smt-option" data-mode-option="swe">SWE</span>
+    </button>
     <div class="sheet-actions">
       <!-- The same Back to Work pill About and Experience use, so every route
            out of a subview is the same control. -->
@@ -6226,7 +6331,8 @@
             <div class="cs-learning">Validate the find → save → visit → review loop with usage data, align the rating summary visual with its score, and make moderation actions easier to discover.</div>
           </div>
         </div>
-      `
+      `,
+      altMode: { cat: 'swe', meta: 'SWE · Design Eng', eyebrow: 'brew.', wip: true }
     },
     climate: {
       meta: 'Data Viz · Survey Analysis',
@@ -7151,7 +7257,8 @@
             <div class="cs-learning">The photo-verification pipeline was the hardest part to get right in 48 hours and shipped less reliable than the rest of the app. The real next step is making that pipeline trustworthy, then following our own hackathon roadmap: sleep, hydration, and mindfulness islands beyond steps, and customizable worlds and companions.</div>
           </div>
         </div>
-      `
+      `,
+      altMode: { cat: 'swe', meta: 'SWE · Hackathon', eyebrow: 'Habitat', wip: true }
     },
     years: {
       meta: 'Data Viz · audio',
@@ -7460,6 +7567,81 @@
     sheet.setAttribute('aria-label', `${title}${meta}`);
   }
 
+  /* ── Product/SWE mode toggle (brew, Habitat) ──
+     A study whose PAGES entry carries .altMode represents both a product
+     write-up (the entry itself) and an engineering one (.altMode) — driven
+     generically off that field, never a brew/habitat name check, so a third
+     dual-tagged project picks this up for free by getting its own .altMode.
+
+       rest    both options sit in view; the fill sits under the mode
+               currently rendered below it
+       click   fill slides to the target option, sheetBody content swaps
+               on the same beat the cross-study switch already uses (see
+               the cross-fade branch of openSheet)
+  */
+  const modeToggle = document.getElementById('sheetModeToggle');
+  let sheetMode = 'ux'; // 'ux' | the open study's altMode.cat ('swe' today)
+
+  const MODE_TOGGLE = { labels: { ux: 'Product / UX', swe: 'SWE' }, swapDelay: 160 };
+
+  // Resolves which PAGES object a given mode actually renders for a study.
+  function effectivePage(p, mode) {
+    return (p.altMode && mode === p.altMode.cat) ? p.altMode : p;
+  }
+
+  // Shows/hides sheetMeta vs. the toggle, and syncs the toggle's own state,
+  // for whichever study is now open. A study with no .altMode never shows
+  // the toggle at all — its header is untouched, exactly as before.
+  function updateModeToggleUI(mode, altMode) {
+    if (!altMode) { sheetMeta.hidden = false; modeToggle.hidden = true; return; }
+    sheetMeta.hidden = true;
+    modeToggle.hidden = false;
+    modeToggle.dataset.mode = mode;
+    modeToggle.setAttribute('aria-pressed', String(mode === altMode.cat));
+    const otherMode = mode === altMode.cat ? 'ux' : altMode.cat;
+    modeToggle.setAttribute('aria-label', `${MODE_TOGGLE.labels[mode]}. Switch to ${MODE_TOGGLE.labels[otherMode]}.`);
+    // Both options are always visible (see .smt-option) — the fill just
+    // slides under whichever one is active, sized to that option's own
+    // measured box rather than a 50/50 split, since "Product / UX" and
+    // "SWE" are very different widths.
+    const activeOption = modeToggle.querySelector(`[data-mode-option="${mode}"]`);
+    if (activeOption) {
+      modeToggle.style.setProperty('--fill-x', `${activeOption.offsetLeft}px`);
+      modeToggle.style.setProperty('--fill-w', `${activeOption.offsetWidth}px`);
+    }
+  }
+
+  // In-place mode swap for the study already open. Reuses openSheet's own
+  // cross-fade timing (same switchSheetTimer, same opacity-out/rebuild/
+  // opacity-in shape) but deliberately never calls playSheetRailEntry() —
+  // that beat is reserved for opening a DIFFERENT study, not toggling this
+  // one's discipline.
+  function setSheetMode(nextMode) {
+    const key = sheet.dataset.page;
+    const p = PAGES[key];
+    const altMode = p?.altMode;
+    if (!altMode || nextMode === sheetMode || (nextMode !== 'ux' && nextMode !== altMode.cat)) return;
+    sheetMode = nextMode;
+    sheet.dataset.mode = sheetMode;
+    updateModeToggleUI(sheetMode, altMode);
+    const page = effectivePage(p, sheetMode);
+    sheetMeta.textContent = page.meta || '';
+    setSheetLabel(key, null, page);
+    clearTimeout(switchSheetTimer);
+    sheetBody.style.opacity = '0';
+    switchSheetTimer = setTimeout(() => {
+      sheetBody.innerHTML = buildSheetHTML(page, null);
+      initializeIterationPlayers(sheetBody);
+      buildSheetToc();
+      sheet.scrollTo({ top: 0, behavior: 'auto' });
+      sheetBody.style.opacity = '';
+    }, motionDelay(MODE_TOGGLE.swapDelay));
+  }
+  modeToggle.addEventListener('click', () => {
+    const altMode = PAGES[sheet.dataset.page]?.altMode;
+    if (altMode) setSheetMode(sheetMode === altMode.cat ? 'ux' : altMode.cat);
+  });
+
   /* ── Case-study section index ──
      Built from the open study's own `.cs-section > .cs-label` text, so a study
      gets an index by being written normally — nothing to maintain per page.
@@ -7587,6 +7769,12 @@
 
   function openSheet(key, srcEl, { indexId } = {}) {
     const p = PAGES[key]; if (!p) return;
+    // A rail-index click's indexId already names which discipline row was
+    // clicked ("swe:brew") — that's the mode to open in, when this study
+    // actually has one. Anything else (a feed card, an About deep link) has
+    // no discipline context and opens in the study's primary (product) mode.
+    const modeFromIndex = indexId?.split(':', 1)[0];
+    const requestedMode = (p.altMode && modeFromIndex === p.altMode.cat) ? modeFromIndex : 'ux';
 
     // Same study already open — nothing to load. It can still have been
     // reached from the study's other discipline entry, so move the highlight,
@@ -7596,6 +7784,7 @@
     if (sheet.classList.contains('open') && sheet.dataset.page === key) {
       syncRailIndex(key, indexId);
       sheet.scrollTo({ top: 0, behavior: 'auto' });
+      if (p.altMode) setSheetMode(requestedMode);
       return;
     }
 
@@ -7616,11 +7805,15 @@
       // came from the index, the row's focus meant it never collapsed at all
       // (see the focus hand-off in buildRailIndexItem).
       playSheetRailEntry();
-      sheetMeta.textContent = p.meta || '';
-      setSheetLabel(key, srcEl, p);
+      sheetMode = requestedMode;
+      sheet.dataset.mode = sheetMode;
+      updateModeToggleUI(sheetMode, p.altMode);
+      const page = effectivePage(p, sheetMode);
+      sheetMeta.textContent = page.meta || '';
+      setSheetLabel(key, srcEl, page);
       updateSheetBackButton(); // Update back button when switching studies
       switchSheetTimer = setTimeout(() => {
-        sheetBody.innerHTML = buildSheetHTML(p, srcEl);
+        sheetBody.innerHTML = buildSheetHTML(page, srcEl);
         initializeIterationPlayers(sheetBody);
         buildSheetToc();
         // Explicit auto: .sheet sets scroll-behavior: smooth for anchor jumps,
@@ -7637,9 +7830,13 @@
     // the board was to put it back untouched on close.
     feedScrollBeforeOpen = main.scrollTop;
     sheet.dataset.page = key;
-    sheetMeta.textContent = p.meta || '';
-    setSheetLabel(key, srcEl, p);
-    sheetBody.innerHTML = buildSheetHTML(p, srcEl);
+    sheetMode = requestedMode;
+    sheet.dataset.mode = sheetMode;
+    updateModeToggleUI(sheetMode, p.altMode);
+    const page = effectivePage(p, sheetMode);
+    sheetMeta.textContent = page.meta || '';
+    setSheetLabel(key, srcEl, page);
+    sheetBody.innerHTML = buildSheetHTML(page, srcEl);
     initializeIterationPlayers(sheetBody);
     buildSheetToc();
     updateSheetBackButton(); // Update back button based on source
@@ -8165,6 +8362,25 @@
     title.textContent = pin.dataset.title || pin.dataset.page;
 
     item.append(icon, title);
+
+    // A row opens PAGES[key] for its primary discipline, or PAGES[key].altMode
+    // when this row's own cat matches the alt content's cat — data-driven,
+    // not a brew/habitat name check, so a third dual-tagged project (or
+    // brew's SWE write-up once it exists and its wip flag lifts) needs no
+    // change here. Tag the row when whatever it actually opens is still WIP.
+    const page = PAGES[pin.dataset.page];
+    const rowPage = (page?.altMode?.cat === cat) ? page.altMode : page;
+    if (rowPage?.wip) {
+      const wip = document.createElement('span');
+      wip.className = 'rail-index-wip';
+      wip.textContent = 'WIP';
+      item.append(wip);
+      const dot = document.createElement('span');
+      dot.className = 'rail-index-wip-dot';
+      dot.setAttribute('aria-hidden', 'true');
+      item.append(dot);
+    }
+
     item.addEventListener('click', event => {
       openSheet(pin.dataset.page, pin, { indexId: item.dataset.indexId });
       // A POINTER click leaves focus sitting on this row, and .rail:focus-within
