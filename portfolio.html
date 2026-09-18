@@ -2219,12 +2219,8 @@
     height: 40px; padding: 0 16px;
     border-radius: 999px;
     font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em;
-    color: var(--ink-mid); white-space: nowrap;
+    color: var(--ink); white-space: nowrap;
     transition: color var(--motion-fast) ease;
-  }
-  .sheet-mode-toggle[data-mode="ux"] .smt-option[data-mode-option="ux"],
-  .sheet-mode-toggle[data-mode="swe"] .smt-option[data-mode-option="swe"] {
-    color: var(--ink);
   }
   .sheet-actions { display: flex; gap: 12px; align-items: center; }
   /* .sheet-close is .page-back and nothing more at rest (see Header pills):
@@ -2432,7 +2428,6 @@
     background: oklch(0.98 0 0);
     color: oklch(0.16 0.02 90);
     box-shadow: 0 0 0 1px oklch(0.98 0 0);
-    font-weight: 700;
   }
   .sheet[data-page="climate"] .cs-cta-btn:hover {
     background: oklch(0.9 0 0);
@@ -3066,7 +3061,6 @@
     background: var(--brew-cream-ink);
     color: var(--brew-cream);
     box-shadow: none;
-    font-weight: 700;
   }
   .sheet[data-page="brew"] .cs-brew-actions .cs-cta-btn:hover,
   .sheet[data-page="brew"] .cs-brew-actions .cs-cta-btn:focus-visible {
@@ -3627,7 +3621,6 @@
     background: var(--crow-accent-ink);
     color: var(--crow-accent);
     box-shadow: none;
-    font-weight: 700;
   }
   .sheet[data-page="crow"] .cs-crow-actions .cs-cta-btn:hover,
   .sheet[data-page="crow"] .cs-crow-actions .cs-cta-btn:focus-visible {
@@ -3818,7 +3811,6 @@
     background: var(--habitat-accent-ink);
     color: var(--habitat-accent);
     box-shadow: none;
-    font-weight: 700;
   }
   .sheet[data-page="habitat"] .cs-habitat-actions .cs-cta-btn:hover,
   .sheet[data-page="habitat"] .cs-habitat-actions .cs-cta-btn:focus-visible {
@@ -4069,7 +4061,7 @@
   }
   .sheet[data-page="dreamcatcher"] .cs-dream-actions .cs-cta-btn {
     border: 0; background: var(--dream-deep); color: var(--dream-cream);
-    box-shadow: none; font-weight: 700;
+    box-shadow: none;
   }
   .sheet[data-page="dreamcatcher"] .cs-dream-actions .cs-cta-btn:hover,
   .sheet[data-page="dreamcatcher"] .cs-dream-actions .cs-cta-btn:focus-visible { opacity: .84; box-shadow: none; }
@@ -7794,9 +7786,6 @@
       sheetBody.style.opacity = '0';
       document.querySelectorAll('.pin').forEach(pin => pin.classList.remove('pin-active'));
       srcEl?.classList.add('pin-active');
-      sheet.dataset.page = key;
-      /* Switching studies swaps the paper under an open sheet too. */
-      syncRootPaper();
       syncRailIndex(key, indexId);
       // Switching studies replays the rail's own entry beat, exactly as a
       // first open does: expanded for a moment so the rest of the work stays
@@ -7806,13 +7795,23 @@
       // (see the focus hand-off in buildRailIndexItem).
       playSheetRailEntry();
       sheetMode = requestedMode;
-      sheet.dataset.mode = sheetMode;
       updateModeToggleUI(sheetMode, p.altMode);
       const page = effectivePage(p, sheetMode);
       sheetMeta.textContent = page.meta || '';
       setSheetLabel(key, srcEl, page);
       updateSheetBackButton(); // Update back button when switching studies
       switchSheetTimer = setTimeout(() => {
+        // Deferred with the content, not set eagerly above: .sheet[data-page]
+        // repaints --paper/--ink for the WHOLE sheet (header included), so
+        // flipping it before the old body has finished fading out briefly
+        // showed the outgoing study's real content recolored as the
+        // incoming one — read as a flash of some unrelated study. Landing
+        // both together, behind the same opacity:0 moment, is what the fade
+        // is supposed to hide.
+        sheet.dataset.page = key;
+        sheet.dataset.mode = sheetMode;
+        /* Switching studies swaps the paper under an open sheet too. */
+        syncRootPaper();
         sheetBody.innerHTML = buildSheetHTML(page, srcEl);
         initializeIterationPlayers(sheetBody);
         buildSheetToc();
