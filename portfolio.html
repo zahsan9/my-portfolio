@@ -59,6 +59,15 @@
     --sans:  'Inter', -apple-system, sans-serif;
     --serif-display: 'Fraunces', Georgia, serif;
     --mono:  'Inter', -apple-system, sans-serif;
+    /* Small-type tracking, sitewide. Two roles, one value each: quiet
+       uppercase metadata (badges, eyebrows, section labels) vs. sentence-case
+       small UI text (pills, buttons, byline chrome). These had drifted to two
+       near-identical values apiece (0.06em/0.08em for labels, 0.01em/0.02em
+       for UI text) purely by accretion — same role, no reason for the split.
+       Font-size stays per-component (it's fit to each container), but
+       tracking has no such excuse and is centralized here. */
+    --tracking-label: 0.06em;
+    --tracking-ui: 0.02em;
     --chrome-size: 80px;
     /* Expanded rail: the narrowest width that still fits every study label on
        one line — "The Neutral Response" beside its icon, and "Daily type &
@@ -211,7 +220,7 @@
     padding: 0 24px 44px;
     text-align: center;
     font-family: var(--mono);
-    font-size: 10px; letter-spacing: 0.02em;
+    font-size: 10px; letter-spacing: var(--tracking-ui);
     color: color-mix(in oklch, var(--ink) 44%, var(--paper));
     pointer-events: none;
     user-select: none;
@@ -503,7 +512,7 @@
     width: 22px; height: 22px; flex-shrink: 0;
   }
   .rail-label {
-    font-family: var(--mono); font-size: 13px; letter-spacing: 0.01em;
+    font-family: var(--mono); font-size: 13px; letter-spacing: var(--tracking-ui);
     white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0;
     transition: max-width var(--rail-motion) var(--ease-out), opacity var(--motion-fast) ease 0.1s;
   }
@@ -782,7 +791,7 @@
      one at a time. The row's own overflow, and the rail's, still clip them
      while the rail is narrow; only the fade is animated. */
   .rail-index-title {
-    font-family: var(--mono); font-size: 13px; letter-spacing: 0.01em;
+    font-family: var(--mono); font-size: 13px; letter-spacing: var(--tracking-ui);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     max-width: 140px; opacity: 0;
     transition: opacity var(--motion-fast) ease;
@@ -796,7 +805,7 @@
      can never wipe them regardless of call order. */
   .rail-index-wip {
     font-family: var(--mono); font-size: 9px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
+    text-transform: uppercase; letter-spacing: var(--tracking-label);
     margin-left: 6px; flex-shrink: 0; opacity: 0;
     transition: opacity var(--motion-fast) ease;
   }
@@ -872,7 +881,7 @@
     /* .rail-label is collapsed-by-default (max-width:0) for the hover-reveal
        desktop rail — the compact tab bar has no hover state to reveal on,
        so the label must just always be visible here. */
-    font-family: var(--mono); font-size: 10px; letter-spacing: 0.01em;
+    font-family: var(--mono); font-size: 10px; letter-spacing: var(--tracking-ui);
     max-width: none; opacity: 1; white-space: nowrap;
   }
   @media (max-width: 800px) { .mobile-tabbar { display: flex; } }
@@ -910,7 +919,7 @@
     transition: opacity 0.22s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1);
   }
   .email-morph .em-label {
-    font-family: var(--mono); font-size: 12px; letter-spacing: 0.01em; pointer-events: none;
+    font-family: var(--mono); font-size: 12px; letter-spacing: var(--tracking-ui); pointer-events: none;
   }
   .email-morph .em-label svg { width: 17px; height: 17px; }
   .banner .avatar .em-label { font-family: var(--sans); font-size: 68px; line-height: 1; pointer-events: none; }
@@ -936,7 +945,7 @@
   .em-btn {
     flex: 1; min-width: 0; overflow: hidden;
     height: 100%; display: inline-flex; align-items: center; justify-content: center;
-    gap: 5px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.01em;
+    gap: 5px; font-family: var(--mono); font-size: 12px; letter-spacing: var(--tracking-ui);
     color: var(--ink); border-radius: 999px;
     transition: color 0.15s, background 0.15s;
   }
@@ -1111,7 +1120,7 @@
     margin-top: 20px; color: var(--ink-mid);
     text-align: center;
     font-family: var(--mono); font-size: 11px;
-    letter-spacing: 0.06em; text-transform: uppercase;
+    letter-spacing: var(--tracking-label); text-transform: uppercase;
   }
   .banner .meta-sep { font-weight: 700; padding: 0 5px; }
   .feed {
@@ -1229,7 +1238,7 @@
   .feed-empty {
     display: none; padding: 60px 140px;
     font-family: var(--mono); font-size: 12px; color: var(--ink-low);
-    letter-spacing: 0.06em; text-transform: uppercase;
+    letter-spacing: var(--tracking-label); text-transform: uppercase;
   }
   .feed-empty.visible { display: block; }
   .pin .art {
@@ -1295,7 +1304,7 @@
     font-size: 9px;
     line-height: 1.5;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-label);
   }
   .climate-etched-graphic {
     position: absolute;
@@ -1334,13 +1343,13 @@
   }
   .pin .pin-meta {
     font-family: var(--mono); font-size: 10px;
-    text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.78;
+    text-transform: uppercase; letter-spacing: var(--tracking-label); opacity: 0.78;
   }
   .pin .pill, .ab-stack-card .pill {
     font-family: var(--mono); font-size: 10px;
     background: oklch(1 0 0 / 0.14); color: inherit;
     padding: 5px 9px; border-radius: 999px;
-    text-transform: uppercase; letter-spacing: 0.08em; align-self: flex-start;
+    text-transform: uppercase; letter-spacing: var(--tracking-label); align-self: flex-start;
   }
   .art-cream .pill, .art-yellow .pill, .art-sage .pill, .art-sand .pill, .art-paper .pill, .art-plum .pill, .art-clay .pill
     { background: var(--card-ink); color: var(--card-paper); }
@@ -1380,7 +1389,7 @@
   .art-brew .brew-mark { width: 42%; }
   .art-brew .brew-caption {
     font-family: var(--mono); font-size: 9px; line-height: 1.5;
-    text-transform: uppercase; letter-spacing: 0.06em;
+    text-transform: uppercase; letter-spacing: var(--tracking-label);
     text-align: right; color: #000; opacity: 1;
   }
 
@@ -1395,7 +1404,7 @@
   }
   .art-dreamcatcher .dream-caption {
     font-family: var(--mono); font-size: 9px; line-height: 1.5;
-    text-transform: uppercase; letter-spacing: 0.06em;
+    text-transform: uppercase; letter-spacing: var(--tracking-label);
     color: currentColor; opacity: 0.7;
   }
 
@@ -1408,14 +1417,14 @@
   .art-habitat .habitat-logo-mark { width: 62%; height: auto; display: block; }
   .art-habitat .habitat-caption {
     font-family: var(--mono); font-size: 9px; line-height: 1.5;
-    text-transform: uppercase; letter-spacing: 0.06em;
+    text-transform: uppercase; letter-spacing: var(--tracking-label);
     color: currentColor; opacity: 0.82;
   }
 
   /* Book pin */
   .art-book { padding: 22px; display: flex; flex-direction: column; }
   .art-book .title { font-family: var(--serif); font-size: 22px; line-height: 1.1; margin-top: auto; }
-  .art-book small { display: block; margin-top: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--card-muted); }
+  .art-book small { display: block; margin-top: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: var(--tracking-label); color: var(--card-muted); }
 
   /* Charcoal feature card */
   .art-charcoal h3 { font-size: 44px; }
@@ -1655,7 +1664,7 @@
     font-family: var(--mono);
     font-size: 12px;
     font-weight: 400;
-    letter-spacing: 0.02em;
+    letter-spacing: var(--tracking-ui);
   }
   /* Resume stays permanently filled, the same treatment .rail-btn.active
      uses for the current route — it's the one header pill meant to read
@@ -1722,7 +1731,7 @@
   .topbar-updated {
     font-family: var(--mono);
     font-size: 11px;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--ink-mid);
     white-space: nowrap;
@@ -2010,7 +2019,7 @@
     color: inherit;
     font-family: var(--mono);
     font-size: 10px;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     opacity: 1;
     white-space: nowrap;
@@ -2050,7 +2059,7 @@
     margin-top: 22px;
     font-family: var(--mono);
     font-size: 10px;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     opacity: 0.7;
   }
@@ -2178,7 +2187,7 @@
     position: sticky; top: 0; background: var(--paper); z-index: 2;
     min-height: var(--chrome-size);
   }
-  .sheet-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-mid); text-transform: uppercase; letter-spacing: 0.08em; }
+  .sheet-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-mid); text-transform: uppercase; letter-spacing: var(--tracking-label); }
   /* Product/SWE mode toggle — replaces .sheet-meta for a study with an
      .altMode (brew, Habitat). Both options sit in view at once with a pill
      that slides to whichever is active, so the control reads as a two-state
@@ -2218,7 +2227,7 @@
     display: flex; align-items: center; justify-content: center;
     height: 40px; padding: 0 16px;
     border-radius: 999px;
-    font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em;
+    font-family: var(--mono); font-size: 12px; letter-spacing: var(--tracking-ui);
     color: var(--ink); white-space: nowrap;
     transition: color var(--motion-fast) ease;
   }
@@ -2242,7 +2251,7 @@
   .cs-cta-btn {
     display: inline-flex; align-items: center; gap: 6px;
     height: 40px; padding: 0 18px; border-radius: 999px;
-    font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em;
+    font-family: var(--mono); font-size: 12px; letter-spacing: var(--tracking-ui);
     background: transparent; color: var(--ink);
     box-shadow: 0 0 0 1px var(--line);
     cursor: pointer;
@@ -2301,7 +2310,7 @@
     margin-left: -1px;
     border-left: 2px solid transparent;
     font-family: var(--mono); font-size: 11.5px; line-height: 1.35;
-    letter-spacing: 0.01em;
+    letter-spacing: var(--tracking-ui);
     /* --ink-mid, not --ink-low: on a case study's own canvas the low ink lands
        around 2.5:1, under the 4.5:1 floor for text. Current stays ink + bold
        + its rule, so the two are still clearly different. */
@@ -2653,7 +2662,7 @@
   @starting-style {
     .sheet.open .sheet-body > * { opacity: 0; transform: translateY(10px); }
   }
-  .sheet-body .eyebrow { font-family: var(--sans); font-size: 11px; color: var(--ink-mid); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .sheet-body .eyebrow { font-family: var(--sans); font-size: 11px; color: var(--ink-mid); text-transform: uppercase; letter-spacing: var(--tracking-label); margin-bottom: 12px; }
   .sheet-body h2 { font-family: var(--sans); font-weight: 600; font-size: 48px; line-height: 1.05; letter-spacing: -0.015em; margin-bottom: 18px; }
   .sheet-body h2 em { font-style: italic; color: var(--accent); }
   .sheet-body .lead { font-size: 17px; line-height: 1.55; margin-bottom: 28px; }
@@ -2661,7 +2670,7 @@
   .sheet-body .facts > div { padding: 14px 0; border-bottom: 1px solid var(--line); font-family: var(--sans); font-size: 12px; }
   .sheet-body .facts dt { color: var(--ink-mid); margin-bottom: 4px; }
   .sheet-body .facts dd { color: var(--ink); }
-  .sheet-body .fig { aspect-ratio: 16/9; border-radius: 12px; margin: 24px 0; display: grid; place-items: center; color: oklch(0.98 0 0 / 0.6); font-family: var(--sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .sheet-body .fig { aspect-ratio: 16/9; border-radius: 12px; margin: 24px 0; display: grid; place-items: center; color: oklch(0.98 0 0 / 0.6); font-family: var(--sans); font-size: 11px; text-transform: uppercase; letter-spacing: var(--tracking-label); }
   .sheet-body .body h3 { font-family: var(--sans); font-weight: 600; font-size: 24px; margin: 24px 0 8px; }
   .sheet-body .body p { font-size: 15px; line-height: 1.6; margin-bottom: 12px; }
   /* ── About page view ── */
@@ -2858,7 +2867,7 @@
   }
   .ab-card-eyebrow {
     font-family: var(--mono); font-size: 9px;
-    letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.6;
+    letter-spacing: var(--tracking-label); text-transform: uppercase; opacity: 0.6;
   }
   .ab-stack-title {
     font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 4vw, 42px);
@@ -2900,7 +2909,7 @@
   .ab-stack-list.is-compact li { font-size: 12px; line-height: 1.4; }
   .ab-stack-item-label {
     display: block; font-family: var(--mono); font-size: 10px;
-    letter-spacing: 0.08em; text-transform: uppercase;
+    letter-spacing: var(--tracking-label); text-transform: uppercase;
     font-weight: 700;
     margin-bottom: 4px;
   }
@@ -3239,7 +3248,7 @@
     font-family: var(--mono);
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--ink-mid);
   }
@@ -3538,7 +3547,7 @@
     border-radius: 10px;
     font-family: var(--mono);
     font-size: 9px;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--ink-low);
     background: var(--paper-2);
@@ -4220,7 +4229,7 @@
     gap: 8px;
     font-family: var(--mono);
     font-size: 11px;
-    letter-spacing: 0.02em;
+    letter-spacing: var(--tracking-ui);
     color: var(--ink-mid);
     margin: 4px 0 22px;
   }
@@ -4254,7 +4263,7 @@
     display: block;
     font-family: var(--mono);
     font-size: 10px;
-    letter-spacing: 0.02em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--ink-mid);
     line-height: 1.35;
@@ -4280,7 +4289,7 @@
   .cs-feature h3 {
     font-family: var(--mono);
     font-size: 10px;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     line-height: 1.25;
     margin: 0 0 10px;
@@ -4369,7 +4378,7 @@
   .cs-fig-index {
     font-family: var(--mono);
     font-size: 10px;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--ink-low);
     flex-shrink: 0;
@@ -4396,7 +4405,7 @@
     color: oklch(0.18 0.005 60 / 0.72);
     font-family: var(--mono);
     font-size: 10px;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
   }
   .cs-preview-img::before,
@@ -4467,7 +4476,7 @@
     font-family: var(--mono);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.01em;
+    letter-spacing: var(--tracking-ui);
     transition: max-width 0.28s var(--ease-out), opacity var(--motion-fast) ease;
   }
   .cs-expand-icon:hover,
@@ -4547,7 +4556,7 @@
   .cs-copy th, .sheet-body .body th {
     font-family: var(--mono);
     font-size: 10px;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     font-weight: 700;
     color: var(--ink-mid);
@@ -4602,7 +4611,7 @@
   .cs-filmstrip-label {
     font-family: var(--mono);
     font-size: 9px;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--ink-low);
     margin-bottom: 6px;
@@ -4718,7 +4727,7 @@
     left: 8px;
     font-family: var(--mono);
     font-size: 8px;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     padding: 0 4px;
     background: var(--paper-2);
@@ -4751,7 +4760,7 @@
   .cs-anno-strip-tag {
     font-family: var(--mono);
     font-size: 9px;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     width: 46px;
     flex: none;
@@ -4851,7 +4860,7 @@
   }
   .cs-label {
     display: block; font-family: var(--mono); font-size: 11px; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
+    letter-spacing: var(--tracking-label); text-transform: uppercase;
     color: var(--ink); margin-bottom: 16px;
   }
 
@@ -4872,7 +4881,7 @@
   }
   .cs-ci-bot {
     font-family: var(--mono); font-size: 9px; color: var(--ink-low);
-    letter-spacing: 0.02em; line-height: 1.4;
+    letter-spacing: var(--tracking-ui); line-height: 1.4;
   }
   .cs-constraint-note {
     font-size: 12px; color: var(--ink-low); font-style: italic; line-height: 1.5;
@@ -4893,7 +4902,7 @@
     font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink);
   }
   .cs-badge {
-    font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+    font-family: var(--mono); font-size: 9px; letter-spacing: var(--tracking-label);
     text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
     flex-shrink: 0;
   }
@@ -5378,7 +5387,7 @@
           <img class="avatar-photo" src="assets/images/profile.jpg" alt="Portrait of Zainab Ahsan" />
         </div>
         <h1 id="nameTitle">Zainab <em>Ahsan</em></h1>
-        <p class="bio">Co-Founder @ WIIRED Studio  ·  CS + Data Science @ UW<br>I overthink interfaces so you don't have to :)</p>
+        <p class="bio">Data Analytics Intern @ GoDaddy  ·  CS + Data Science @ UW<br>I overthink interfaces so you don't have to :)</p>
         <div class="meta">Seattle, WA <span class="meta-sep">·</span> 5 Boards, 7 Pins</div>
       </div>
 
@@ -7625,6 +7634,7 @@
       sheetBody.innerHTML = buildSheetHTML(page, null);
       initializeIterationPlayers(sheetBody);
       buildSheetToc();
+      window.bindCursorSurfaces?.(sheetBody);
       sheet.scrollTo({ top: 0, behavior: 'auto' });
       sheetBody.style.opacity = '';
     }, motionDelay(MODE_TOGGLE.swapDelay));
@@ -7815,6 +7825,7 @@
         sheetBody.innerHTML = buildSheetHTML(page, srcEl);
         initializeIterationPlayers(sheetBody);
         buildSheetToc();
+        window.bindCursorSurfaces?.(sheetBody);
         // Explicit auto: .sheet sets scroll-behavior: smooth for anchor jumps,
         // and a content swap must not animate a long scroll back to the top.
         sheet.scrollTo({ top: 0, behavior: 'auto' });
@@ -7838,6 +7849,7 @@
     sheetBody.innerHTML = buildSheetHTML(page, srcEl);
     initializeIterationPlayers(sheetBody);
     buildSheetToc();
+    window.bindCursorSurfaces?.(sheetBody);
     updateSheetBackButton(); // Update back button based on source
     sheet.scrollTo({ top: 0, behavior: 'auto' });
     appEl.classList.remove('sheet-closing');
@@ -7880,6 +7892,11 @@
     sheetBody.style.opacity = '';
     clearSheetToc();
     clearScrollFlows();
+    // Closing via Escape (or the rail) can remove the hero the pointer is
+    // still resting on without a mouseleave ever firing on it — same stale
+    // surface-colour risk bindCursorSurfaces already guards against on a
+    // content swap.
+    window.bindCursorSurfaces?.(document.createDocumentFragment());
     const active = document.querySelector('.pin.pin-active');
     const sourceRoute = sheetOpenedFrom || 'feed';
     requestAnimationFrame(() => {
@@ -8958,15 +8975,34 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       cursor.classList.remove('is-hover');
     });
 
-    // Keep the neutral cursor legible across the theme-independent card palette.
-    document.querySelectorAll('.art-blue, .art-charcoal, .art-noir').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('is-on-dark-surface'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('is-on-dark-surface'));
-    });
-    document.querySelectorAll('.art-cream, .art-yellow, .art-sage, .art-sand, .art-plum, .art-clay').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('is-on-light-surface'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('is-on-light-surface'));
-    });
+    // Keep the neutral cursor legible across the theme-independent card
+    // palette AND each case study's own hero accent (cream, plum, blue,
+    // yellow — whichever the study repaints its --paper/--ink to). Exposed
+    // as bindCursorSurfaces so openSheet/setSheetMode can re-run it on
+    // whatever a case study just wrote into sheetBody: this querySelectorAll
+    // runs once at page load and the feed's own cards are static, but the
+    // sheet's content is torn down and rebuilt by innerHTML on every switch,
+    // so anything injected after this IIFE runs was never wired up at all.
+    //
+    // Also clears any lingering surface class first. Switching case studies
+    // (or toggling mode) can destroy the very element the pointer is
+    // resting on mid-hover — its mouseleave never fires because it's gone,
+    // not left — which otherwise strands the cursor on whichever colour it
+    // last held. Landing on the theme's own --ink default until the pointer
+    // next moves is correct; staying wrong forever is not.
+    function bindCursorSurfaces(scope) {
+      cursor.classList.remove('is-on-dark-surface', 'is-on-light-surface');
+      scope.querySelectorAll('.art-blue, .art-charcoal, .art-noir, .cs-hero--habitat').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('is-on-dark-surface'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('is-on-dark-surface'));
+      });
+      scope.querySelectorAll('.art-cream, .art-yellow, .art-sage, .art-sand, .art-plum, .art-clay, .cs-hero--brew, .cs-hero--crow, .cs-hero--dreamcatcher').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('is-on-light-surface'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('is-on-light-surface'));
+      });
+    }
+    bindCursorSurfaces(document);
+    window.bindCursorSurfaces = bindCursorSurfaces;
   })();
 
   /* ─────────────────────────────────────────────────────────
