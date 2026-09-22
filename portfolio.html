@@ -16,6 +16,14 @@
   (function () {
     var d = document.documentElement;
     try { d.setAttribute('data-theme', localStorage.getItem('theme') || 'dark'); } catch (e) {}
+    // Resolve share links before relative images load. Keep the query string
+    // for incoming tracking links, and let an explicit hash take precedence.
+    var studyPath = location.pathname.match(/^\/work\/([^/]+)\/?$/);
+    if (studyPath && /^https?:$/.test(location.protocol)) {
+      try {
+        history.replaceState(null, '', '/' + location.search + (location.hash || '#work/' + studyPath[1]));
+      } catch (e) {}
+    }
     var hash = location.hash.replace('#', '');
     var path = location.pathname.replace(/\/$/, '');
     var onFeed = ((hash === '' && path !== '/about' && !/^\/work\//.test(path)) || hash === 'feed') && hash.indexOf('work/') !== 0;
@@ -9470,7 +9478,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
      Only studies that actually have a writeup resolve. A WIP key or an
      unknown slug falls through to the feed rather than opening an empty
      panel, so a stale link degrades to the work index. */
-  const studySlug = key => (PAGES[key] && !PAGES[key].wip) ? key : null;
+  const studySlug = key => (Object.hasOwn(PAGES, key) && !PAGES[key].wip) ? key : null;
 
   function studyFromLocation() {
     const h = location.hash.replace(/^#/, '');
@@ -9520,16 +9528,10 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     if (sheet.classList.contains('open')) closeSheet({ fromHistory: true });
     setRoute(routeFromHash(), { history: 'none' });
   });
-  /* A deep-linked study opens after the feed exists, since openSheet wants
-     the matching pin to flip to its active state and to animate from — this
-     runs after the feed is built, so it can be called straight out. The
-     pretty /work/<slug> path is swapped for the hash form at the same time,
-     but only on http(s) — replaceState to a path throws on file://. */
+  /* Open after the feed exists so the matching pin can become active.
+     The head script has already resolved /work/<slug> to the root hash. */
   const initialStudy = studyFromLocation();
   if (initialStudy) {
-    if (location.protocol !== 'file:' && !location.hash.startsWith('#work/')) {
-      try { history.replaceState(null, '', '#work/' + initialStudy); } catch (e) {}
-    }
     sheetOpenedFrom = 'feed';
     openSheet(initialStudy, document.querySelector('.pin[data-page="' + initialStudy + '"]'), { fromHistory: true });
   }
