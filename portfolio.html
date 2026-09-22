@@ -8382,6 +8382,9 @@
 
   function openSheet(key, srcEl, { indexId, fromHistory = false } = {}) {
     const p = PAGES[key]; if (!p) return;
+    // Only move keyboard focus when a keyboard-focused control opened the
+    // study. A direct URL should not make Back to Work look selected.
+    const moveKeyboardFocus = !fromHistory && document.activeElement?.matches(':focus-visible');
     // A rail-index click's indexId already names which discipline row was
     // clicked ("swe:brew") — that's the mode to open in, when this study
     // actually has one. Anything else (a feed card, an About deep link) has
@@ -8483,7 +8486,9 @@
       // happened in between, a study is at its top when you first see it.
       sheet.scrollTo({ top: 0, behavior: 'auto' });
       sheet.classList.add('open');
-      setTimeout(() => document.getElementById('sheetClose').focus({ preventScroll: true }), 80);
+      if (moveKeyboardFocus) {
+        document.getElementById('sheetClose').focus({ preventScroll: true });
+      }
     });
   }
   function updateSheetBackButton() {
