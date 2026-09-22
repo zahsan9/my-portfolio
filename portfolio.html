@@ -18,7 +18,7 @@
     try { d.setAttribute('data-theme', localStorage.getItem('theme') || 'dark'); } catch (e) {}
     var hash = location.hash.replace('#', '');
     var path = location.pathname.replace(/\/$/, '');
-    var onFeed = (hash === '' && path !== '/about') || hash === 'feed';
+    var onFeed = ((hash === '' && path !== '/about' && !/^\/work\//.test(path)) || hash === 'feed') && hash.indexOf('work/') !== 0;
     var reduce = false;
     try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
     if (onFeed && !reduce) d.classList.add('splash-active');
@@ -8372,7 +8372,7 @@
     attributes: true, attributeFilter: ['data-theme'],
   });
 
-  function openSheet(key, srcEl, { indexId } = {}) {
+  function openSheet(key, srcEl, { indexId, fromHistory = false } = {}) {
     const p = PAGES[key]; if (!p) return;
     // A rail-index click's indexId already names which discipline row was
     // clicked ("swe:brew") — that's the mode to open in, when this study
@@ -8388,6 +8388,7 @@
     // since the content underneath isn't changing.
     if (sheet.classList.contains('open') && sheet.dataset.page === key) {
       syncRailIndex(key, indexId);
+      writeStudyUrl(key, fromHistory);
       sheet.scrollTo({ top: 0, behavior: 'auto' });
       if (p.altMode) setSheetMode(requestedMode);
       return;
@@ -8400,6 +8401,7 @@
       document.querySelectorAll('.pin').forEach(pin => pin.classList.remove('pin-active'));
       srcEl?.classList.add('pin-active');
       syncRailIndex(key, indexId);
+      writeStudyUrl(key, fromHistory);
       // Switching studies replays the rail's own entry beat, exactly as a
       // first open does: expanded for a moment so the rest of the work stays
       // visible, then it hands the width back. Without it the rail only ever
@@ -8464,6 +8466,7 @@
     document.querySelectorAll('.pin').forEach(pin => pin.classList.remove('pin-active'));
     srcEl?.classList.add('pin-active');
     syncRailIndex(key, indexId);
+    writeStudyUrl(key, fromHistory);
     playSheetRailEntry();
     requestAnimationFrame(() => {
       // Reset once more in the frame the panel becomes visible. The first
@@ -8489,8 +8492,9 @@
     }
   }
 
-  function closeSheet() {
+  function closeSheet({ fromHistory = false } = {}) {
     if (!sheet.classList.contains('open') && !appEl.classList.contains('sheet-open')) return;
+    clearStudyUrl(fromHistory);
     clearTimeout(closeSheetTimer);
     clearTimeout(switchSheetTimer);
     cancelAnimationFrame(scrollTweenFrame);
@@ -9454,16 +9458,82 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     setRoute('feed');
   });
 
+  /* ── Case-study deep links ────────────────────────────────────────────
+     A study is addressable two ways. #work/<slug> is what the app writes as
+     you browse, because it is the only form that is safe everywhere: a
+     pushState to a different PATH throws on file://, and this page is opened
+     straight off disk often enough to matter. /work/<slug> is the pretty
+     form for sharing — vercel.json rewrites it here, and on a real http(s)
+     origin it is normalised to the hash on arrival so that clicking through
+     to a second study can't leave a stale path stuck in front of the hash.
+
+     Only studies that actually have a writeup resolve. A WIP key or an
+     unknown slug falls through to the feed rather than opening an empty
+     panel, so a stale link degrades to the work index. */
+  const studySlug = key => (PAGES[key] && !PAGES[key].wip) ? key : null;
+
+  function studyFromLocation() {
+    const h = location.hash.replace(/^#/, '');
+    if (h.startsWith('work/')) return studySlug(h.slice(5).split('/')[0]);
+    const m = location.pathname.replace(/\/$/, '').match(/^\/work\/([^/]+)$/);
+    return m ? studySlug(m[1]) : null;
+  }
+
+  function writeStudyUrl(key, skip) {
+    if (skip) return;                       // back/forward already owns this entry
+    const target = '#work/' + key;
+    if (location.hash === target) return;
+    try { history.pushState(null, '', target); } catch (e) {}
+  }
+
+  function clearStudyUrl(skip) {
+    if (skip) return;
+    if (!location.hash.startsWith('#work/')) return;
+    const back = currentRouteName && currentRouteName !== 'feed' ? '#' + currentRouteName : location.pathname;
+    try { history.pushState(null, '', back); } catch (e) {}
+  }
+
   // ── Hash routing ──
   const VALID_ROUTES = new Set(['feed', 'about', 'experience']);
   const routeFromHash = () => {
     const hash = location.hash.replace('#', '');
+    // #work/<slug> is a study, not a route: it sits on top of the feed.
+    if (hash.startsWith('work/')) return 'feed';
     if (VALID_ROUTES.has(hash)) return hash;
     // /about and /work are served here via vercel.json rewrites (no hash present on first load).
     if (location.pathname.replace(/\/$/, '') === '/about') return 'about';
     return 'feed';
   };
-  window.addEventListener('hashchange', () => setRoute(routeFromHash(), { history: 'none' }));
+  /* One listener owns both, because a study and a route share the hash.
+     Everything here passes fromHistory/none: the browser already made the
+     entry we are reacting to, and writing another would need two Backs to
+     leave one study. */
+  window.addEventListener('hashchange', () => {
+    const study = studyFromLocation();
+    if (study) {
+      if (sheet.dataset.page !== study) {
+        sheetOpenedFrom = currentRouteName || 'feed';
+        openSheet(study, document.querySelector('.pin[data-page="' + study + '"]'), { fromHistory: true });
+      }
+      return;
+    }
+    if (sheet.classList.contains('open')) closeSheet({ fromHistory: true });
+    setRoute(routeFromHash(), { history: 'none' });
+  });
+  /* A deep-linked study opens after the feed exists, since openSheet wants
+     the matching pin to flip to its active state and to animate from — this
+     runs after the feed is built, so it can be called straight out. The
+     pretty /work/<slug> path is swapped for the hash form at the same time,
+     but only on http(s) — replaceState to a path throws on file://. */
+  const initialStudy = studyFromLocation();
+  if (initialStudy) {
+    if (location.protocol !== 'file:' && !location.hash.startsWith('#work/')) {
+      try { history.replaceState(null, '', '#work/' + initialStudy); } catch (e) {}
+    }
+    sheetOpenedFrom = 'feed';
+    openSheet(initialStudy, document.querySelector('.pin[data-page="' + initialStudy + '"]'), { fromHistory: true });
+  }
+
   const initialRoute = routeFromHash();
   if (initialRoute !== 'feed') setRoute(initialRoute, { history: 'replace' });
   else if (document.documentElement.classList.contains('splash-active')) {
