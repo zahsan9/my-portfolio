@@ -2488,15 +2488,20 @@
     margin-bottom: 22px;
     box-shadow: none;
   }
-  .sheet[data-page="climate"] .cs-cta-btn {
-    background: oklch(0.98 0 0);
-    color: oklch(0.16 0.02 90);
-    box-shadow: 0 0 0 1px oklch(0.98 0 0);
+  /* A white pill made sense when this hero had no panel and sat on the dark
+     page. On the yellow panel it reads as a hole, so it inverts the way
+     crow's and habitat's do: the panel's own ink as the fill, the panel's
+     colour as the label. */
+  .sheet[data-page="climate"] .cs-hero .cs-cta-btn {
+    border: 0;
+    background: var(--card-ink);
+    color: var(--c-yellow);
+    box-shadow: none;
   }
-  .sheet[data-page="climate"] .cs-cta-btn:hover {
-    background: oklch(0.9 0 0);
-    color: oklch(0.12 0.02 90);
-    box-shadow: 0 0 0 1px oklch(0.9 0 0);
+  .sheet[data-page="climate"] .cs-hero .cs-cta-btn:hover,
+  .sheet[data-page="climate"] .cs-hero .cs-cta-btn:focus-visible {
+    opacity: 0.85;
+    box-shadow: none;
   }
   .sheet[data-page="climate"] .cs-copy table {
     background: var(--paper-2);
@@ -3095,6 +3100,36 @@
     font-family: var(--sans); font-size: 13px; line-height: 1.5;
     color: oklch(0.52 0.005 70); margin-bottom: 20px;
   }
+
+  /* ── Shared case-study header ──────────────────────────────────────────
+     Every study wears the same head: accent panel, bold title, and a
+     labelled meta row along the bottom. Nothing here names a colour — each
+     study's own .cs-hero--* rule already sets background and color, so the
+     meta inherits the right ink through currentColor and no study needs a
+     new palette token. The divider is a mix of that same ink rather than a
+     --line, which would be the page's grey sitting on a coloured panel. */
+  .cs-hero-top {
+    display: flex; align-items: center; justify-content: space-between; gap: 36px;
+  }
+  .cs-hero-mark { flex-shrink: 0; width: 132px; height: auto; margin-right: 6px; }
+  .cs-hero-meta {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+    margin: 30px 0 0; padding-top: 24px;
+    border-top: 1px solid color-mix(in oklab, currentColor 22%, transparent);
+  }
+  .cs-hero-meta dt {
+    margin-bottom: 9px; font-family: var(--mono); font-size: 9px; font-weight: 700;
+    letter-spacing: var(--tracking-label); text-transform: uppercase;
+    color: currentColor; opacity: .62;
+  }
+  .cs-hero-meta dd {
+    margin: 0; font-family: var(--sans); font-size: 13px; line-height: 1.55;
+    color: currentColor;
+  }
+  @media (max-width: 900px) {
+    .cs-hero-meta { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .cs-hero-mark { width: 84px; }
+  }
   .cs-hero--brew .cs-hero-title {
     font-family: var(--serif);
     font-weight: 700;
@@ -3172,17 +3207,6 @@
     width: clamp(150px, 23vw, 230px);
     height: auto;
     margin-bottom: 12px;
-  }
-  .sheet[data-page="brew"] .cs-hero--brew .cs-hero-title em {
-    display: block;
-    margin-top: 7px;
-    font-family: var(--sans);
-    font-size: 0.54em;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: -0.025em;
-    color: var(--brew-cream-ink);
   }
   .sheet[data-page="brew"] .cs-hero-sub {
     max-width: 760px;
@@ -3917,18 +3941,6 @@
     height: auto;
     margin-bottom: 14px;
   }
-  .sheet[data-page="habitat"] .cs-hero--habitat .cs-hero-title em {
-    display: block;
-    margin-top: 7px;
-    font-family: var(--sans);
-    font-size: 0.5em;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    color: var(--habitat-accent-ink);
-    opacity: 0.85;
-  }
   .sheet[data-page="habitat"] .cs-hero-sub {
     max-width: 760px;
     margin-bottom: 22px;
@@ -4329,18 +4341,12 @@
   }
 
   .sheet[data-page="godaddy"] .cs-hero--godaddy {
-    padding: 38px 36px 34px; border-radius: 18px; background: var(--gd-accent);
-  }
-  /* The mark fills the space the title's 17ch measure leaves on the right.
-     It sits in the same flex row rather than being positioned over the
-     card, so a longer title pushes it instead of colliding with it. The
-     black lockup is the one GoDaddy ships; on the teal panel it needs no
-     recolouring. Decorative — the study is titled in text beside it. */
-  .sheet[data-page="godaddy"] .cs-gd-hero-top {
-    display: flex; align-items: center; justify-content: space-between; gap: 36px;
-  }
-  .sheet[data-page="godaddy"] .cs-gd-logo {
-    flex-shrink: 0; width: 132px; height: auto; margin-right: 6px;
+    padding: 38px 36px 34px; border-radius: 18px;
+    background: var(--gd-accent);
+    /* The shared meta row inks itself from currentColor, so the panel has to
+       declare its own text colour — without it the row inherited the generic
+       hero's near-white and sat light-on-light against the teal. */
+    color: var(--gd-deep);
   }
   .sheet[data-page="godaddy"] .cs-hero--godaddy .cs-hero-title {
     margin-bottom: 0; font-family: var(--sans);
@@ -4352,20 +4358,6 @@
   .sheet[data-page="godaddy"] .cs-hero--godaddy .cs-hero-title em {
     font-style: italic; color: inherit;
   }
-  .sheet[data-page="godaddy"] .cs-gd-meta {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
-    margin: 30px 0 0; padding-top: 24px;
-    border-top: 1px solid oklch(0.20 0.04 220 / 0.22);
-  }
-  .sheet[data-page="godaddy"] .cs-gd-meta dt {
-    margin-bottom: 9px; font-family: var(--mono); font-size: 9px; font-weight: 700;
-    letter-spacing: var(--tracking-label); text-transform: uppercase;
-    color: var(--gd-deep); opacity: .6;
-  }
-  .sheet[data-page="godaddy"] .cs-gd-meta dd {
-    margin: 0; font-family: var(--sans); font-size: 13px; line-height: 1.55; color: var(--gd-deep);
-  }
-
   /* Generous section rhythm. This study is short and mostly panels, so the
      gaps are what separate one idea from the next — there are no long runs
      of prose doing that work. A label sits closer to its own content than
@@ -4562,7 +4554,6 @@
   .sheet[data-page="godaddy"] .cs-gd-contact b { color: var(--ink); font-weight: 600; }
 
   @media (max-width: 900px) {
-    .sheet[data-page="godaddy"] .cs-gd-meta { grid-template-columns: repeat(2, 1fr); gap: 18px; }
     .sheet[data-page="godaddy"] .cs-gd-project,
     .sheet[data-page="godaddy"] .cs-gd-project:nth-of-type(even) {
       grid-template-columns: 1fr; gap: 24px;
@@ -4576,7 +4567,6 @@
   @media (max-width: 640px) {
     .sheet[data-page="godaddy"] .cs-section { padding-top: 72px; }
     .sheet[data-page="godaddy"] .cs-hero--godaddy { padding: 28px 22px 26px; }
-    .sheet[data-page="godaddy"] .cs-gd-logo { width: 84px; }
     .sheet[data-page="godaddy"] .cs-gd-kpis { grid-template-columns: repeat(2, 1fr); }
   }
 
@@ -4586,17 +4576,26 @@
      headline, one real number set large instead of illustrated shapes, a
      plain byline instead of button-shaped metadata, and the Tableau link
      surfaced here instead of buried in Data + Method. */
+  /* Climate was the one study without an accent panel — it sat on the page
+     with a yellow highlight behind two words of the title. It wears the
+     shared head now, which means the highlight has nowhere to sit: on a
+     yellow panel it would simply disappear. The emphasis moves to italic,
+     the same way every other study marks it. */
   .cs-hero--climate {
-    background: none;
-    padding: 28px 0 0;
-    overflow: visible;
+    background: var(--c-yellow);
+    color: var(--card-ink);
+    border-radius: 18px;
+    padding: 38px 36px 34px;
+    overflow: hidden;
   }
+  /* 30px, matching the shared meta's own margin-top, so the divider sits at
+     the same height here as in every other study's header. */
   .cs-hero-topline {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 24px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
   }
   .cs-hero-topline .cs-cta-btn { flex-shrink: 0; margin-top: 6px; }
   .cs-hero--climate .cs-hero-title {
@@ -4604,19 +4603,12 @@
     font-weight: 700;
     line-height: 0.98;
     letter-spacing: -0.02em;
-    color: var(--ink);
+    color: var(--card-ink);
     margin-bottom: 0;
   }
   .cs-hero--climate .cs-hero-title em {
-    display: inline-block;
-    font-style: normal;
-    color: oklch(0.18 0.02 90);
-    background: var(--c-yellow);
-    padding: 0 8px;
-    margin-top: 8px;
-    border-radius: 6px;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
+    font-style: italic;
+    color: inherit;
   }
   .cs-hero--climate .cs-hero-sub { color: var(--ink-mid); }
   .cs-hero--climate .cs-role-line { display: none; }
@@ -4635,11 +4627,15 @@
   /* Four real per-cut numbers as individual frosted-glass callout cards —
      the premium-apple reference's "gray callout block" pattern, applied to
      real data instead of decorative shapes. */
+  /* Climate's scale figures. They used to sit inside that study's hero; with
+     the shared header they open the Context section instead, so the margin
+     flips — room below, before the copy they frame, rather than a small lift
+     under a title they no longer follow. */
   .cs-hero-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
-    margin-top: 8px;
+    margin: 0 0 32px;
   }
   .cs-hstat {
     background: var(--paper-2);
@@ -6414,13 +6410,14 @@
               <a class="cs-cta-btn" href="https://www.figma.com/design/fRDum7bCiXLQUExZ5Kdqx8/brew.?node-id=76-4&amp;p=f&amp;t=LZwBOvpgaqXkDuEh-0" target="_blank" rel="noopener noreferrer">Figma ↗</a>
             </div>
           </div>
-          <h2 class="cs-hero-title"><img class="cs-brew-title-logo" src="assets/images/brew-logo.png" alt="brew."><em>Find your third space.</em></h2>
+          <h2 class="cs-hero-title"><img class="cs-brew-title-logo" src="assets/images/brew-logo.png" alt="brew."></h2>
           <p class="cs-hero-sub">A cafe-discovery app organized around what someone needs from a space, with meaningful save states and one shared system for comments and reviews.</p>
-          <div class="cs-hero-byline cs-brew-byline" aria-label="Project details">
-            <span>Product design + front-end</span>
-            <span>Partner project</span>
-            <span>React Native + Expo</span>
-          </div>
+          <dl class="cs-hero-meta">
+            <div><dt>Timeline</dt><dd>2026</dd></div>
+            <div><dt>Role</dt><dd>Product design + front-end</dd></div>
+            <div><dt>Team</dt><dd>Partner project</dd></div>
+            <div><dt>Stack</dt><dd>React Native + Expo</dd></div>
+          </dl>
         </div>
 
         <div class="cs-section">
@@ -6745,6 +6742,16 @@
             <h2 class="cs-hero-title">A closer look at<br><em>neutral perspectives.</em></h2>
             <a class="cs-cta-btn" href="https://public.tableau.com/app/profile/zainab.ahsan/viz/GroupIndividualNeutralResponsesAnalysisESDFamilySurvey/ESDFamilySurveyNeutralResponsesAnalysis" target="_blank" rel="noopener noreferrer">View on Tableau ↗</a>
           </div>
+          <dl class="cs-hero-meta">
+            <div><dt>Timeline</dt><dd>2026</dd></div>
+            <div><dt>Role</dt><dd>Data analysis + visualisation</dd></div>
+            <div><dt>Team</dt><dd>Edmonds School District</dd></div>
+            <div><dt>Tools</dt><dd>Tableau</dd></div>
+          </dl>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Context</span>
           <div class="cs-hero-stats">
             <div class="cs-hstat">
               <span class="cs-hstat-n">~30×</span>
@@ -6759,10 +6766,6 @@
               <span class="cs-hstat-l">Peak topic neutral rate</span>
             </div>
           </div>
-        </div>
-
-        <div class="cs-section">
-          <span class="cs-label">Context</span>
           <div class="cs-copy">
             <p><strong>22% of ~6,000 family climate survey responses were neutral.</strong> Instead of treating that as a leftover category, I wanted to know whether there was a pattern behind it. There was. Neutral responses varied by topic, school, race/ethnicity, and home language. I built the topic, race, and language views and co-developed the school treemap so Edmonds School District's equity team could see where those differences showed up and decide what was worth investigating.</p>
           </div>
@@ -6940,11 +6943,12 @@
           </div>
           <h2 class="cs-hero-title">What if you could choose your dreams?</h2>
           <p class="cs-hero-sub">DreamCatcher is a mobile-first concept for detecting, visualizing, and intentionally shaping dream experiences. It turns an invisible part of sleep into dream worlds to explore, a guided creation flow, personal insights, and constellations that grow over time.</p>
-          <div class="cs-hero-byline cs-dream-byline" aria-label="Project details">
-            <span>Product + interaction design</span>
-            <span>Team of 2</span>
-            <span>Figma prototype</span>
-          </div>
+          <dl class="cs-hero-meta">
+            <div><dt>Timeline</dt><dd>FigBuild 2026</dd></div>
+            <div><dt>Role</dt><dd>Product + interaction design</dd></div>
+            <div><dt>Team</dt><dd>Team of 2</dd></div>
+            <div><dt>Stack</dt><dd>Figma prototype</dd></div>
+          </dl>
         </div>
 
         <div class="cs-section">
@@ -7179,11 +7183,12 @@
           </div>
           <h2 class="cs-hero-title">The CROW</h2>
           <p class="cs-hero-sub">UW Bothell's student research journal, ten volumes and counting. The original site ran on generic template styling with no real identity and buried its submission rules in walls of text. WIIRED Studio rebuilt it end to end, from an unbranded template into a journal worth submitting to.</p>
-          <div class="cs-hero-byline cs-crow-byline" aria-label="Project details">
-            <span>Visual design + front-end build</span>
-            <span>WIIRED Studio · Partner project</span>
-            <span>HTML, CSS, JavaScript</span>
-          </div>
+          <dl class="cs-hero-meta">
+            <div><dt>Timeline</dt><dd>2026</dd></div>
+            <div><dt>Role</dt><dd>Visual design + front-end build</dd></div>
+            <div><dt>Team</dt><dd>WIIRED Studio · Partner project</dd></div>
+            <div><dt>Stack</dt><dd>HTML, CSS, JavaScript</dd></div>
+          </dl>
         </div>
 
         <div class="cs-section">
@@ -7416,11 +7421,11 @@
       eyebrow: 'Case Study',
       custom: `
         <div class="cs-hero cs-hero--godaddy">
-          <div class="cs-gd-hero-top">
-            <h2 class="cs-hero-title">Building analytics and AI evaluation tools @ <em>GoDaddy</em></h2>
-            <img class="cs-gd-logo" src="assets/images/godaddy-icon-black.svg" alt="" aria-hidden="true">
+          <div class="cs-hero-top">
+            <h2 class="cs-hero-title">Building analytics and AI evaluation tools <em>@ GoDaddy</em></h2>
+            <img class="cs-hero-mark" src="assets/images/godaddy-icon-black.svg" alt="" aria-hidden="true">
           </div>
-          <dl class="cs-gd-meta">
+          <dl class="cs-hero-meta">
             <div><dt>Timeline</dt><dd>July 2026 – Present, extended through fall</dd></div>
             <div><dt>Role</dt><dd>Data Analytics Intern, Product</dd></div>
             <div><dt>Teams</dt><dd>Commerce, Media Solutions</dd></div>
@@ -7556,13 +7561,14 @@
               <a class="cs-cta-btn" href="https://github.com/zahsan9/uwbhacks26" target="_blank" rel="noopener noreferrer">Repo ↗</a>
             </div>
           </div>
-          <h2 class="cs-hero-title"><img class="cs-habitat-title-logo" src="assets/images/habitat-logo.png" alt="HABITAT"><em>Your habits, your world.</em></h2>
+          <h2 class="cs-hero-title"><img class="cs-habitat-title-logo" src="assets/images/habitat-logo.png" alt="HABITAT"></h2>
           <p class="cs-hero-sub">A gamified habit tracker that turns HealthKit data into a living island world. Each habit grows its own island, and a pixel panda's health responds to how those islands are doing, so checking in feels like visiting a place instead of reading a guilt-driven dashboard.</p>
-          <div class="cs-hero-byline cs-habitat-byline" aria-label="Project details">
-            <span>Visual + product design</span>
-            <span>Team of 4 · 48-hour hackathon</span>
-            <span>React Native + Expo</span>
-          </div>
+          <dl class="cs-hero-meta">
+            <div><dt>Timeline</dt><dd>48-hour hackathon, 2026</dd></div>
+            <div><dt>Role</dt><dd>Visual + product design</dd></div>
+            <div><dt>Team</dt><dd>Team of 4</dd></div>
+            <div><dt>Stack</dt><dd>React Native + Expo</dd></div>
+          </dl>
         </div>
 
         <div class="cs-section">
