@@ -5451,7 +5451,14 @@
        Back to Work — never sits underneath it. */
     .main { padding-bottom: 70px; }
     .topbar { padding: 14px 18px; }
-    .banner h1 { font-size: 46px; }
+    .banner { padding: 56px 24px 32px; max-height: none; }
+    .banner .avatar {
+      width: 88px; height: 88px; min-height: 88px; max-height: 88px;
+      margin-bottom: 18px;
+    }
+    .banner h1 { font-size: 32px; margin-bottom: 10px; }
+    .banner .bio { font-size: 13px; line-height: 1.55; }
+    .banner .meta { margin-top: 12px; font-size: 11px; }
     /* Experience: the desktop track is scroll-hijacked horizontally as you
        scroll the page down. On mobile that fights the native vertical
        scroll, so switch to a plain horizontal swipe strip, centred in the
@@ -5573,21 +5580,17 @@
     .ab-about-copy { margin-top: 0 !important; padding-bottom: 0 !important; }
   }
   @media (max-width: 600px) {
-    /* Banner (avatar/name/bio/meta) and the filter tabs beneath it use
-       desktop-scale sizing and padding everywhere above — on a real phone
-       that reads as a huge photo, oversized name, and a wall of empty
-       space before any actual content. Scale it down to something that
-       fits a phone screen without three extra scrolls. */
-    .banner { padding: 72px 24px 40px; max-height: none; }
+    /* A compact phone intro gives the work more room on the first screen. */
+    .banner { padding: 48px 24px 28px; }
     .banner .avatar {
-      width: 96px; height: 96px; min-height: 96px; max-height: 96px;
-      margin: 0 auto 20px;
+      width: 80px; height: 80px; min-height: 80px; max-height: 80px;
+      margin: 0 auto 16px;
     }
     .banner .avatar.is-open,
     .banner .avatar:has(.em-btn:focus-visible) { width: 240px; }
-    .banner h1 { font-size: 32px; margin-bottom: 10px; }
+    .banner h1 { font-size: 30px; margin-bottom: 8px; }
     .banner .bio { font-size: 12px; line-height: 1.55; }
-    .banner .meta { margin-top: 12px; font-size: 11.5px; }
+    .banner .meta { margin-top: 10px; font-size: 10px; }
     .tabs { padding: 14px 0 16px; gap: 10px 13px; justify-content: center; }
     .tab { font-size: 12px; padding: 5px 0 8px; }
 .cs-two-col,
