@@ -5471,10 +5471,10 @@
       margin-bottom: 24px;
     }
     .banner h1 { font-size: 32px; margin-bottom: 10px; }
-    .banner .bio { max-width: 400px; font-size: 13px; line-height: 1.55; text-wrap: pretty; }
+    .banner .bio { max-width: 400px; font-size: 14px; line-height: 1.55; text-wrap: pretty; }
     .banner .bio-role { display: none; }
     .banner .bio-details { display: block; }
-    .banner .meta { margin-top: 12px; font-size: 11px; }
+    .banner .meta { display: none; }
     .tabs {
       width: min(400px, 100% - 64px);
       justify-content: center; flex-wrap: nowrap; gap: 24px;
@@ -5610,8 +5610,7 @@
     .banner .avatar.is-open,
     .banner .avatar:has(.em-btn:focus-visible) { width: 240px; }
     .banner h1 { font-size: 30px; margin-bottom: 8px; }
-    .banner .bio { max-width: 292px; font-size: 12px; line-height: 1.55; }
-    .banner .meta { margin-top: 10px; font-size: 10px; }
+    .banner .bio { max-width: 292px; font-size: 13px; line-height: 1.55; }
     .tabs { width: min(292px, 100% - 36px); padding: 14px 0 16px; }
     .tab { font-size: 12px; padding: 12px 0; }
 .cs-two-col,
@@ -8967,9 +8966,17 @@
       art.style.setProperty('--wheel-scale', (1 - Math.abs(phase) * (1 - FEED_WHEEL.minScale)).toFixed(4));
       art.style.setProperty('--wheel-opacity', (1 - phase * (1 - FEED_WHEEL.minOpacity)).toFixed(4));
     });
+    // While filter cards slide into place, keep re-posing every frame so
+    // tilt/scale follow each card instead of snapping when the FLIP settles.
+    if (performance.now() < feedWheelTrackUntil) scheduleFeedWheel();
   }
+  let feedWheelTrackUntil = 0;
   function scheduleFeedWheel() {
     if (feedWheelFrame === null) feedWheelFrame = requestAnimationFrame(updateFeedWheel);
+  }
+  function trackFeedWheel(ms) {
+    feedWheelTrackUntil = performance.now() + ms;
+    scheduleFeedWheel();
   }
   main.addEventListener('scroll', scheduleFeedWheel, { passive: true });
   window.addEventListener('resize', scheduleFeedWheel);
@@ -9298,6 +9305,7 @@
     });
 
     feedEmpty.classList.toggle('visible', show.size === 0);
+    trackFeedWheel(motionDelay(560));
 
     filterSettleTimer = setTimeout(() => {
       filterSettleTimer = null;
