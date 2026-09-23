@@ -1242,6 +1242,10 @@
     .feed.is-filtered { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px)  { .feed { flex-direction: column; width: min(292px, 100% - 36px); } }
+  @media (max-width: 800px) {
+    .feed .feed-col { display: contents; }
+    .feed .pin:has(.skills-card, .contact-card) { display: none; }
+  }
 
   .pin {
     cursor: pointer;
@@ -5445,11 +5449,6 @@
        of scrollable content — copyright footer, final exp card, About's
        Back to Work — never sits underneath it. */
     .main { padding-bottom: 70px; }
-    /* A WIP card can't be opened, and the one thing that says so — the custom
-       cursor's "Under construction" — is pointer:fine only. On a phone it
-       looks exactly like a card that works and does nothing when tapped, so
-       it doesn't ship here. */
-    .pin[data-cursor-label="Under construction"] { display: none; }
     .topbar { padding: 14px 18px; }
     .banner h1 { font-size: 46px; }
     /* Experience: the desktop track is scroll-hijacked horizontally as you
@@ -8874,6 +8873,28 @@
   const feed = document.getElementById('feed');
   const feedEmpty = document.getElementById('feedEmpty');
   const pins = [...feed.querySelectorAll('.pin')];
+
+  // Keep mobile reading and keyboard order in sync, then restore the
+  // hand-balanced desktop columns when the viewport grows again.
+  const mobileFeedQuery = matchMedia('(max-width: 800px)');
+  const desktopFeedColumns = [...feed.querySelectorAll('.feed-col')].map(column => ({
+    column, cards: [...column.children]
+  }));
+  const mobileFeedOrder = ['godaddy', 'brew', 'habitat', 'climate', 'crow', 'dreamcatcher', 'wiired'];
+  function syncFeedLayout() {
+    if (mobileFeedQuery.matches) {
+      const column = desktopFeedColumns[0].column;
+      mobileFeedOrder.forEach(key => {
+        const card = pins.find(pin => pin.dataset.page === key);
+        if (card) column.append(card);
+      });
+    } else {
+      desktopFeedColumns.forEach(({ column, cards }) => column.append(...cards));
+    }
+    requestAnimationFrame(lockFeedHeight);
+  }
+  mobileFeedQuery.addEventListener('change', syncFeedLayout);
+  syncFeedLayout();
 
   const CAT_LABELS = {
     ux: 'Product / UX',
