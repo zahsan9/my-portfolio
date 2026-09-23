@@ -1246,6 +1246,7 @@
     .feed .feed-col { display: contents; }
     .feed .pin:has(.skills-card, .contact-card) { display: none; }
     .feed .pin[data-page] > .art { aspect-ratio: 4 / 5; }
+    .tabs .tab[data-filter="studio"] { display: none; }
   }
 
   .pin {
@@ -5451,13 +5452,13 @@
        Back to Work — never sits underneath it. */
     .main { padding-bottom: 70px; }
     .topbar { padding: 14px 18px; }
-    .banner { padding: 56px 24px 32px; max-height: none; }
+    .banner { padding: 72px 32px 48px; max-height: none; }
     .banner .avatar {
       width: 88px; height: 88px; min-height: 88px; max-height: 88px;
-      margin-bottom: 18px;
+      margin-bottom: 24px;
     }
     .banner h1 { font-size: 32px; margin-bottom: 10px; }
-    .banner .bio { font-size: 13px; line-height: 1.55; }
+    .banner .bio { max-width: 400px; font-size: 13px; line-height: 1.55; text-wrap: pretty; }
     .banner .meta { margin-top: 12px; font-size: 11px; }
     /* Experience: the desktop track is scroll-hijacked horizontally as you
        scroll the page down. On mobile that fights the native vertical
@@ -5580,16 +5581,16 @@
     .ab-about-copy { margin-top: 0 !important; padding-bottom: 0 !important; }
   }
   @media (max-width: 600px) {
-    /* A compact phone intro gives the work more room on the first screen. */
-    .banner { padding: 48px 24px 28px; }
+    /* Keep air around the portrait; align the bio's measure with the cards. */
+    .banner { padding: 72px 18px 40px; }
     .banner .avatar {
       width: 80px; height: 80px; min-height: 80px; max-height: 80px;
-      margin: 0 auto 16px;
+      margin: 0 auto 24px;
     }
     .banner .avatar.is-open,
     .banner .avatar:has(.em-btn:focus-visible) { width: 240px; }
     .banner h1 { font-size: 30px; margin-bottom: 8px; }
-    .banner .bio { font-size: 12px; line-height: 1.55; }
+    .banner .bio { max-width: 292px; font-size: 12px; line-height: 1.55; }
     .banner .meta { margin-top: 10px; font-size: 10px; }
     .tabs { padding: 14px 0 16px; gap: 10px 13px; justify-content: center; }
     .tab { font-size: 12px; padding: 5px 0 8px; }
@@ -9239,6 +9240,14 @@
       applyFilter(filter);
     });
   });
+
+  function syncMobileFilter() {
+    if (mobileFeedQuery.matches && currentFilter === 'studio') {
+      document.querySelector('.tab[data-filter="all"]').click();
+    }
+  }
+  mobileFeedQuery.addEventListener('change', syncMobileFilter);
+  syncMobileFilter();
 
   /* ── "Updated" tag ──
      The month shipped in the markup is the source of truth offline; this only
