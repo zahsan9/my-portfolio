@@ -8959,8 +8959,12 @@
     const poses = wheelCards.filter(({ pin }) => pin.getClientRects().length).map(({ pin, art }) => {
       const rect = pin.getBoundingClientRect();
       const phase = Math.max(0, Math.min(1, (rect.top + rect.height / 2 - center) / travel));
-      return { art, phase };
+      return { art, phase, top: rect.top };
     });
+    // The first card is what the feed opens on, so it always sits flat.
+    // `pins` is in desktop column order, so find it by position instead.
+    const first = poses.reduce((a, b) => (b.top < a.top ? b : a), poses[0]);
+    if (first) first.phase = 0;
     poses.forEach(({ art, phase }) => {
       art.style.setProperty('--wheel-turn', `${(-phase * FEED_WHEEL.maxTilt).toFixed(2)}deg`);
       art.style.setProperty('--wheel-scale', (1 - Math.abs(phase) * (1 - FEED_WHEEL.minScale)).toFixed(4));
