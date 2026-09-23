@@ -1287,6 +1287,7 @@
     .feed.has-wheel:not(.has-open) .pin[data-page] > .art {
       transform: perspective(var(--wheel-perspective, 1000px))
         rotateX(var(--wheel-turn, 0deg)) scale(var(--wheel-scale, 1));
+      opacity: var(--wheel-opacity, 1);
       transform-origin: center;
       transition: box-shadow var(--motion-med) ease;
     }
@@ -8921,14 +8922,15 @@
 
   /* ── MOBILE FEED WHEEL ─────────────────────────────────────
    * Scroll position brings each card forward as it enters:
-   *   below center  → card tilts back and recedes slightly
+   *   below center  → smaller, softly faded card tilts toward you
    *   at center     → full-size, forward-facing card
    *   above center  → stays flat and full-size as it scrolls out
    * Native scrolling and the cards' layout boxes stay unchanged.
    * ───────────────────────────────────────────────────────── */
   const FEED_WHEEL = {
     maxTilt: 26,          // degrees at the visible edges
-    minScale: 0.90,       // depth without making the artwork hard to read
+    minScale: 0.84,       // smaller incoming card, full size at center
+    minOpacity: 0.65,     // soft fade that clears as the card rises
     perspective: 1000,    // gentle perspective in pixels
     center: 0.5,         // reading position within the viewport
     travel: 0.5,         // half a viewport from face-on to maximum tilt
@@ -8946,6 +8948,7 @@
       wheelCards.forEach(({ art }) => {
         art.style.removeProperty('--wheel-turn');
         art.style.removeProperty('--wheel-scale');
+        art.style.removeProperty('--wheel-opacity');
       });
       return;
     }
@@ -8961,6 +8964,7 @@
     poses.forEach(({ art, phase }) => {
       art.style.setProperty('--wheel-turn', `${(-phase * FEED_WHEEL.maxTilt).toFixed(2)}deg`);
       art.style.setProperty('--wheel-scale', (1 - Math.abs(phase) * (1 - FEED_WHEEL.minScale)).toFixed(4));
+      art.style.setProperty('--wheel-opacity', (1 - phase * (1 - FEED_WHEEL.minOpacity)).toFixed(4));
     });
   }
   function scheduleFeedWheel() {
