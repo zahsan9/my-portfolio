@@ -8920,10 +8920,10 @@
   syncFeedLayout();
 
   /* ── MOBILE FEED WHEEL ─────────────────────────────────────
-   * Scroll position owns the motion, in either direction:
+   * Scroll position brings each card forward as it enters:
    *   below center  → card tilts back and recedes slightly
    *   at center     → full-size, forward-facing card
-   *   above center  → card tips away as the next one rises
+   *   above center  → stays flat and full-size as it scrolls out
    * Native scrolling and the cards' layout boxes stay unchanged.
    * ───────────────────────────────────────────────────────── */
   const FEED_WHEEL = {
@@ -8955,7 +8955,7 @@
     // Measure the untransformed card wrappers first, then write styles.
     const poses = wheelCards.filter(({ pin }) => pin.getClientRects().length).map(({ pin, art }) => {
       const rect = pin.getBoundingClientRect();
-      const phase = Math.max(-1, Math.min(1, (rect.top + rect.height / 2 - center) / travel));
+      const phase = Math.max(0, Math.min(1, (rect.top + rect.height / 2 - center) / travel));
       return { art, phase };
     });
     poses.forEach(({ art, phase }) => {
