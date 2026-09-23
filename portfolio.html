@@ -5461,6 +5461,11 @@
     .banner .bio { max-width: 400px; font-size: 13px; line-height: 1.55; text-wrap: pretty; }
     .banner .bio-role { display: none; }
     .banner .meta { margin-top: 12px; font-size: 11px; }
+    .tabs {
+      width: min(400px, 100% - 64px);
+      justify-content: space-between; flex-wrap: nowrap; gap: 12px;
+    }
+    .tab { min-height: 40px; }
     /* Experience: the desktop track is scroll-hijacked horizontally as you
        scroll the page down. On mobile that fights the native vertical
        scroll, so switch to a plain horizontal swipe strip, centred in the
@@ -5593,8 +5598,8 @@
     .banner h1 { font-size: 30px; margin-bottom: 8px; }
     .banner .bio { max-width: 292px; font-size: 12px; line-height: 1.55; }
     .banner .meta { margin-top: 10px; font-size: 10px; }
-    .tabs { padding: 14px 0 16px; gap: 10px 13px; justify-content: center; }
-    .tab { font-size: 12px; padding: 5px 0 8px; }
+    .tabs { width: min(292px, 100% - 36px); padding: 14px 0 16px; }
+    .tab { font-size: 12px; padding: 12px 0; }
 .cs-two-col,
     .cs-artifact-grid,
     .cs-viz-grid,
