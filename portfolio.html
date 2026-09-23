@@ -1283,6 +1283,18 @@
   .ar-1  { aspect-ratio: 1; }
   .ar-45 { aspect-ratio: 4 / 5; }
 
+  @media (max-width: 800px) and (prefers-reduced-motion: no-preference) {
+    .feed.has-wheel:not(.has-open) .pin[data-page] > .art {
+      transform: perspective(var(--wheel-perspective, 1000px))
+        rotateX(var(--wheel-turn, 0deg)) scale(var(--wheel-scale, 1));
+      transform-origin: center;
+      transition: box-shadow var(--motion-med) ease;
+    }
+  }
+  @media (max-width: 800px) and (prefers-reduced-motion: reduce) {
+    .feed .pin[data-page] > .art { transform: none; }
+  }
+
   /* Art backgrounds */
   .art-clay    { background: var(--c-clay);    color: var(--card-ink); }
   .art-blue    { background: var(--c-blue);    color: oklch(0.97 0 0); }
@@ -8907,6 +8919,59 @@
   mobileFeedQuery.addEventListener('change', syncFeedLayout);
   syncFeedLayout();
 
+  /* ── MOBILE FEED WHEEL ─────────────────────────────────────
+   * Scroll position owns the motion, in either direction:
+   *   below center  → card tilts back and recedes slightly
+   *   at center     → full-size, forward-facing card
+   *   above center  → card tips away as the next one rises
+   * Native scrolling and the cards' layout boxes stay unchanged.
+   * ───────────────────────────────────────────────────────── */
+  const FEED_WHEEL = {
+    maxTilt: 26,          // degrees at the visible edges
+    minScale: 0.90,       // depth without making the artwork hard to read
+    perspective: 1000,    // gentle perspective in pixels
+    center: 0.5,         // reading position within the viewport
+    travel: 0.5,         // half a viewport from face-on to maximum tilt
+  };
+  const wheelCards = pins.filter(pin => pin.dataset.page).map(pin => ({
+    pin, art: pin.querySelector('.art')
+  }));
+  feed.style.setProperty('--wheel-perspective', `${FEED_WHEEL.perspective}px`);
+  let feedWheelFrame = null;
+  function updateFeedWheel() {
+    feedWheelFrame = null;
+    const enabled = mobileFeedQuery.matches && !prefersReducedMotion();
+    feed.classList.toggle('has-wheel', enabled);
+    if (!enabled) {
+      wheelCards.forEach(({ art }) => {
+        art.style.removeProperty('--wheel-turn');
+        art.style.removeProperty('--wheel-scale');
+      });
+      return;
+    }
+    if (feed.classList.contains('has-open') || !feed.getClientRects().length) return;
+    const center = innerHeight * FEED_WHEEL.center;
+    const travel = innerHeight * FEED_WHEEL.travel;
+    // Measure the untransformed card wrappers first, then write styles.
+    const poses = wheelCards.filter(({ pin }) => pin.getClientRects().length).map(({ pin, art }) => {
+      const rect = pin.getBoundingClientRect();
+      const phase = Math.max(-1, Math.min(1, (rect.top + rect.height / 2 - center) / travel));
+      return { art, phase };
+    });
+    poses.forEach(({ art, phase }) => {
+      art.style.setProperty('--wheel-turn', `${(-phase * FEED_WHEEL.maxTilt).toFixed(2)}deg`);
+      art.style.setProperty('--wheel-scale', (1 - Math.abs(phase) * (1 - FEED_WHEEL.minScale)).toFixed(4));
+    });
+  }
+  function scheduleFeedWheel() {
+    if (feedWheelFrame === null) feedWheelFrame = requestAnimationFrame(updateFeedWheel);
+  }
+  main.addEventListener('scroll', scheduleFeedWheel, { passive: true });
+  window.addEventListener('resize', scheduleFeedWheel);
+  reducedMotionQuery.addEventListener('change', scheduleFeedWheel);
+  mobileFeedQuery.addEventListener('change', scheduleFeedWheel);
+  scheduleFeedWheel();
+
   const CAT_LABELS = {
     ux: 'Product / UX',
     swe: 'SWE',
@@ -9143,6 +9208,7 @@
     if (feedView.style.display === 'none') return;
     feed.style.height = 'auto';
     feed.style.height = feed.getBoundingClientRect().height + 'px';
+    scheduleFeedWheel();
   }
   window.addEventListener('load', lockFeedHeight);
   window.addEventListener('resize', lockFeedHeight);
