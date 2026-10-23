@@ -47,11 +47,17 @@
     font-size: clamp(28px, 4vw, 48px); line-height: 1.15;
   }
   #construction .sign { margin-top: 16px; font-family: var(--mono); font-size: 11px; color: var(--ink-mid); text-transform: uppercase; letter-spacing: var(--tracking-label); }
-  /* Typing loop. The ghost copy holds the full line's width in the same grid
-     cell, so the typed text grows left to right inside a fixed, centred box
-     instead of re-centring on every keystroke. */
-  #construction .cx-type { display: inline-grid; text-align: left; }
-  #construction .cx-type > span { grid-area: 1 / 1; }
+  /* Typing loop. Each line is its own box: a ghost copy holds the line's full
+     width in the same grid cell, so the typed text grows left to right inside
+     a fixed, centred box instead of re-centring on every keystroke. The two
+     boxes sit side by side on desktop and stack on phones. */
+  #construction .cx-line { display: inline-grid; text-align: left; }
+  #construction .cx-line + .cx-line { margin-left: 0.15em; }
+  #construction .cx-line > span { grid-area: 1 / 1; }
+  @media (max-width: 600px) {
+    #construction .cx-type { display: grid; justify-items: center; }
+    #construction .cx-line + .cx-line { margin-left: 0; }
+  }
   #construction .cx-ghost { visibility: hidden; }
   #construction .cx-cursor {
     display: inline-block; width: 0.06em; height: 0.9em;
@@ -70,32 +76,43 @@
 
 <div id="construction">
   <div>
-    <p class="cx-type" aria-label="under construction… check back soon :)"><span class="cx-ghost" aria-hidden="true">under construction… check back soon :)<span class="cx-cursor"></span></span><span aria-hidden="true"><span class="cx-text">under construction… check back soon :)</span><span class="cx-cursor"></span></span></p>
+    <p class="cx-type" aria-label="under construction… check back soon :)"><span class="cx-line" aria-hidden="true"><span class="cx-ghost">under construction…<span class="cx-cursor"></span></span><span><span class="cx-text">under construction…</span></span></span><span class="cx-line" aria-hidden="true"><span class="cx-ghost">check back soon :)<span class="cx-cursor"></span></span><span><span class="cx-text">check back soon :)</span><span class="cx-cursor"></span></span></span></p>
     <p class="sign">— zainab, oct 26</p>
   </div>
 </div>
 <script>
-  /* Types the line, holds with the cursor blinking, backspaces, repeats.
-     Reduced motion keeps the full line with a still cursor. */
+  /* Types both lines, holds with the cursor blinking, backspaces, repeats.
+     The one cursor moves to whichever line is being typed. Reduced motion
+     keeps the full text with a still cursor. */
   (function () {
     var box = document.querySelector('#construction .cx-type');
-    var out = box && box.querySelector('.cx-text');
-    if (!out) return;
+    var outs = box ? box.querySelectorAll('.cx-text') : [];
+    var cursor = box && box.querySelector('.cx-text + .cx-cursor');
+    if (!outs.length || !cursor) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var line = out.textContent, i = 0;
+    var lines = Array.prototype.map.call(outs, function (o) { return o.textContent; });
+    var total = lines.join('').length, n = 0;
 
-    function show(n, typing) {
-      out.textContent = line.slice(0, n);
+    // Show the first n characters across the lines, cursor after the last one.
+    function show(count, typing) {
+      var left = count, at = 0;
+      lines.forEach(function (line, k) {
+        var take = Math.min(left, line.length);
+        outs[k].textContent = line.slice(0, take);
+        if (left > 0 || k === 0) at = k;
+        left -= take;
+      });
+      outs[at].after(cursor);
       box.classList.toggle('is-typing', typing);
     }
     function type() {
-      show(++i, true);
-      if (i < line.length) setTimeout(type, 55 + Math.random() * 70);
-      else { show(i, false); setTimeout(erase, 7000); }
+      show(++n, true);
+      if (n < total) setTimeout(type, 55 + Math.random() * 70);
+      else { show(n, false); setTimeout(erase, 7000); }
     }
     function erase() {
-      show(--i, true);
-      if (i > 0) setTimeout(erase, 28);
+      show(--n, true);
+      if (n > 0) setTimeout(erase, 28);
       else { show(0, false); setTimeout(type, 1200); }
     }
     show(0, false);
