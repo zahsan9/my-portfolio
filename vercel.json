@@ -1,20 +1,15 @@
 {
+  "redirects": [
+    {
+      "source": "/((?!construction\\.html).+)",
+      "destination": "/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/",
-      "destination": "/portfolio.html"
-    },
-    {
-      "source": "/about",
-      "destination": "/portfolio.html"
-    },
-    {
-      "source": "/work",
-      "destination": "/portfolio.html"
-    },
-    {
-      "source": "/work/:slug",
-      "destination": "/portfolio.html"
+      "destination": "/construction.html"
     }
   ]
 }
