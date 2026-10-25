@@ -63,11 +63,11 @@ The sheet is `role="dialog"` but deliberately **not** `aria-modal` — the rail 
 
 ### Experience timeline
 
-The experience section (`#expView`) is a scroll-driven horizontal track. A sticky sentinel + `IntersectionObserver` drives `updateExperienceTrackNow()` which reads scroll position and sets `--exp-track-x` on `.exp-scroll` to translate `.exp-track`. 
+The experience section (`#expView`) is a vertical zig-zag timeline on desktop (over 800px), at full card size: the "Experience timeline" heading alone on the first screen (centred, with a "Scroll" cue at the bottom, `.exp-scroll-cue`), then a thin centre line (`.exp-track::before`, itself a grid item) with the cards alternating left and right of it, one per row, starting with Tesla on the left (a two-column CSS grid on `.exp-track`). Each card's date (`.yr`) sits beside a dot on the line, level with the job type, on the far side from its card. Each dot takes its card's colour (`--exp-dot`). Under each date, a `.yr-span` line gives the length ("6 months", "1 year 5 months", "Upcoming"). It's computed at load from the `.yr`'s `data-from` / `data-to` (`YYYY-MM`, or `now` for Present roles), counting months inclusively. Each dot stays hidden until it's scrolled up past a reading position 80% of the way down the screen, then gets `.is-reached` and pops in. The scroll cue fades out over the first ~220px (`--exp-cue`). All three are computed in `updateExperienceTrackNow()`. The date is still the card's own child, so it moves with the card. The empty half of each row is reserved for an image later. An `IntersectionObserver` adds `.is-in` as each card scrolls into view, and it plays `exp-card-in`: a soft fade through a light blur, with an 18px rise and a slight scale-up. Cards have no hover state on purpose. Leaving the page clears `.is-in` so the entrances replay next visit. Scrolling is guided: while `#expView` is active, `.main` gets `scroll-snap-type: y mandatory` (via `:has()`), with the heading screen snapping to the top and each card snapping to centre (`scroll-snap-stop: always`, so one scroll moves one card). After the last card, `.exp-outro` ("If you've scrolled this far, let's work together :)" plus `.exp-outro-email`, a pill matching `.page-back` (no outline, fills on hover) that uses the shared `[data-copy-email]` handler: envelope + address at rest, "Copy email" on hover, tick + "Copied" on press) is the final snap stop. Cards also trail the scroll on a spring (`--exp-lag` on the card's `translate`, set by a `.main` scroll listener; lower-on-screen cards trail more), which is why the reveal animation uses `backwards` fill rather than `both`. The degree card (lavender, `art-plum`) closes the list. Mobile keeps the horizontal swipe strip.
 
 Experience cards carry no tech-logo stack. There was one (`.exp-tech-zone`, an absolute 76×210 column at the card's top-right); it overlaid the card's own content box and collided with the title and bullets as soon as the card narrowed, and it was removed rather than patched. The logo files under `assets/logos/` are now unreferenced.
 
-End-of-scroll: `endHold = viewport.clientHeight * 0.55` — a buffer where the card deck fades out (smoothstep opacity + translateY) before the sticky viewport releases. Cards individually fade in via `--scroll-reveal-opacity` as they enter the track.
+
 
 ### Motion
 
@@ -102,7 +102,7 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 | `syncRailIndex(key, indexId)` | Marks exactly one index row active (`null` key clears it). |
 | `cardPalette(pin)` | A card's `{color, on, icon, dark}` — surface, text-on-surface, and its icon color per theme. |
 | `playSheetRailEntry()` | Expands the rail on open, then collapses it to swatches. |
-| `updateExperienceTrackNow()` | Recalculates horizontal scroll position and card reveal state. |
+| `updateExperienceTrackNow()` | Desktop: sets which dots have appeared (`.is-reached`) and the scroll-cue fade. Also clears the cards' `.is-in` reveal state when the page is left. |
 
 ---
 
@@ -189,7 +189,7 @@ Do not make every sheet visually identical. Consistency comes from the canvas, s
 ### Shared visual foundation
 
 - **Case-study canvas**: all finished case studies use the same mode-aware sheet background. Dark mode uses the lighter neutral gray `oklch(0.29 0 0)`; light mode uses the darker neutral gray `oklch(0.91 0 0)`. Keep the shared selector centralized so case-study backgrounds cannot drift apart.
-- **Section rhythm**: use `66px` of top spacing between major `.cs-section` blocks. The space belongs before the next text section, not as extra space after a figure. Every major section should use the same rhythm, including Impact/Current Outcome.
+- **Section rhythm**: use `66px` of top spacing between major `.cs-section` blocks. The space belongs before the next text section, not as extra space after a figure. Every major section should use the same rhythm, including Impact/Current Outcome. The one exception is the Overview that opens every study: it takes GoDaddy's wider step, `112px` above and below (`72px` at 640px and under), with its label `20px` from the lead, so the summary stands apart from the sections it introduces.
 - **Section labels**: title case, bold sans, compact rounded rectangle, and visually smaller than the content heading. Labels are not all-caps mono pills. Current size is `15px` for Brew and `16px` for Neutral.
 - **Structural boxes**: use a subtle fill with no outline and no shadow. Neutral and Brew section containers should not look like bordered cards. Borders are reserved for true content boundaries, such as figures, tables, version controls, or input-like elements.
 - **Shadows**: case-study content does not use decorative shadows in either theme.
@@ -204,7 +204,7 @@ Do not make every sheet visually identical. Consistency comes from the canvas, s
 
 - Lead with the finding, not the artifact name.
 - Hero facts may use a three-column stat row when those figures help a reviewer understand scale immediately.
-- Report sections typically follow: Context, The Ask, Data + Method, What I Found, Analytical + Design Decisions, Impact, and reflection.
+- Report sections typically follow: Overview, The Ask, Data + Method, What I Found, Analytical + Design Decisions, Impact, and reflection.
 - Data tables and figure frames may use subtle boundaries because they are evidence containers, not decorative section cards.
 - “What I Found” and Impact may use a solid yellow break in the gray rhythm. Keep text black and use clean bullets for impact details.
 - Numbered analytical decisions align to one vertical text guide regardless of whether an alternating row has a fill.
@@ -253,9 +253,9 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 
 ### Structure, in order
 
-1. **`cs-hero` title** — states the finding or twist, not just the project name ("What 22% Neutral Hid.", not "Neutral Response Analysis"). `cs-hero-sub` tells the whole story in 1-2 sentences: context → tension → what you built.
+1. **`cs-hero` title** — states the finding or twist, not just the project name ("What 22% Neutral Hid.", not "Neutral Response Analysis"). The hero carries no summary line. Directly under it, an **Overview** section (`cs-section` + `cs-copy cs-overview`) tells the whole story in 1-3 sentences: context → tension → what you built. `.cs-overview` sets it as a lead (GoDaddy's treatment, shared by every finished study); the label keeps each study's own palette.
 2. **`cs-role-line`** — Solo/Team, client, year. This sets the "I" vs "we" frame for everything below it (see Rules).
-3. **Scale numbers** — fold 1-2 real scale figures into the `cs-hero-sub` sentence itself ("a climate survey of ~6,000 families across 35+ schools") rather than adding a separate `cs-stat-row` block. `cs-hero-sub` + `cs-role-line` is already two stacked pieces under the title; a third block (stat row) reads as cluttered. Reserve `cs-stat-row` for heroes that have no `cs-role-line` (see the WIIRED hero) — never stack both.
+3. **Scale numbers** — fold 1-2 real scale figures into the Overview sentence itself ("a climate survey of ~6,000 families across 35+ schools") rather than adding a separate `cs-stat-row` block. The Overview + `cs-role-line` is already two stacked pieces under the title; a third block (stat row) reads as cluttered. Reserve `cs-stat-row` for heroes that have no `cs-role-line` (see the WIIRED hero) — never stack both.
 4. **"The Question"** (`cs-section` + `cs-question` + `cs-copy`) — the problem, framed as a real ambiguity, plus the constraint that made it hard (data scale, conflicting audiences, a deadline).
 5. **"Data + Approach"** (`cs-two-col` / `cs-feature`) — source and transforms, 2-4 sentences each. This is the *only* section where methods belong — don't repeat tool/technique names elsewhere.
 6. **"Design Decisions"** (`cs-decision-block`, numbered, 3-5 of them) — each one names the option considered, why it was rejected, and the insight that drove the final call. Insight over technique: never state a choice ("used a treemap") without the reason ("bar chart implies false equivalence between a 30- and 900-respondent school").
