@@ -2130,7 +2130,9 @@
       position: absolute;
       left: 50%;
       bottom: 40px;
-      translate: -50% 0;
+      /* transform, not translate: the entrance animates translate, which
+         dropped this centring mid-animation and slid the cue sideways. */
+      transform: translateX(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
