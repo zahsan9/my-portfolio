@@ -10,9 +10,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet" />
 <script>
   /* Runs before first paint: apply the stored theme (kills the light-mode
-     FOUC) and decide whether the splash mounts. It plays on every load that
-     lands on the main feed — not on deep links to About / Experience, and
-     not under reduced motion. */
+     FOUC) and decide whether the feed's entrance plays (html.feed-intro).
+     It plays on every load that lands on the main feed — not on deep links
+     to About / Experience, and not under reduced motion. */
   (function () {
     var d = document.documentElement;
     try { d.setAttribute('data-theme', localStorage.getItem('theme') || 'dark'); } catch (e) {}
@@ -29,7 +29,7 @@
     var onFeed = ((hash === '' && path !== '/about' && !/^\/work\//.test(path)) || hash === 'feed') && hash.indexOf('work/') !== 0;
     var reduce = false;
     try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-    if (onFeed && !reduce) d.classList.add('splash-active');
+    if (onFeed && !reduce) d.classList.add('feed-intro');
   })();
 </script>
 <style>
@@ -193,7 +193,7 @@
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 
   /* Reduced motion: the storyboards already opt out in JS (motionDelay,
-     playSheetRailEntry, the splash), but every CSS transition on the site runs
+     playSheetRailEntry, the feed entrance), but every CSS transition on the site runs
      off these four tokens — so collapsing them here is what actually honours
      the preference. Kept at a hair above zero rather than 0s so anything
      waiting on a transition still fires. */
@@ -5937,53 +5937,42 @@
   }
   .lightbox.open .lightbox-img { transform: scale(1); }
 
-  /* ── Splash (every load onto the main feed — the mark draws itself on) ──
-     Mounted only when the head script adds html.splash-active. Sits on the
-     same --paper ground as the page, so the first painted frame is already
-     the right colour and the reveal is just this layer lifting away. */
-  #splash {
-    display: none;
-    position: fixed; inset: 0; z-index: 9999;
-    background: var(--paper);
-    place-items: center;
-    opacity: 1; transform: translateY(0);
-    transition:
-      opacity var(--splash-exit-dur, 480ms) var(--ease-soft),
-      transform var(--splash-exit-dur, 480ms) var(--ease-soft);
+  /* ── Feed entrance + scroll reveal ──
+     html.feed-intro (head script, opening loads on the feed) holds the
+     banner, tabs and cards back for the first frame; then .feed-play
+     builds them in, staggered by --feed-d. Cards further down wait for
+     .is-in (an IntersectionObserver) and fade in the same way as they
+     scroll into view. Same soft fade-up-through-blur as the Experience
+     cards. On desktop cards also trail the scroll a few px on a spring
+     (--feed-lag), on the standalone translate property so the filter
+     FLIP, which uses transform, composes with it. */
+  @keyframes feed-in {
+    from { opacity: 0; translate: 0 16px; filter: blur(6px); }
+    to   { opacity: 1; translate: 0 0; filter: blur(0); }
   }
-  html.splash-active #splash { display: grid; }
-  #splash.is-leaving { opacity: 0; transform: translateY(-10px); pointer-events: none; }
-  .splash-glyph { width: clamp(46px, 7vw, 88px); height: auto; overflow: visible; }
-  /* The fill is revealed by a mask that sweeps along the z's writing
-     direction (top bar → diagonal → bottom bar); the outline traces the
-     contour. Both animate via stroke-dashoffset, driven from the storyboard. */
-  .splash-glyph .splash-fill { fill: var(--ink); }
-  .splash-glyph .splash-outline {
-    fill: none;
-    stroke: var(--ink); stroke-width: 0.24;
-    stroke-linecap: round; stroke-linejoin: round;
+  html.feed-intro .banner > *,
+  html.feed-intro .tabs { opacity: 0; }
+  html.feed-intro.feed-play .banner > *,
+  html.feed-intro.feed-play .tabs {
+    opacity: 1;
+    animation: feed-in 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--feed-d, 0ms);
   }
-  /* Head script already blocks the splash under reduced motion; this only
-     matters if the class is ever forced on some other way. */
-  @media (prefers-reduced-motion: reduce) {
-    html.splash-active #splash { display: none; }
+  .feed.has-reveal .pin { opacity: 0; }
+  .feed.has-reveal .pin.is-in {
+    opacity: 1;
+    animation: feed-in 1000ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: var(--feed-d, 0ms);
   }
+  @media (min-width: 801px) {
+    .feed .pin { translate: 0 var(--feed-lag, 0px); }
+  }
+
 
 </style>
 </head>
 <body>
 
-<div id="splash" aria-hidden="true">
-  <svg class="splash-glyph" viewBox="0 0 6 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <mask id="splashZWipe" maskUnits="userSpaceOnUse" x="-2" y="-2" width="10" height="11">
-        <path class="splash-wipe" d="M0.55 1.16 H4.9 L1.1 5.06 H5.7" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </mask>
-    </defs>
-    <path class="splash-fill" mask="url(#splashZWipe)" d="M1.692 6.276C1.188 6.276 0.780001 6.152 0.468001 5.904C0.156001 5.656 7.37607e-07 5.316 7.37607e-07 4.884C7.37607e-07 4.444 0.112001 4.116 0.336001 3.9C0.560001 3.684 0.804001 3.528 1.068 3.432L3.84 2.4V2.352H1.404C1.044 2.352 0.744001 2.256 0.504001 2.064C0.272001 1.864 0.156001 1.568 0.156001 1.176C0.156001 0.776001 0.272001 0.480001 0.504001 0.288001C0.744001 0.0960009 1.044 9.53674e-07 1.404 9.53674e-07H4.344C4.728 9.53674e-07 5.052 0.092001 5.316 0.276001C5.588 0.460001 5.724 0.788001 5.724 1.26C5.724 1.62 5.612 1.924 5.388 2.172C5.172 2.42 4.856 2.624 4.44 2.784L2.16 3.648V3.696H4.608C5 3.696 5.324 3.804 5.58 4.02C5.836 4.236 5.964 4.56 5.964 4.992C5.964 5.432 5.836 5.756 5.58 5.964C5.324 6.172 5 6.276 4.608 6.276H1.692Z"/>
-    <path class="splash-outline" d="M1.692 6.276C1.188 6.276 0.780001 6.152 0.468001 5.904C0.156001 5.656 7.37607e-07 5.316 7.37607e-07 4.884C7.37607e-07 4.444 0.112001 4.116 0.336001 3.9C0.560001 3.684 0.804001 3.528 1.068 3.432L3.84 2.4V2.352H1.404C1.044 2.352 0.744001 2.256 0.504001 2.064C0.272001 1.864 0.156001 1.568 0.156001 1.176C0.156001 0.776001 0.272001 0.480001 0.504001 0.288001C0.744001 0.0960009 1.044 9.53674e-07 1.404 9.53674e-07H4.344C4.728 9.53674e-07 5.052 0.092001 5.316 0.276001C5.588 0.460001 5.724 0.788001 5.724 1.26C5.724 1.62 5.612 1.924 5.388 2.172C5.172 2.42 4.856 2.624 4.44 2.784L2.16 3.648V3.696H4.608C5 3.696 5.324 3.804 5.58 4.02C5.836 4.236 5.964 4.56 5.964 4.992C5.964 5.432 5.836 5.756 5.58 5.964C5.324 6.172 5 6.276 4.608 6.276H1.692Z"/>
-  </svg>
-</div>
 
 <div class="app">
 
@@ -6596,13 +6585,13 @@
    *  180ms   rail expands and reveals its navigation labels
    * 2380ms   rail collapses; normal hover behavior takes over
    *
-   * On a splash load the whole storyboard starts afterSplash ms after the
-   * splash lifts, so the feed has a beat to register first.
+   * On an opening load it starts afterIntro ms in, so the feed's entrance
+   * has a beat to register first.
    * ───────────────────────────────────────────────────────── */
   const RAIL_ENTRY_TIMING = {
     expand:      180,
     collapse:    2380,
-    afterSplash: 620,
+    afterIntro:  700,
   };
 
   function playWorkRailEntry() {
@@ -6663,98 +6652,6 @@
     document.querySelector('.rail')?.classList.remove('is-sheet-expanded');
   }
 
-  /* ─────────────────────────────────────────────────────────
-   * SPLASH GLYPH STORYBOARD
-   *
-   * Every load that lands on the main feed, motion on. The head script
-   * has already mounted the layer (html.splash-active) and applied the
-   * stored theme, so the paper ground is correct from frame one.
-   *
-   *    0ms   paper ground painted, glyph hidden
-   *   80ms   outline traces the z contour, pen following the path
-   *  480ms   ink sweeps in along the writing direction — across the top
-   *          bar, down the diagonal, across the bottom bar. It starts while
-   *          the pen is still visibly travelling, so the ink chases the
-   *          contour instead of waiting for it.
-   * 1460ms   hold
-   * 2200ms   layer lifts and fades to reveal the feed
-   * 2680ms   layer removed; fires splash:done so the rail entry can run
-   *
-   * Two things make that overlap actually read. The outline's ease is heavily
-   * front-loaded — the pen is 90% round by 600ms even though its transition
-   * does not end until 900ms — so the *perceived* landing is ~600ms and any
-   * overlap scheduled into that last 300ms is invisible. And the ink's curve
-   * is close to linear at the head; the old ease-in loitered near zero, so the
-   * sweep was technically running while nothing was visibly filling. When
-   * retiming this, compare against the perceived landing, not draw + drawDur.
-   *
-   * Any deliberate input (pointer / key / wheel / touch) cuts to the lift.
-   * ───────────────────────────────────────────────────────── */
-  const SPLASH_TIMING = {
-    draw:     80,
-    drawDur:  820,
-    fill:     480,
-    fillDur:  980,
-    exit:     2200,
-    exitDur:  480,
-  };
-
-  (function playSplash() {
-    const root = document.documentElement;
-    const splash = document.getElementById('splash');
-    if (!splash) return;
-    if (!root.classList.contains('splash-active') || prefersReducedMotion()) {
-      splash.remove();
-      root.classList.remove('splash-active');
-      return;
-    }
-
-    const outline = splash.querySelector('.splash-outline');
-    const wipe    = splash.querySelector('.splash-wipe');
-    const oLen = outline.getTotalLength();
-    const wLen = wipe.getTotalLength();
-    const timers = [];
-    let leaving = false;
-
-    root.style.setProperty('--splash-exit-dur', SPLASH_TIMING.exitDur + 'ms');
-    outline.style.transition = 'none';
-    outline.style.strokeDasharray = oLen;
-    outline.style.strokeDashoffset = oLen;
-    wipe.style.transition = 'none';
-    wipe.style.strokeDasharray = wLen;
-    wipe.style.strokeDashoffset = wLen;
-    outline.getBoundingClientRect();
-
-    const at = (ms, fn) => timers.push(setTimeout(fn, ms));
-
-    at(SPLASH_TIMING.draw, () => {
-      outline.style.transition = 'stroke-dashoffset ' + SPLASH_TIMING.drawDur + 'ms cubic-bezier(0.4, 0.1, 0.25, 1)';
-      outline.style.strokeDashoffset = '0';
-    });
-    at(SPLASH_TIMING.fill, () => {
-      wipe.style.transition = 'stroke-dashoffset ' + SPLASH_TIMING.fillDur + 'ms cubic-bezier(0.22, 0.35, 0.3, 1)';
-      wipe.style.strokeDashoffset = '0';
-    });
-    at(SPLASH_TIMING.exit, leave);
-
-    function leave() {
-      if (leaving) return;
-      leaving = true;
-      timers.forEach(clearTimeout);
-      splash.classList.add('is-leaving');
-      setTimeout(() => {
-        splash.remove();
-        root.classList.remove('splash-active');
-        root.style.removeProperty('--splash-exit-dur');
-        window.dispatchEvent(new Event('splash:done'));
-      }, SPLASH_TIMING.exitDur + 40);
-    }
-
-    ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev =>
-      window.addEventListener(ev, leave, { once: true, passive: true })
-    );
-    window.addEventListener('pagehide', () => timers.forEach(clearTimeout), { once: true });
-  })();
 
   function updateFeedScrollbar() {
     const scrollable = main.scrollHeight - main.clientHeight;
@@ -10237,13 +10134,11 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
 
   const initialRoute = routeFromHash();
   if (initialRoute !== 'feed') setRoute(initialRoute, { history: 'replace' });
-  else if (document.documentElement.classList.contains('splash-active')) {
-    // Splash owns the opening beat; let the feed settle, then nudge the rail.
-    window.addEventListener('splash:done', () => {
-      setTimeout(() => {
-        if (currentRouteName === 'feed') playWorkRailEntry();
-      }, RAIL_ENTRY_TIMING.afterSplash);
-    }, { once: true });
+  else if (document.documentElement.classList.contains('feed-intro')) {
+    // The feed's entrance owns the opening beat; then nudge the rail.
+    setTimeout(() => {
+      if (currentRouteName === 'feed') playWorkRailEntry();
+    }, RAIL_ENTRY_TIMING.afterIntro);
   } else playWorkRailEntry();
 
   // ── Site cursor ──
@@ -10734,6 +10629,103 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
         });
       }
     });
+  })();
+
+  // ── Feed entrance, scroll reveal, scroll give ──
+  (function feedMotion() {
+    const root = document.documentElement;
+    const feedEl = document.getElementById('feed');
+    const mainEl = document.querySelector('.main');
+    if (!feedEl || !mainEl) return;
+    const pins = [...feedEl.querySelectorAll('.pin')];
+    const still = prefersReducedMotion();
+
+    // Scroll reveal: cards fade in as they come into view, a row at a time
+    // (each batch the observer reports is staggered left to right).
+    if (!still && 'IntersectionObserver' in window) {
+      feedEl.classList.add('has-reveal');
+      let introDone = !root.classList.contains('feed-intro');
+      const reveal = new IntersectionObserver(entries => {
+        if (!introDone) return;          // the intro reveals the first screen itself
+        const arriving = entries.filter(e => e.isIntersecting).map(e => e.target)
+          .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
+                       || a.getBoundingClientRect().left - b.getBoundingClientRect().left);
+        arriving.forEach((pin, i) => {
+          pin.style.setProperty('--feed-d', (i * 80) + 'ms');
+          pin.classList.add('is-in');
+          reveal.unobserve(pin);
+        });
+      }, { threshold: 0.12 });
+      pins.forEach(pin => reveal.observe(pin));
+
+      // Opening load: the banner builds in, then the cards already on screen
+      // follow in reading order.
+      const playIntro = () => {
+        const banner = [...document.querySelectorAll('.banner > *'), document.querySelector('.tabs')].filter(Boolean);
+        banner.forEach((el, i) => el.style.setProperty('--feed-d', (i * 90) + 'ms'));
+        const vh = window.innerHeight;
+        const onScreen = pins.filter(p => {
+          const r = p.getBoundingClientRect();
+          return r.height && r.top < vh && r.bottom > 0;
+        }).sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
+                       || a.getBoundingClientRect().left - b.getBoundingClientRect().left);
+        const base = banner.length * 90 + 60;
+        onScreen.forEach((pin, i) => {
+          pin.style.setProperty('--feed-d', (base + i * 90) + 'ms');
+          pin.classList.add('is-in');
+          reveal.unobserve(pin);
+        });
+        root.classList.add('feed-play');
+        introDone = true;
+        // Anything the observer saw while the intro held it back.
+        pins.filter(p => !p.classList.contains('is-in')).forEach(p => { reveal.unobserve(p); reveal.observe(p); });
+      };
+      // Two frames in, so the held-back first frame paints before it plays.
+      if (root.classList.contains('feed-intro')) requestAnimationFrame(() => requestAnimationFrame(playIntro));
+    } else {
+      root.classList.remove('feed-intro');
+    }
+
+    // Scroll give (desktop): cards trail the scroll and spring home, lower
+    // cards a little more, like the Experience timeline.
+    const LAG = 0.12, LAG_MAX = 40, K = 110, C = 15;
+    const springs = new Map(pins.map(p => [p, { y: 0, v: 0 }]));
+    let last = mainEl.scrollTop, frame = 0, t0 = 0;
+    const step = now => {
+      frame = 0;
+      const dt = Math.min(0.05, t0 ? (now - t0) / 1000 : 1 / 60);
+      t0 = now;
+      let moving = false;
+      springs.forEach((sp, pin) => {
+        if (!sp.y && !sp.v) return;
+        for (let k = 0; k < 2; k++) {
+          const h = dt / 2;
+          sp.v += (-K * sp.y - C * sp.v) * h;
+          sp.y += sp.v * h;
+        }
+        if (Math.abs(sp.y) < 0.05 && Math.abs(sp.v) < 0.05) { sp.y = 0; sp.v = 0; }
+        else moving = true;
+        pin.style.setProperty('--feed-lag', sp.y.toFixed(2) + 'px');
+      });
+      if (moving) frame = requestAnimationFrame(step);
+      else t0 = 0;
+    };
+    mainEl.addEventListener('scroll', () => {
+      const top = mainEl.scrollTop;
+      const delta = top - last;
+      last = top;
+      if (!delta || still || currentRouteName !== 'feed'
+          || window.matchMedia('(max-width: 800px)').matches
+          || document.querySelector('.app.sheet-open')) return;
+      const vh = window.innerHeight;
+      springs.forEach((sp, pin) => {
+        const r = pin.getBoundingClientRect();
+        if (!r.height || r.bottom < -200 || r.top > vh + 200) return;
+        const depth = Math.min(Math.max((r.top + r.height / 2) / vh, 0), 1);
+        sp.y = Math.min(LAG_MAX, Math.max(-LAG_MAX, sp.y + delta * LAG * (0.45 + 0.55 * depth)));
+      });
+      if (!frame) frame = requestAnimationFrame(step);
+    }, { passive: true });
   })();
 
 </script>
