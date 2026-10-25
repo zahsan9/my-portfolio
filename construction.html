@@ -55,7 +55,9 @@
   #construction .cx-line + .cx-line { margin-left: 0.15em; }
   #construction .cx-line > span { grid-area: 1 / 1; }
   @media (max-width: 600px) {
-    #construction .cx-type { display: grid; justify-items: center; }
+    /* Sized so "a few new things are on the way…" holds one line down to a
+       320px phone instead of wrapping its last word. */
+    #construction .cx-type { display: grid; justify-items: center; font-size: clamp(20px, 7vw, 28px); white-space: nowrap; }
     #construction .cx-line + .cx-line { margin-left: 0; }
   }
   #construction .cx-ghost { visibility: hidden; }
@@ -76,7 +78,7 @@
 
 <div id="construction">
   <div>
-    <p class="cx-type" aria-label="under construction… check back soon :)"><span class="cx-line" aria-hidden="true"><span class="cx-ghost">under construction…<span class="cx-cursor"></span></span><span><span class="cx-text">under construction…</span></span></span><span class="cx-line" aria-hidden="true"><span class="cx-ghost">check back soon :)<span class="cx-cursor"></span></span><span><span class="cx-text">check back soon :)</span><span class="cx-cursor"></span></span></span></p>
+    <p class="cx-type" aria-label="a few new things are on the way… check back soon :)"><span class="cx-line" aria-hidden="true"><span class="cx-ghost">a few new things are on the way…<span class="cx-cursor"></span></span><span><span class="cx-text">a few new things are on the way…</span></span></span><span class="cx-line" aria-hidden="true"><span class="cx-ghost">check back soon :)<span class="cx-cursor"></span></span><span><span class="cx-text">check back soon :)</span><span class="cx-cursor"></span></span></span></p>
     <p class="sign">— zainab, oct 26</p>
   </div>
 </div>
