@@ -2104,13 +2104,17 @@
       justify-content: center;
       width: auto;
     }
-    /* The line — a grid item itself, spanning the card rows. */
+    /* The line — a grid item itself, spanning the card rows. It also reaches
+       up through the gap above Tesla (the row gap; the scroll cue sits flush
+       with the heading screen's bottom) so it starts exactly where the cue's
+       own line ends: one line, the nudge pulsing down its top stretch. */
     .exp-track::before {
       content: '';
       grid-column: 1 / -1;
       grid-row: 2 / 7;
       justify-self: center;
       align-self: stretch;
+      margin-top: calc(-1 * var(--exp-line-gap));
       width: 1px;
       background: color-mix(in oklch, var(--ink) 22%, transparent);
     }
@@ -2129,7 +2133,10 @@
     .exp-scroll-cue {
       position: absolute;
       left: 50%;
-      bottom: 40px;
+      /* Flush with the heading screen's bottom edge, so its line (and the
+         pulse running down it) covers the whole visible stretch of the
+         timeline line before you scroll. */
+      bottom: 0;
       /* transform, not translate: the entrance animates translate, which
          dropped this centring mid-animation and slid the cue sideways. */
       transform: translateX(-50%);
@@ -2148,9 +2155,10 @@
     .exp-scroll-cue-line {
       position: relative;
       width: 1px;
-      height: 32px;
+      height: 72px;
       overflow: hidden;
-      background: color-mix(in oklch, var(--ink-mid) 30%, transparent);
+      /* Same colour as the timeline line it runs into. */
+      background: color-mix(in oklch, var(--ink) 22%, transparent);
     }
     .exp-scroll-cue-line::after {
       content: '';
@@ -2216,6 +2224,84 @@
     .exp-card:nth-of-type(even) .yr::before { left: calc(100% + 18px); }
     /* The arrow pointed along the old sideways track. */
     .exp-arrow { display: none; }
+    /* Hover reveal on the card's empty side: a TL;DR of the case study and
+       a link to it, under the date. It's the card's own child, so pointing
+       at it keeps the card hovered; hiding waits 400ms (visibility flips at
+       the end of the delay) as a grace period on top of the hit area below. */
+    .exp-reveal {
+      position: absolute;
+      top: calc(20px * var(--exp-s) + 56px);
+      width: min(300px, calc(var(--exp-card-w) - 40px));
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      color: var(--ink);
+      opacity: 0;
+      visibility: hidden;
+      translate: 0 8px;
+      filter: blur(4px);
+      transition:
+        opacity 350ms cubic-bezier(0.22, 1, 0.36, 1) 400ms,
+        translate 450ms cubic-bezier(0.22, 1, 0.36, 1) 400ms,
+        filter 350ms cubic-bezier(0.22, 1, 0.36, 1) 400ms,
+        visibility 0s linear 750ms;
+    }
+    /* Once the card is hovered, the whole revealed side counts as the card:
+       a hit area (behind its content, so the link still takes clicks)
+       spanning from the card across the line to past the TL;DR, the card's
+       full height and a little more. Moving over to the link never leaves
+       the hover. Only while hovered, so it doesn't widen what starts it. */
+    .exp-card:has(.exp-reveal):hover::after {
+      content: '';
+      position: absolute;
+      top: -24px;
+      bottom: -24px;
+      width: calc(var(--exp-line-gap) / 2 + 18px + min(300px, calc(var(--exp-card-w) - 40px)) + 32px);
+      z-index: -1;
+    }
+    .exp-card:nth-of-type(even):has(.exp-reveal):hover::after { right: 100%; }
+    .exp-card:nth-of-type(odd):has(.exp-reveal):hover::after { left: 100%; }
+    .exp-card:nth-of-type(even) .exp-reveal { right: calc(100% + var(--exp-line-gap) / 2 + 18px); text-align: right; align-items: flex-end; }
+    .exp-card:nth-of-type(odd) .exp-reveal { left: calc(100% + var(--exp-line-gap) / 2 + 18px); }
+    .exp-card:hover .exp-reveal,
+    .exp-card:focus-within .exp-reveal {
+      opacity: 1;
+      visibility: visible;
+      translate: 0 0;
+      filter: blur(0);
+      transition-delay: 0s;
+    }
+    .exp-reveal-label {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+      color: color-mix(in oklch, var(--ink) 50%, transparent);
+    }
+    .exp-reveal-text {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: color-mix(in oklch, var(--ink) 82%, transparent);
+      text-wrap: pretty;
+    }
+    .exp-reveal-link {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: underline;
+      text-decoration-color: color-mix(in oklch, var(--ink) 35%, transparent);
+      text-underline-offset: 4px;
+      transition: text-decoration-color var(--motion-fast) ease;
+    }
+    .exp-reveal-link:hover,
+    .exp-reveal-link:focus-visible { text-decoration-color: currentColor; }
+    @media (prefers-reduced-motion: reduce) {
+      .exp-reveal { translate: none; filter: none; }
+    }
     /* Guided scroll: while this page is open, .main snaps from stop to stop
        — the heading screen, then each card centred in the space under the
        sticky topbar. snap-stop: always keeps a fast flick from skipping a
@@ -2374,7 +2460,11 @@
   }
   .exp-card:nth-of-type(odd) { margin-top: -32px; }
   .exp-card:nth-of-type(even) { margin-top: 32px; }
-  /* No hover state on purpose: the lift read as bouncy for no reason. */
+  /* No hover state on purpose: the lift read as bouncy for no reason.
+     (The desktop timeline's hover reveal, .exp-reveal, is the one exception
+     — it shows content beside the card, the card itself doesn't move.) */
+  .exp-reveal { display: none; }
+  @media (min-width: 801px) { .exp-reveal { display: flex; } }
   /* The date sits outside the card, on the side facing away from the row's
      centre line — above the high cards, below the low ones — so the dates
      zig-zag along the row like a timeline. It's still the card's own child,
@@ -6513,6 +6603,11 @@
                   <li>QuickSight dashboards + AI automation</li>
                   <li>Exec-level data storytelling</li>
                 </ul>
+                <div class="exp-reveal">
+                  <p class="exp-reveal-label">TL;DR</p>
+                  <p class="exp-reveal-text">I build evaluation systems, data pipelines, and reporting for GoDaddy’s production LLM agent. A Langfuse eval loop surfaces routing, retrieval, and generation errors; Redshift pipelines cut experiment analysis from weeks to minutes.</p>
+                  <a class="exp-reveal-link" href="#work/godaddy" data-open-case="godaddy" data-cursor-link="↗ case study">Read the case study →</a>
+                </div>
               </article>
               <article class="exp-card art-sage exp-link-card" role="link" tabindex="0" aria-label="Open WIIRED Studio on Instagram" data-cursor-link="↗ @wiiredstudio" data-href="https://www.instagram.com/wiiredstudio/">
                 <div class="yr" data-from="2026-04" data-to="now">Apr 2026 – Present</div>
@@ -6525,6 +6620,11 @@
                   <li>200+ on Instagram</li>
                   <li>Brand systems + web apps</li>
                 </ul>
+                <div class="exp-reveal">
+                  <p class="exp-reveal-label">TL;DR</p>
+                  <p class="exp-reveal-text">I co-founded a bootstrapped, two-person design engineering studio. We take brand identities, websites, web apps, and design systems from discovery to launch, with no outside capital or contractors.</p>
+                  <a class="exp-reveal-link" href="#work/wiired" data-open-case="wiired" data-cursor-link="↗ case study">Read the case study →</a>
+                </div>
               </article>
               <article class="exp-card art-charcoal">
                 <div class="yr" data-from="2025-06" data-to="now">Jun 2025 – Present</div>
@@ -6537,6 +6637,10 @@
                   <li>Email, rooms &amp; equipment management</li>
                   <li>Staff &amp; faculty coordination</li>
                 </ul>
+                <div class="exp-reveal">
+                  <p class="exp-reveal-label">TL;DR</p>
+                  <p class="exp-reveal-text">Front-office operations at UW: reception, shared inboxes, room and equipment requests, and day-to-day support for staff and faculty.</p>
+                </div>
               </article>
               <article class="exp-card art-plum">
                 <div class="yr" data-from="2024-09" data-to="now">Sep 2024 – Present (Expected Jun 2028)</div>
@@ -6549,6 +6653,10 @@
                   <li>HCI + Visualization</li>
                   <li>Interaction Design Assoc., Marketer</li>
                 </ul>
+                <div class="exp-reveal">
+                  <p class="exp-reveal-label">TL;DR</p>
+                  <p class="exp-reveal-text">CS major, Data Science minor, drawn to HCI, product design, and data visualization. I also help run marketing for UW’s Interaction Design Association and Pakistani Student Association.</p>
+                </div>
               </article>
             </div>
           </div>
@@ -10331,6 +10439,36 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     }
     bindCursorSurfaces(document);
     window.bindCursorSurfaces = bindCursorSurfaces;
+    // A card's hover TL;DR is inside the card, and WIIRED's card is itself a
+    // link (to Instagram): keep clicks and keys in the TL;DR from reaching
+    // the card, and don't show the card's "↗ @wiiredstudio" pill over it.
+    document.querySelectorAll('.exp-reveal').forEach(reveal => {
+      reveal.addEventListener('click', e => e.stopPropagation());
+      reveal.addEventListener('keydown', e => e.stopPropagation());
+      const card = reveal.closest('[data-cursor-link]');
+      if (!card) return;
+      reveal.addEventListener('mouseenter', () => document.dispatchEvent(new CustomEvent('cursor:dismiss')));
+      reveal.addEventListener('mouseleave', e => {
+        if (card.contains(e.relatedTarget)) {
+          document.dispatchEvent(new CustomEvent('cursor:label', { detail: card.dataset.cursorLink }));
+        }
+      });
+    });
+    // Experience cards carry content that sits on the page, not the card:
+    // the date on the line, the hover TL;DR (.exp-reveal) and the hover hit
+    // area. The surface is decided by where the pointer actually is, so the
+    // cursor and its "↗ case study" pill go back to the page's own colour
+    // off the card instead of staying dark-on-dark.
+    document.querySelectorAll('.exp-card').forEach(card => {
+      const cls = card.matches('.art-blue, .art-charcoal, .art-noir') ? 'is-on-dark-surface' : 'is-on-light-surface';
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const onCard = e.clientX >= r.left && e.clientX <= r.right
+          && e.clientY >= r.top && e.clientY <= r.bottom
+          && !e.target.closest('.exp-reveal');
+        cursor.classList.toggle(cls, onCard);
+      });
+    });
   })();
 
   /* ─────────────────────────────────────────────────────────
