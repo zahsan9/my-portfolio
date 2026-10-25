@@ -1130,13 +1130,20 @@
   .banner h1 em { margin-left: 0.16em; font-style: normal; }
   .banner .bio { font-size: 16px; line-height: 1.65; max-width: 520px; margin: 0 auto; }
   .banner .bio em { font-style: italic; color: var(--accent); }
+  /* Desktop line 1 is the roles (.bio-role); phones swap in the school
+     line instead (.bio-school), since the roles don't fit. */
+  .banner .bio-school { display: none; }
+  /* Same divider as the header's before "Updated" (.topbar-divider): a
+     plain bar in the faint line colour. */
+  .banner .bio-divider { color: var(--line); margin: 0 10px; user-select: none; }
   .banner .meta {
     margin-top: 20px; color: var(--ink-mid);
     text-align: center;
     font-family: var(--mono); font-size: 11px;
     letter-spacing: var(--tracking-label); text-transform: uppercase;
   }
-  .banner .meta-sep { font-weight: 700; padding: 0 5px; }
+  /* Same divider as the bio line and the header's "Updated" (.topbar-divider). */
+  .banner .meta-sep { color: var(--line); margin: 0 10px; user-select: none; }
   .feed {
     transform: translateX(calc(var(--feed-shift, 0px) * -1));
     transition: transform var(--motion-slow) var(--ease-soft), opacity var(--motion-med) ease;
@@ -1998,13 +2005,53 @@
     opacity: var(--scroll-reveal-opacity);
     transform: translateY(0);
   }
-  .exp-page.active[data-exp-stage="3"] .exp-card:hover {
-    transform: translateY(-8px) rotate(var(--hover-tilt));
+  /* Desktop: a vertical zig-zag timeline (layout further down). Each card
+     fades in as it scrolls into view — .is-in, added by an
+     IntersectionObserver in the experience script — rising a few px on a
+     long, soft ease-out. */
+  @media (min-width: 801px) {
+    .exp-card {
+      --scroll-reveal-opacity: 1;
+      --scroll-reveal-y: 0px;
+      /* Scroll give: each card trails the scroll a few px and springs back
+         (--exp-lag, set per frame by the experience script). */
+      translate: 0 var(--exp-lag, 0px);
+    }
+    .exp-page.active[data-exp-stage] .exp-card {
+      opacity: 0;
+      transform: none;
+      transition:
+        transform 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 650ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .exp-page.active[data-exp-stage="3"] .exp-card.is-in {
+      opacity: 1;
+      /* backwards, not both: once it ends, translate goes back to the
+         scroll-lag offset below instead of being held at 0. */
+      animation: exp-card-in 1100ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+  }
+  /* translate, not transform, so it composes with the scroll-lag offset. */
+  @keyframes exp-cue-drop {
+    from { transform: translateY(-100%); }
+    to   { transform: translateY(250%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .exp-scroll-cue-line::after { animation: none; }
+  }
+  /* Desktop-only; the mobile swipe strip has its own intro slide. */
+  .exp-scroll-cue { display: none; }
+  @media (min-width: 801px) { .exp-scroll-cue { display: flex; } }
+  @keyframes exp-card-in {
+    from { opacity: 0; translate: 0 18px; scale: 0.985; filter: blur(6px); }
+    to   { opacity: 1; translate: 0 0; scale: 1; filter: blur(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .exp-page.active[data-exp-stage="3"] .exp-card.is-in { animation: none; }
   }
   .exp-page.active[data-exp-stage="3"] .exp-intro-panel { transition-delay: 0ms; }
   .exp-scroll {
-    --exp-track-x: 0px;
-    height: calc(100vh - var(--chrome-size) + var(--exp-travel, 1800px));
+    height: auto;
     margin-top: 0;
     position: relative;
   }
@@ -2015,20 +2062,246 @@
     overflow: hidden;
     display: flex;
     align-items: center;
-    /* Remove padding-top - centering does this now */
   }
   .exp-track {
+    --exp-intro-w: clamp(280px, 28vw, 390px);
+    --exp-card-w: clamp(260px, 24vw, 340px);
+    --exp-gap: clamp(34px, 5vw, 72px);
     display: flex;
     align-items: center;
-    gap: clamp(34px, 5vw, 72px);
+    gap: var(--exp-gap);
     width: max-content;
-    padding: 0 140px;
-    transform: translateX(var(--exp-track-x));
-    transition: transform 0.15s linear;
-    will-change: transform;
   }
+  /* Desktop: a vertical zig-zag timeline at full card size. A thin line
+     runs down the middle; cards alternate left and right of it, one per
+     row, each with its date on the line beside a dot. The empty half of
+     each row is room for an image later. Mobile keeps the swipe strip. */
+  @media (min-width: 801px) {
+    .exp-scroll { height: auto; }
+    .exp-viewport {
+      position: static;
+      height: auto;
+      overflow: visible;
+      display: block;
+      padding: 48px 0 0;
+    }
+    .exp-track {
+      /* One spacing both ways — across the line and between consecutive
+         cards — so the cards sit evenly apart; roomy enough for a hover
+         reveal on the empty side later. */
+      --exp-line-gap: 160px;
+      /* A little larger than the base card (clamp(260px, 24vw, 340px)) —
+         the vertical timeline has the room. --exp-s scales everything
+         inside by the same ratio (380 / 340), so it's the same card, bigger. */
+      --exp-card-w: clamp(290px, 27vw, 380px);
+      --exp-s: 1.12;
+      display: grid;
+      grid-template-columns: var(--exp-card-w) var(--exp-card-w);
+      column-gap: var(--exp-line-gap);
+      row-gap: var(--exp-line-gap);
+      justify-content: center;
+      width: auto;
+    }
+    /* The line — a grid item itself, spanning the card rows. */
+    .exp-track::before {
+      content: '';
+      grid-column: 1 / -1;
+      grid-row: 2 / 7;
+      justify-self: center;
+      align-self: stretch;
+      width: 1px;
+      background: color-mix(in oklch, var(--ink) 22%, transparent);
+    }
+    /* The heading gets the whole first screen to itself, centred, with a
+       scroll cue near the bottom; Tesla opens the timeline below the fold. */
+    .exp-track .exp-intro-panel {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      justify-self: stretch;
+      position: relative;
+      /* A full screen tall, pulled up over the viewport's 48px top padding,
+         so the heading sits at the true centre of what's visible. */
+      min-height: calc(100vh - var(--chrome-size));
+      margin: -48px 0 0;
+    }
+    .exp-scroll-cue {
+      position: absolute;
+      left: 50%;
+      bottom: 40px;
+      translate: -50% 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-label);
+      color: var(--ink-mid);
+      opacity: var(--exp-cue, 1);
+      transition: opacity 300ms ease-out;
+    }
+    .exp-scroll-cue-line {
+      position: relative;
+      width: 1px;
+      height: 32px;
+      overflow: hidden;
+      background: color-mix(in oklch, var(--ink-mid) 30%, transparent);
+    }
+    .exp-scroll-cue-line::after {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto;
+      height: 40%;
+      background: var(--ink-mid);
+      animation: exp-cue-drop 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+    }
+    /* Beats the base odd/even ±32px rise-and-fall (same specificity, later
+       in the file), so the line starts at Tesla's top edge and the gaps
+       between cards are truly even. */
+    .exp-track .exp-card:nth-of-type(n) { margin-top: 0; }
+    .exp-card:nth-of-type(1) { grid-column: 1; grid-row: 2; }
+    .exp-card:nth-of-type(2) { grid-column: 2; grid-row: 3; }
+    .exp-card:nth-of-type(3) { grid-column: 1; grid-row: 4; }
+    .exp-card:nth-of-type(4) { grid-column: 2; grid-row: 5; }
+    .exp-card:nth-of-type(5) { grid-column: 1; grid-row: 6; }
+    /* Date on the line: level with the job type, a dot on the line, the
+       text on the far side from the card. */
+    .exp-track .exp-card:nth-of-type(n) .yr { top: calc(20px * var(--exp-s)); bottom: auto; }
+    /* The card's insides, scaled with it (base values × --exp-s). */
+    .exp-track .exp-card { padding: calc(22px * var(--exp-s)); border-radius: calc(16px * var(--exp-s)); }
+    .exp-track .exp-card h3 { font-size: calc(clamp(28px, 2.6vw, 38px) * var(--exp-s)); margin-bottom: calc(22px * var(--exp-s)); }
+    .exp-track .exp-card h3 span { font-size: calc(13px * var(--exp-s)); margin-top: calc(10px * var(--exp-s)); }
+    .exp-track .exp-card ul { font-size: calc(12px * var(--exp-s)); gap: calc(9px * var(--exp-s)); padding-top: calc(14px * var(--exp-s)); }
+    .exp-track .exp-card li::before { width: calc(4px * var(--exp-s)); height: calc(4px * var(--exp-s)); margin-right: calc(8px * var(--exp-s)); }
+    .exp-track .exp-card .place { font-size: calc(10px * var(--exp-s)); }
+    .exp-track .exp-card-logo { width: calc(34px * var(--exp-s)); }
+    .exp-track .exp-card-logo--godaddy { width: calc(44px * var(--exp-s)); }
+    .exp-track .exp-card:nth-of-type(odd) .yr { left: calc(100% + var(--exp-line-gap) / 2 + 18px); right: auto; }
+    .exp-track .exp-card:nth-of-type(even) .yr { left: auto; right: calc(100% + var(--exp-line-gap) / 2 + 18px); text-align: right; }
+    /* The dot takes its card's colour; the faint ring keeps light dots
+       (cream on a light page) and dark ones (charcoal on a dark page)
+       visible against the background. */
+    .exp-card .yr::before {
+      content: '';
+      position: absolute;
+      /* Centred on the date's first line, not the two-line block. */
+      top: 0.675em;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--exp-dot, var(--ink));
+      box-shadow: 0 0 0 1px color-mix(in oklch, var(--ink) 28%, transparent);
+      translate: -50% -50%;
+      /* Hidden until you scroll it up to the reading position
+         (.is-reached), then it pops in with a little overshoot. */
+      scale: 0;
+      opacity: 0;
+      transition:
+        scale 600ms cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 400ms ease-out;
+    }
+    .exp-card.is-reached .yr::before { scale: 1; opacity: 1; }
+    .exp-card.art-cream    { --exp-dot: var(--c-cream); }
+    .exp-card.art-yellow   { --exp-dot: var(--c-yellow); }
+    .exp-card.art-sage     { --exp-dot: var(--c-sage); }
+    .exp-card.art-charcoal { --exp-dot: var(--c-charcoal); }
+    .exp-card.art-plum     { --exp-dot: var(--c-plum); }
+    [data-theme="dark"] .exp-card.art-charcoal { --exp-dot: oklch(0.38 0.015 60); }
+    .exp-card:nth-of-type(odd) .yr::before { left: -18px; }
+    .exp-card:nth-of-type(even) .yr::before { left: calc(100% + 18px); }
+    /* The arrow pointed along the old sideways track. */
+    .exp-arrow { display: none; }
+    /* Guided scroll: while this page is open, .main snaps from stop to stop
+       — the heading screen, then each card centred in the space under the
+       sticky topbar. snap-stop: always keeps a fast flick from skipping a
+       card, so each scroll moves exactly one card along. */
+    .main:has(#expView.active) {
+      scroll-snap-type: y mandatory;
+      scroll-padding-top: var(--chrome-size);
+    }
+    .exp-track .exp-intro-panel { scroll-snap-align: start; }
+    .exp-track .exp-card { scroll-snap-align: center; scroll-snap-stop: always; }
+    .exp-outro { min-height: 70vh; scroll-snap-align: center; }
+  }
+  /* Closing note under the timeline — the last scroll stop on desktop. */
+  .exp-outro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    padding: 56px 24px 96px;
+    text-align: center;
+    color: var(--ink);
+  }
+  .exp-outro-text {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(26px, 3.2vw, 40px);
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .exp-outro-text em { font-style: italic; }
+  /* The email, as a pill on .page-back's box (48px, 18px sides, round,
+     transparent at rest, --control-soft under the pointer) — not the class
+     itself, which the rail listens for. Three beats, like the header's email
+     button: envelope + address at rest, copy mark + "Copy email" on hover,
+     tick + "Copied" once pressed (.is-copied, from the shared
+     [data-copy-email] handler), then back. */
+  .exp-outro-email {
+    display: inline-flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: var(--tracking-ui);
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .exp-outro-email:hover,
+  .exp-outro-email:focus-visible,
+  .exp-outro-email.is-copied { background: var(--control-soft); }
+  .exp-outro-email:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  /* Each state is its icon + label as one unit, all three stacked in one
+     cell and centred, so the pill keeps its widest state's width while the
+     icon always sits right beside its own words. */
+  .exp-email-states { display: grid; }
+  .exp-email-state {
+    grid-area: 1 / 1;
+    justify-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    opacity: 0; transform: translateY(2px) scale(0.92);
+    transition:
+      opacity var(--email-fade) var(--ease-out),
+      transform var(--email-swap) var(--ease-soft);
+  }
+  .exp-email-state svg { width: 14px; height: 14px; flex-shrink: 0; }
+  /* Resting beat, then hover (pointers that can hover), then the
+     confirmation — later rules win, so the tick beats hover on press. */
+  .exp-email-state--idle,
+  .exp-outro-email:focus-visible .exp-email-state--copy { opacity: 1; transform: none; transition-delay: var(--email-fade); }
+  .exp-outro-email:focus-visible .exp-email-state--idle { opacity: 0; transform: translateY(2px) scale(0.92); transition-delay: 0s; }
+  @media (hover: hover) {
+    .exp-outro-email:hover .exp-email-state--copy { opacity: 1; transform: none; transition-delay: var(--email-fade); }
+    .exp-outro-email:hover .exp-email-state--idle { opacity: 0; transform: translateY(2px) scale(0.92); transition-delay: 0s; }
+  }
+  .exp-outro-email.is-copied .exp-email-state--check { opacity: 1; transform: none; transition-delay: var(--email-fade); }
+  .exp-outro-email.is-copied .exp-email-state--idle,
+  .exp-outro-email.is-copied .exp-email-state--copy { opacity: 0; transform: translateY(2px) scale(0.92); transition-delay: 0s; }
+  .exp-outro-email:active .exp-email-states { opacity: 0.55; transform: scale(0.94); }
   .exp-intro-panel {
-    flex: 0 0 clamp(280px, 28vw, 390px);
+    flex: 0 0 var(--exp-intro-w);
     min-height: 0;
     display: flex;
     flex-direction: row;
@@ -2065,8 +2338,7 @@
   .exp-card {
     --scroll-reveal-opacity: 0;
     --scroll-reveal-y: 20px;
-    --hover-tilt: 0deg;
-    flex: 0 0 clamp(260px, 24vw, 340px);
+    flex: 0 0 var(--exp-card-w);
     aspect-ratio: 4 / 5;
     min-height: 0;
     height: auto;
@@ -2087,25 +2359,38 @@
   }
   .exp-card:nth-of-type(odd) { margin-top: -32px; }
   .exp-card:nth-of-type(even) { margin-top: 32px; }
-  .exp-card:hover {
-    transform: translateY(-8px) rotate(var(--hover-tilt));
-    box-shadow: 0 26px 62px -34px oklch(0.08 0.005 60 / 0.56);
-  }
-  .exp-card:nth-of-type(1) { --hover-tilt: -2deg; }
-  .exp-card:nth-of-type(2) { --hover-tilt: 2deg; }
-  .exp-card:nth-of-type(3) { --hover-tilt: -2deg; }
-  .exp-card:nth-of-type(4) { --hover-tilt: 2deg; }
-  .exp-card:nth-of-type(5) { --hover-tilt: -2deg; }
+  /* No hover state on purpose: the lift read as bouncy for no reason. */
+  /* The date sits outside the card, on the side facing away from the row's
+     centre line — above the high cards, below the low ones — so the dates
+     zig-zag along the row like a timeline. It's still the card's own child,
+     so it lifts and tilts with the card on hover. On the page, not the
+     card, hence page ink. */
   .exp-card .yr {
-    align-self: flex-start;
-    color: inherit;
+    position: absolute;
+    /* Same as the card's 22px padding, so the date lines up with the job
+       type, title and bullets inside. */
+    left: 22px;
+    /* Softened through the colour, not opacity, so the timeline dot (its
+       ::before) keeps its card's full colour. */
+    color: color-mix(in oklch, var(--ink) 80%, transparent);
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    opacity: 1;
     white-space: nowrap;
+    pointer-events: none;
   }
+  /* The length under each date ("6 months", "1 year 5 months"), filled in by the
+     experience script from data-from / data-to. */
+  .exp-card .yr { line-height: 1.35; }
+  .exp-card .yr-span {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+    color: color-mix(in oklch, var(--ink) 50%, transparent);
+  }
+  .exp-card:nth-of-type(odd) .yr { bottom: calc(100% + 14px); }
+  .exp-card:nth-of-type(even) .yr { top: calc(100% + 14px); }
   .exp-card h3 {
     font-family: var(--serif);
     font-weight: 400;
@@ -2133,19 +2418,25 @@
     border-top: 2px solid currentColor;
   }
   .exp-card li::before {
-    content: '✦';
-    margin-right: 6px;
-    font-size: 9px;
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    vertical-align: 0.2em;
   }
   .exp-card .place {
-    margin-top: 22px;
     font-family: var(--mono);
     font-size: 10px;
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     opacity: 0.7;
   }
-  .exp-card-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .exp-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .exp-card-logo { width: 34px; height: auto; flex-shrink: 0; align-self: flex-start; }
+  .exp-card-logo--godaddy { width: 44px; }
   .exp-link-card:focus-visible {
     outline-color: currentColor;
     outline-offset: 6px;
@@ -2863,10 +3154,11 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 22px;
+    /* Same as .ab-page-row's gap, so the divider sits evenly between the
+       heading and the deck. */
+    gap: clamp(34px, 5vw, 72px);
     text-align: center;
     color: var(--ink);
-    margin-right: 10px;
   }
   .ab-intro-panel h3 {
     font-family: var(--serif);
@@ -2877,9 +3169,11 @@
     text-align: center;
   }
   .ab-intro-panel h3 em { font-style: italic; color: inherit; }
-  .ab-arrow { width: 84px; height: 44px; flex: 0 0 auto; }
-  .ab-arrow svg { width: 100%; height: 100%; display: block; }
-  .ab-arrow svg.ab-arrow-v { display: none; }
+  /* A hairline divider between the heading and the deck, in the faint
+     line colour — vertical here, horizontal on mobile where they stack.
+     (The arrow SVGs stay in the markup, hidden.) */
+  .ab-arrow { width: 1px; height: 120px; flex: 0 0 auto; background: var(--line); }
+  .ab-arrow svg { display: none; }
 
   /* ── About stack ── */
   .ab-stack {
@@ -2945,22 +3239,14 @@
     animation: cardSpread 0.95s cubic-bezier(0.32, 0.02, 0.22, 1) backwards;
     animation-delay: var(--intro-delay, 0s);
   }
-  .ab-stack-card.is-lifting {
-    --lift-y: -48px;
-    --stack-scale: 1.04;
-    z-index: 3000;
-    transition:
-      transform 250ms cubic-bezier(0.36, 0, 0.2, 1),
-      box-shadow 250ms ease;
-    box-shadow: 0 48px 96px -48px oklch(0.08 0.005 60 / 0.76), inset 0 0 0 1px oklch(0 0 0 / 0.08);
+  /* A card change is sprung frame by frame (see springAboutStack), so the
+     CSS transform transition steps aside — a transition restarting on every
+     frame's new value only adds lag. */
+  .ab-stack.is-springing .ab-stack-card {
+    transition: box-shadow var(--stack-dur) ease;
   }
-  .ab-stack-card.is-placing {
-    --lift-y: 0px;
-    --stack-scale: 1;
-    z-index: 3000;
-    transition:
-      transform 540ms cubic-bezier(0.18, 0.72, 0.28, 1.05),
-      box-shadow 540ms ease;
+  .ab-stack-card.is-chosen {
+    box-shadow: 0 48px 96px -48px oklch(0.08 0.005 60 / 0.76), inset 0 0 0 1px oklch(0 0 0 / 0.08);
   }
   .ab-stack-card:not(.is-front) {
     cursor: pointer;
@@ -3234,12 +3520,6 @@
     width: clamp(150px, 23vw, 230px);
     height: auto;
     margin-bottom: 12px;
-  }
-  .sheet[data-page="brew"] .cs-hero-sub {
-    max-width: 760px;
-    margin-bottom: 22px;
-    font-size: 14px;
-    color: oklch(0.34 0.018 70);
   }
   .sheet[data-page="brew"] .cs-brew-byline {
     margin: 0;
@@ -3781,13 +4061,6 @@
     letter-spacing: -0.02em;
     color: var(--crow-accent-ink);
   }
-  .sheet[data-page="crow"] .cs-hero-sub {
-    max-width: 760px;
-    margin-bottom: 22px;
-    font-size: 14px;
-    color: var(--crow-accent-ink);
-    opacity: 0.82;
-  }
   .sheet[data-page="crow"] .cs-crow-byline {
     margin: 0;
     color: var(--crow-accent-ink);
@@ -3967,13 +4240,6 @@
     width: clamp(150px, 22vw, 220px);
     height: auto;
     margin-bottom: 14px;
-  }
-  .sheet[data-page="habitat"] .cs-hero-sub {
-    max-width: 760px;
-    margin-bottom: 22px;
-    font-size: 14px;
-    color: var(--habitat-accent-ink);
-    opacity: 0.82;
   }
   .sheet[data-page="habitat"] .cs-habitat-byline {
     margin: 0;
@@ -4203,7 +4469,6 @@
     display: block; margin-top: 8px; color: var(--dream-deep);
     font-family: var(--serif); font-weight: 400; opacity: .72;
   }
-  .sheet[data-page="dreamcatcher"] .cs-hero-sub { max-width: 730px; color: var(--dream-deep); opacity: .76; }
   .sheet[data-page="dreamcatcher"] .cs-dream-byline { margin: 0; color: var(--dream-deep); opacity: .62; }
   .sheet[data-page="dreamcatcher"] .cs-dream-byline span {
     display: inline-flex;
@@ -4665,7 +4930,6 @@
     font-style: italic;
     color: inherit;
   }
-  .cs-hero--climate .cs-hero-sub { color: var(--ink-mid); }
   .cs-hero--climate .cs-role-line { display: none; }
   .cs-hero-byline {
     display: flex;
@@ -4969,6 +5233,28 @@
     color: var(--ink);
   }
   .cs-copy strong { color: var(--ink); }
+  /* Every study opens on an Overview set as a lead, GoDaddy's treatment:
+     full column width, with the larger type keeping the measure readable.
+     The study's own palette still colours the label above it. */
+  .sheet .cs-copy.cs-overview { max-width: none; }
+  .sheet .cs-copy.cs-overview p {
+    font-size: clamp(17px, 1.9vw, 23px);
+    line-height: 1.45;
+    letter-spacing: -.011em;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+  .cs-overview + .cs-hero-stats { margin: 32px 0 0; }
+  /* GoDaddy's spacing around it too: a wider gap above and below than the
+     study's usual section rhythm sets the lead apart, and the label sits
+     closer to it. Only the Overview and the section after it change. */
+  .sheet .cs-section:has(> .cs-overview),
+  .sheet .cs-section:has(> .cs-overview) + .cs-section { padding-top: 112px; }
+  .sheet .cs-section:has(> .cs-overview) > .cs-label { margin-bottom: 20px; }
+  @media (max-width: 640px) {
+    .sheet .cs-section:has(> .cs-overview),
+    .sheet .cs-section:has(> .cs-overview) + .cs-section { padding-top: 72px; }
+  }
   .cs-copy ul, .cs-copy ol,
   .cs-feature ul, .cs-feature ol,
   .sheet-body .body ul, .sheet-body .body ol {
@@ -5436,16 +5722,12 @@
   .cs-wip-text { font-size: 13px; color: var(--ink-mid); margin: 0; line-height: 1.5; }
 
   /* ── Responsive ── */
-  @media (max-width: 1000px) {
-    .exp-track { padding: 0 48px; }
-  }
   @media (max-width: 900px) {
     .page.active { padding: 48px 24px 80px; }
-    .exp-intro-panel { flex-basis: 300px; }
+    .exp-track { --exp-intro-w: 300px; --exp-card-w: 286px; }
     .exp-intro-panel h3 { font-size: 46px; }
     .exp-arrow { width: 70px; height: 38px; }
     .exp-card {
-      flex-basis: 286px;
       height: auto;
       min-height: 0;
       padding: 22px;
@@ -5473,6 +5755,7 @@
     .banner h1 { font-size: 32px; margin-bottom: 10px; }
     .banner .bio { max-width: 400px; font-size: 14px; line-height: 1.55; text-wrap: pretty; }
     .banner .bio-role { display: none; }
+    .banner .bio-school { display: inline; }
     .banner .bio-details { display: block; }
     .banner .meta { display: none; }
     .tabs {
@@ -5543,9 +5826,7 @@
        with even breathing room above and below the arrow. */
     .ab-page-row { flex-direction: column; gap: 44px; align-items: center; }
     .ab-intro-panel { flex-direction: column; gap: 18px; margin-right: 0; align-items: center; }
-    .ab-arrow { width: 24px; height: 46px; }
-    .ab-arrow svg.ab-arrow-h { display: none; }
-    .ab-arrow svg.ab-arrow-v { display: block; }
+    .ab-arrow { width: 48px; height: 1px; }
     /* The About deck is a pointer-driven fan (hover-lift, click-to-cycle).
        Flatten it to a plain vertical read on mobile — cards held near the
        feed/experience card width, full content, in flow. The stack JS is
@@ -5687,6 +5968,7 @@
   @media (prefers-reduced-motion: reduce) {
     html.splash-active #splash { display: none; }
   }
+
 </style>
 </head>
 <body>
@@ -5837,8 +6119,8 @@
           <img class="avatar-photo" src="assets/images/profile.jpg" alt="Portrait of Zainab Ahsan" />
         </div>
         <h1 id="nameTitle">Zainab <em>Ahsan</em></h1>
-        <p class="bio"><span class="bio-role">Data Analytics Intern @ GoDaddy  ·  </span>CS + Data Science @ UW<br>I design, build, and overthink the <span class="bio-details">details in between :)</span></p>
-        <div class="meta">Seattle, WA <span class="meta-sep">·</span> 5 Boards, 7 Pins</div>
+        <p class="bio"><span class="bio-role">Incoming Product Engineer @ Tesla<span class="bio-divider" aria-hidden="true">|</span>CS + Data Science @ UW</span><span class="bio-school">CS + Data Science @ UW</span><br>I design, build, and overthink the <span class="bio-details">details in between :)</span></p>
+        <div class="meta">Seattle, WA<span class="meta-sep" aria-hidden="true">|</span>5 Boards, 7 Pins</div>
       </div>
 
       <nav class="tabs" aria-label="Filter work">
@@ -6050,7 +6332,7 @@
             <h3>A little<br><em>about me</em></h3>
           </div>
           <div class="ab-arrow" aria-hidden="true">
-            <svg class="ab-arrow-h" viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="ab-arrow-h" viewBox="0 0 84 44" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 22H76M58 6l18 16-18 16"/>
             </svg>
             <svg class="ab-arrow-v" viewBox="0 0 44 84" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -6175,20 +6457,38 @@
                     <path d="M4 22H76M58 6l18 16-18 16"/>
                   </svg>
                 </div>
+                <div class="exp-scroll-cue" aria-hidden="true"><span>Scroll</span><span class="exp-scroll-cue-line"></span></div>
               </div>
+              <article class="exp-card art-cream">
+                <div class="yr" data-from="2027-01">Starting Jan 2027</div>
+                <div class="exp-card-header">
+                  <div class="place">Internship</div>
+                  <img class="exp-card-logo" src="assets/images/tesla-icon-black.svg" alt="" aria-hidden="true">
+                </div>
+                <h3>Tesla<span>Product Engineering Intern</span></h3>
+                <ul>
+                  <li>Product development &amp; engineering</li>
+                  <li>Prototyping &amp; iterative problem-solving</li>
+                  <li>Cross-functional product collaboration</li>
+                </ul>
+              </article>
               <article class="exp-card art-yellow">
-                <div class="yr">Jul 2026 – Present (Dec 2026)</div>
+                <div class="yr" data-from="2026-07" data-to="2026-12">Jul – Dec 2026</div>
+                <div class="exp-card-header">
+                  <div class="place">Internship</div>
+                  <img class="exp-card-logo exp-card-logo--godaddy" src="assets/images/godaddy-icon-black.svg" alt="" aria-hidden="true">
+                </div>
                 <h3>GoDaddy<span>Data Analytics Intern</span></h3>
                 <ul>
                   <li>SQL, Python &amp; Redshift pipelines</li>
                   <li>QuickSight dashboards + AI automation</li>
                   <li>Exec-level data storytelling</li>
                 </ul>
-                <div class="place">Internship</div>
               </article>
               <article class="exp-card art-sage exp-link-card" role="link" tabindex="0" aria-label="Open WIIRED Studio on Instagram" data-cursor-link="↗ @wiiredstudio" data-href="https://www.instagram.com/wiiredstudio/">
+                <div class="yr" data-from="2026-04" data-to="now">Apr 2026 – Present</div>
                 <div class="exp-card-header">
-                  <div class="yr">Apr 2026 – Present</div>
+                  <div class="place">Part-time</div>
                 </div>
                 <h3>WIIRED<br>Studio<span>Co-founder</span></h3>
                 <ul>
@@ -6196,30 +6496,43 @@
                   <li>200+ on Instagram</li>
                   <li>Brand systems + web apps</li>
                 </ul>
-                <div class="place">Part-time</div>
               </article>
               <article class="exp-card art-charcoal">
-                <div class="yr">Jun 2025 – Present</div>
+                <div class="yr" data-from="2025-06" data-to="now">Jun 2025 – Present</div>
+                <div class="exp-card-header">
+                  <div class="place">Part-time</div>
+                </div>
                 <h3>University<br>of Washington<span>Student Assistant</span></h3>
                 <ul>
                   <li>Front office reception</li>
                   <li>Email, rooms &amp; equipment management</li>
                   <li>Staff &amp; faculty coordination</li>
                 </ul>
-                <div class="place">Part-time</div>
               </article>
-              <article class="exp-card art-cream">
-                <div class="yr">Sep 2024 – Fall 2027</div>
-                <h3>University<br>of Washington<span>BS in Computer Science &amp; Software Engineering</span></h3>
+              <article class="exp-card art-plum">
+                <div class="yr" data-from="2024-09" data-to="now">Sep 2024 – Present (Expected Jun 2028)</div>
+                <div class="exp-card-header">
+                  <div class="place">Bachelor's degree</div>
+                </div>
+                <h3>University<br>of Washington<span>BS in Computer Science</span></h3>
                 <ul>
                   <li>Minor in Data Science</li>
                   <li>HCI + Visualization</li>
                   <li>Interaction Design Assoc., Marketer</li>
                 </ul>
-                <div class="place">Bachelor's degree</div>
               </article>
             </div>
           </div>
+        </div>
+        <div class="exp-outro">
+          <p class="exp-outro-text">If you've scrolled this far,<br><em>let's work together</em> :)</p>
+          <button class="exp-outro-email" type="button" data-copy-email="zahsan9@uw.edu" aria-label="Copy email address zahsan9@uw.edu">
+            <span class="exp-email-states" aria-hidden="true">
+              <span class="exp-email-state exp-email-state--idle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="m3.6 6.4 8.4 6.6 8.4-6.6"/></svg>zahsan9@uw.edu</span>
+              <span class="exp-email-state exp-email-state--copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2.4"/><path d="M14.5 4.5H6.3A1.8 1.8 0 0 0 4.5 6.3v8.2"/></svg>Copy email</span>
+              <span class="exp-email-state exp-email-state--check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>Copied</span>
+            </span>
+          </button>
         </div>
       </div>
     </section>
@@ -6470,13 +6783,19 @@
             </div>
           </div>
           <h2 class="cs-hero-title"><img class="cs-brew-title-logo" src="assets/images/brew-logo.png" alt="brew."></h2>
-          <p class="cs-hero-sub">A cafe-discovery app organized around what someone needs from a space, with meaningful save states and one shared system for comments and reviews.</p>
           <dl class="cs-hero-meta">
             <div><dt>Timeline</dt><dd>2026</dd></div>
             <div><dt>Role</dt><dd>Product design + front-end</dd></div>
             <div><dt>Team</dt><dd>Partner project</dd></div>
             <div><dt>Stack</dt><dd>React Native + Expo</dd></div>
           </dl>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Overview</span>
+          <div class="cs-copy cs-overview">
+            <p>A cafe-discovery app organized around what someone needs from a space, with meaningful save states and one shared system for comments and reviews.</p>
+          </div>
         </div>
 
         <div class="cs-section">
@@ -6810,7 +7129,10 @@
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">Context</span>
+          <span class="cs-label">Overview</span>
+          <div class="cs-copy cs-overview">
+            <p><strong>22% of ~6,000 family survey responses were neutral.</strong> I helped Edmonds School District's equity team see how it shifted by topic, school, race, and language.</p>
+          </div>
           <div class="cs-hero-stats">
             <div class="cs-hstat">
               <span class="cs-hstat-n">~30×</span>
@@ -6824,9 +7146,6 @@
               <span class="cs-hstat-n">35%</span>
               <span class="cs-hstat-l">Peak topic neutral rate</span>
             </div>
-          </div>
-          <div class="cs-copy">
-            <p><strong>22% of ~6,000 family climate survey responses were neutral.</strong> Instead of treating that as a leftover category, I wanted to know whether there was a pattern behind it. There was. Neutral responses varied by topic, school, race/ethnicity, and home language. I built the topic, race, and language views and co-developed the school treemap so Edmonds School District's equity team could see where those differences showed up and decide what was worth investigating.</p>
           </div>
         </div>
 
@@ -7001,13 +7320,19 @@
             </div>
           </div>
           <h2 class="cs-hero-title">What if you could choose your dreams?</h2>
-          <p class="cs-hero-sub">DreamCatcher is a mobile-first concept for detecting, visualizing, and intentionally shaping dream experiences. It turns an invisible part of sleep into dream worlds to explore, a guided creation flow, personal insights, and constellations that grow over time.</p>
           <dl class="cs-hero-meta">
             <div><dt>Timeline</dt><dd>FigBuild 2026</dd></div>
             <div><dt>Role</dt><dd>Product + interaction design</dd></div>
             <div><dt>Team</dt><dd>Team of 2</dd></div>
             <div><dt>Stack</dt><dd>Figma prototype</dd></div>
           </dl>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Overview</span>
+          <div class="cs-copy cs-overview">
+            <p>A mobile-first concept for detecting, visualizing, and intentionally shaping dreams: worlds to explore, a guided creation flow, and constellations that grow over time.</p>
+          </div>
         </div>
 
         <div class="cs-section">
@@ -7241,13 +7566,19 @@
             </div>
           </div>
           <h2 class="cs-hero-title">The CROW</h2>
-          <p class="cs-hero-sub">UW Bothell's student research journal, ten volumes and counting. The original site ran on generic template styling with no real identity and buried its submission rules in walls of text. WIIRED Studio rebuilt it end to end, from an unbranded template into a journal worth submitting to.</p>
           <dl class="cs-hero-meta">
             <div><dt>Timeline</dt><dd>2026</dd></div>
             <div><dt>Role</dt><dd>Visual design + front-end build</dd></div>
             <div><dt>Team</dt><dd>WIIRED Studio · Partner project</dd></div>
             <div><dt>Stack</dt><dd>HTML, CSS, JavaScript</dd></div>
           </dl>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Overview</span>
+          <div class="cs-copy cs-overview">
+            <p>UW Bothell's student research journal, ten volumes in, ran on an unbranded template with its submission rules buried in walls of text. WIIRED Studio rebuilt it end to end.</p>
+          </div>
         </div>
 
         <div class="cs-section">
@@ -7494,8 +7825,8 @@
 
         <div class="cs-section">
           <span class="cs-label">Overview</span>
-          <div class="cs-copy">
-            <p>Data analytics intern on product at GoDaddy, building the measurement layer underneath a production LLM agent and a running program of product experiments: evaluation, pipelines, and the reporting on top of them.</p>
+          <div class="cs-copy cs-overview">
+            <p>Data analytics intern on product at GoDaddy, building evaluation, pipelines, and reporting for a production LLM agent and a running program of product experiments.</p>
           </div>
         </div>
 
@@ -7621,13 +7952,19 @@
             </div>
           </div>
           <h2 class="cs-hero-title"><img class="cs-habitat-title-logo" src="assets/images/habitat-logo.png" alt="HABITAT"></h2>
-          <p class="cs-hero-sub">A gamified habit tracker that turns HealthKit data into a living island world. Each habit grows its own island, and a pixel panda's health responds to how those islands are doing, so checking in feels like visiting a place instead of reading a guilt-driven dashboard.</p>
           <dl class="cs-hero-meta">
             <div><dt>Timeline</dt><dd>48-hour hackathon, 2026</dd></div>
             <div><dt>Role</dt><dd>Visual + product design</dd></div>
             <div><dt>Team</dt><dd>Team of 4</dd></div>
             <div><dt>Stack</dt><dd>React Native + Expo</dd></div>
           </dl>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Overview</span>
+          <div class="cs-copy cs-overview">
+            <p>A gamified habit tracker where each HealthKit-synced habit grows its own island, so checking in feels like visiting a place, not reading a guilt-driven dashboard.</p>
+          </div>
         </div>
 
         <div class="cs-section">
@@ -8672,13 +9009,13 @@
         return;
       }
 
-      // Find which card the pointer is actually over using elementFromPoint
-      const target = document.elementFromPoint(lastMouseX, lastMouseY);
-      const hoveredCard = target?.closest('.ab-stack-card');
+      // Hit-test against where each card *rests*, not where it's drawn: the
+      // hover lift moves a card, so testing its live position flickered at
+      // the edges (lift → pointer falls off → drop → pointer back on → lift).
+      const hoveredCard = aboutCardAtRest(lastMouseX, lastMouseY);
 
       // Only non-front cards can be hovered
-      const validHover = hoveredCard && !hoveredCard.classList.contains('is-front')
-                         && aboutCards.includes(hoveredCard);
+      const validHover = hoveredCard && !hoveredCard.classList.contains('is-front');
 
       const newHoveredCard = validHover ? hoveredCard : null;
 
@@ -8690,6 +9027,30 @@
         }
         aboutHoveredCard = newHoveredCard;
       }
+    }
+
+    // Topmost card whose resting footprint contains the point. Undoes each
+    // card's resting rotation about the shared hinge (see renderAboutStack)
+    // and checks the point against its untransformed box.
+    function aboutCardAtRest(x, y) {
+      const page = aboutStack.closest('.about-page');
+      if (page && document.elementFromPoint(x, y)?.closest('.about-page') !== page) return null;
+      const box = aboutStack.getBoundingClientRect();
+      const hinge = parseFloat(aboutStack.style.getPropertyValue('--hinge-below')) || 0;
+      for (const i of aboutOrder) {
+        const card = aboutCards[i];
+        const w = card.offsetWidth;
+        const h = card.offsetHeight;
+        const ox = box.left + w / 2;
+        const oy = box.top + h + hinge;
+        const r = -(parseFloat(card.style.getPropertyValue('--stack-r')) || 0) * Math.PI / 180;
+        const dx = x - ox;
+        const dy = y - oy;
+        const lx = dx * Math.cos(r) - dy * Math.sin(r) + w / 2;
+        const ly = dx * Math.sin(r) + dy * Math.cos(r) + h + hinge;
+        if (lx >= 0 && lx <= w && ly >= 0 && ly <= h) return card;
+      }
+      return null;
     }
 
     function measureAboutStack() {
@@ -8723,10 +9084,92 @@
       });
     }
 
+    /* Card change with give. Every card rides its own spring for rotation,
+       lift and scale, written to --stack-r/--lift-y/--stack-scale each frame.
+       The chosen card springs up off the fan, then — once the order flips —
+       swings down into the front slot, overshooting a touch before it
+       settles; the rest re-fan to their new depths one after another. A new
+       choice mid-motion retargets from wherever everything is. */
+    const AB_SPRING_K = 170;         // stiffness
+    const AB_SPRING_C = 15;          // damping (critical ≈ 26 at this k) — lower = more overshoot
+    const AB_LIFT_MS = 200;          // how long the chosen card rises before the order flips
+    const AB_RIPPLE_MS = 45;         // stagger between the other cards re-fanning
+    const abSprings = new Map();
+    let abFrame = 0;
+    let abLastT = 0;
+    let abPhaseTimer = 0;
+    let abPendingOrder = null;
+    let abChosen = null;
+    let aboutSpringing = false;
+
+    function setAboutStacking() {
+      aboutCards.forEach((card, i) => {
+        const depth = aboutOrder.indexOf(i);
+        card.style.setProperty('--stack-z', card === abChosen ? 3000 : aboutCards.length - depth);
+        card.classList.toggle('is-front', depth === 0);
+        card.setAttribute('aria-pressed', depth === 0 ? 'true' : 'false');
+      });
+    }
+
+    function stopAboutSprings() {
+      cancelAnimationFrame(abFrame);
+      abFrame = 0;
+      abLastT = 0;
+      clearTimeout(abPhaseTimer);
+      abPhaseTimer = 0;
+      if (abPendingOrder) { aboutOrder = abPendingOrder; abPendingOrder = null; }
+      abSprings.clear();
+      abChosen?.classList.remove('is-chosen');
+      abChosen = null;
+      aboutCards.forEach(card => {
+        card.style.removeProperty('--lift-y');
+        card.style.removeProperty('--stack-scale');
+        card.style.removeProperty('--hover-r');
+      });
+      aboutStack.classList.remove('is-springing');
+      aboutSpringing = false;
+    }
+
+    function stepAboutSprings(now) {
+      abFrame = 0;
+      const dt = Math.min(0.05, abLastT ? (now - abLastT) / 1000 : 1 / 60);
+      abLastT = now;
+      let moving = !!abPhaseTimer;
+      abSprings.forEach((sp, card) => {
+        if (sp.wait > now) { moving = true; return; }
+        // Two half-steps keep the spring stable on a slow frame.
+        for (let k = 0; k < 2; k++) {
+          const h = dt / 2;
+          sp.vr += (AB_SPRING_K * (sp.tr - sp.r) - AB_SPRING_C * sp.vr) * h;
+          sp.vy += (AB_SPRING_K * (sp.ty - sp.y) - AB_SPRING_C * sp.vy) * h;
+          sp.vs += (AB_SPRING_K * (sp.ts - sp.s) - AB_SPRING_C * sp.vs) * h;
+          sp.r += sp.vr * h;
+          sp.y += sp.vy * h;
+          sp.s += sp.vs * h;
+        }
+        const settled = Math.abs(sp.tr - sp.r) < 0.01 && Math.abs(sp.vr) < 0.01
+          && Math.abs(sp.ty - sp.y) < 0.1 && Math.abs(sp.vy) < 0.1
+          && Math.abs(sp.ts - sp.s) < 0.0005 && Math.abs(sp.vs) < 0.0005;
+        if (settled) { sp.r = sp.tr; sp.y = sp.ty; sp.s = sp.ts; sp.vr = sp.vy = sp.vs = 0; }
+        else moving = true;
+        card.style.setProperty('--stack-r', sp.r.toFixed(3) + 'deg');
+        card.style.setProperty('--lift-y', sp.y.toFixed(2) + 'px');
+        card.style.setProperty('--stack-scale', sp.s.toFixed(4));
+      });
+      if (moving) { abFrame = requestAnimationFrame(stepAboutSprings); return; }
+      // Settled: hand the deck back to the resting render and the hover.
+      stopAboutSprings();
+      aboutStackMetrics = null;
+      renderAboutStack();
+      aboutStack.classList.remove('is-busy');
+      aboutStackBusy = false;
+    }
+
     function finishAboutMotion() {
       aboutMotionTimers.forEach(clearTimeout);
       aboutMotionTimers = [];
-      aboutCards.forEach(card => card.classList.remove('is-intro', 'is-lifting', 'is-placing'));
+      stopAboutSprings();
+      aboutCards.forEach(card => card.classList.remove('is-intro'));
       aboutStack.classList.remove('is-busy');
       aboutStackBusy = false;
       aboutStackMetrics = null;
@@ -8739,11 +9182,18 @@
       if (now - lastSelectTime < MIN_SELECT_INTERVAL) return;
       lastSelectTime = now;
 
-      // A new choice always wins: finish any intro/selection at its current
-      // logical order, then immediately retarget the deck to the latest card.
-      if (aboutStackBusy) {
+      // The intro unfurl is a CSS animation, not a spring — finish it at its
+      // resting order first. A card change already in flight is retargeted
+      // below instead, from wherever its springs are.
+      if (aboutStackBusy && !aboutSpringing) {
         finishAboutMotion();
         void aboutStack.offsetWidth;
+      }
+      if (abPendingOrder) {
+        clearTimeout(abPhaseTimer);
+        abPhaseTimer = 0;
+        aboutOrder = abPendingOrder;
+        abPendingOrder = null;
       }
       // The front card isn't a control — it's just the current state — so tapping
       // it does nothing, matching its own cursor (only non-front cards get the
@@ -8752,40 +9202,69 @@
       const nextOrder = [index, ...aboutOrder.filter(i => i !== index)];
 
       if (prefersReducedMotion()) {
+        stopAboutSprings();
         aboutOrder = nextOrder;
         aboutStackMetrics = null;
         renderAboutStack();
         return;
       }
 
-      aboutStackBusy = true;
       aboutStackMetrics = measureAboutStack();
-      // Clear hover state during animation
+      const { tilt } = aboutStackMetrics;
+      // Start each spring from where the card is now — including a hover
+      // lift, so the chosen card doesn't dip before it rises.
+      aboutCards.forEach(card => {
+        if (abSprings.has(card)) return;
+        const hovered = card.classList.contains('is-hovered');
+        abSprings.set(card, {
+          r: (parseFloat(card.style.getPropertyValue('--stack-r')) || 0) + (hovered ? -1 : 0),
+          y: hovered ? -12 : 0,
+          s: 1,
+          vr: 0, vy: 0, vs: 0,
+          tr: 0, ty: 0, ts: 1,
+          wait: 0,
+        });
+        const sp = abSprings.get(card);
+        sp.tr = sp.r; sp.ty = sp.y; sp.ts = sp.s;
+      });
       aboutCards.forEach(c => c.classList.remove('is-hovered'));
       aboutHoveredCard = null;
-      const card = aboutCards[index];
-      const depth = aboutOrder.indexOf(index);
-      const angle = depth * aboutStackMetrics.tilt;
-      aboutStack.classList.add('is-busy');
-      // lift the card up off the fan along its own axis, keeping half its resting tilt
-      card.style.setProperty('--stack-r', `${angle * 0.5}deg`);
-      card.classList.add('is-lifting');
+      aboutCards.forEach(card => card.style.setProperty('--hover-r', '0deg'));
+      aboutStackBusy = true;
+      aboutSpringing = true;
+      aboutStack.classList.add('is-busy', 'is-springing');
 
-      aboutMotionTimers.push(setTimeout(() => {
-        aboutOrder = nextOrder;
-        renderAboutStack({ freezeMetrics: true });
-        card.classList.remove('is-lifting');
-        card.classList.add('is-placing');
-      }, 250));
+      abChosen?.classList.remove('is-chosen');
+      abChosen = aboutCards[index];
+      abChosen.classList.add('is-chosen');
+      setAboutStacking();
+      // Rise: up off the fan along its own axis, keeping half its tilt.
+      const lift = abSprings.get(abChosen);
+      lift.tr = aboutOrder.indexOf(index) * tilt * 0.5;
+      lift.ty = -48;
+      lift.ts = 1.04;
+      lift.wait = 0;
 
-      aboutMotionTimers.push(setTimeout(() => {
-        card.classList.remove('is-placing');
-        aboutStackMetrics = null;
-        renderAboutStack();
-        aboutStack.classList.remove('is-busy');
-        aboutStackBusy = false;
-        aboutMotionTimers = [];
-      }, 820));
+      abPendingOrder = nextOrder;
+      abPhaseTimer = setTimeout(() => {
+        abPhaseTimer = 0;
+        aboutOrder = abPendingOrder;
+        abPendingOrder = null;
+        setAboutStacking();
+        // Settle: everyone springs to their new depth; the chosen card lands
+        // first and the rest ripple back out behind it.
+        const t0 = performance.now();
+        aboutCards.forEach((card, i) => {
+          const depth = aboutOrder.indexOf(i);
+          const sp = abSprings.get(card);
+          sp.tr = depth * tilt;
+          sp.ty = 0;
+          sp.ts = 1;
+          sp.wait = depth === 0 ? 0 : t0 + depth * AB_RIPPLE_MS;
+        });
+      }, AB_LIFT_MS);
+
+      if (!abFrame) abFrame = requestAnimationFrame(stepAboutSprings);
     }
 
     aboutCards.forEach((card, index) => {
@@ -9401,64 +9880,128 @@
   const topbarResume = document.getElementById('topbarResume');
 const expScroll   = document.getElementById('expScroll');
   const expTrack    = document.getElementById('expTrack');
-  let expTravelPx = 0;
   let expFrame = 0;
+
+  // Under each date, how long the role ran: "6 months", "1 year 5 months". Months
+  // count inclusively (Jul–Dec is 6), "now" is today so Present roles stay
+  // right, and a start still in the future reads "Upcoming".
+  (function addExperienceSpans() {
+    const today = new Date();
+    const toIndex = v => {
+      if (v === 'now') return today.getFullYear() * 12 + today.getMonth();
+      const [y, m] = v.split('-').map(Number);
+      return y * 12 + (m - 1);
+    };
+    const plural = (n, word) => n + ' ' + word + (n === 1 ? '' : 's');
+    document.querySelectorAll('.exp-card .yr[data-from]').forEach(yr => {
+      const from = toIndex(yr.dataset.from);
+      let text;
+      if (from > toIndex('now')) text = 'Upcoming';
+      else {
+        const months = toIndex(yr.dataset.to || 'now') - from + 1;
+        const y = Math.floor(months / 12);
+        const m = months % 12;
+        text = [y ? plural(y, 'year') : '', m ? plural(m, 'month') : ''].filter(Boolean).join(' ');
+      }
+      const span = document.createElement('span');
+      span.className = 'yr-span';
+      span.textContent = text;
+      yr.appendChild(span);
+    });
+  })();
+
+  // Desktop: each card slides in as it scrolls into view (see .is-in in the
+  // CSS); leaving the page resets them so they play again next visit.
+  const expReveal = expTrack && 'IntersectionObserver' in window
+    ? new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-in'); });
+      }, { threshold: 0.2 })
+    : null;
+  expTrack?.querySelectorAll('.exp-card').forEach(card => {
+    if (expReveal) expReveal.observe(card);
+    else card.classList.add('is-in');
+  });
 
   function updateExperienceTrackNow() {
     if (!expScroll || !expTrack) return;
     const viewport = expScroll.querySelector('.exp-viewport');
-    // Mobile drops the scroll-driven track for a plain horizontal swipe
-    // (see the max-width: 800px rules) — clear anything the desktop path set.
-    if (window.matchMedia('(max-width: 800px)').matches) {
-      expScroll.style.removeProperty('--exp-track-x');
-      expScroll.style.removeProperty('--exp-travel');
-      expTravelPx = 0;
-      viewport.style.opacity = '';
-      viewport.style.transform = '';
-      return;
-    }
-    if (!expView.classList.contains('active')) {
-      expScroll.style.setProperty('--exp-track-x', '0px');
-      viewport.style.opacity = '';
-      viewport.style.transform = '';
-      return;
-    }
-
-    const maxX = Math.max(0, expTrack.scrollWidth - viewport.clientWidth);
-    const moveTravel = maxX * 1.22;
-    const scrollTravel = moveTravel;
-    if (Math.abs(scrollTravel - expTravelPx) > 1) {
-      expTravelPx = scrollTravel;
-      expScroll.style.setProperty('--exp-travel', scrollTravel + 'px');
-    }
-    const travel = Math.max(1, moveTravel);
-    const stickyTop = parseFloat(getComputedStyle(viewport).top) || 0;
-    const raw = stickyTop - expScroll.getBoundingClientRect().top;
-    const progressed = Math.min(Math.max(raw, 0), travel);
-    const x = -maxX * (progressed / travel);
-    expScroll.style.setProperty('--exp-track-x', x + 'px');
-
     viewport.style.opacity = '';
     viewport.style.transform = '';
-
-    const viewportRect = viewport.getBoundingClientRect();
-    expTrack.querySelectorAll('.exp-card').forEach(card => {
-      const rect = card.getBoundingClientRect();
-      const rightStart = viewportRect.right + rect.width * 0.9;
-      const rightEnd = viewportRect.right - rect.width * 0.9;
-      const leftStart = viewportRect.left - rect.width * 0.9;
-      const leftEnd = viewportRect.left + rect.width * 0.9;
-      const fromRight = Math.min(Math.max((rightStart - rect.left) / Math.max(1, rightStart - rightEnd), 0), 1);
-      const fromLeft = Math.min(Math.max((rect.right - leftStart) / Math.max(1, leftEnd - leftStart), 0), 1);
-      const t = Math.min(fromRight, fromLeft);
-      // Smoother easing with less aggressive smoothstep
-      const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-      card.style.setProperty('--scroll-reveal-opacity', String(eased));
-      // Add subtle Y movement as card fades in
-      const yOffset = 20 * (1 - eased);
-      card.style.setProperty('--scroll-reveal-y', yOffset.toFixed(1) + 'px');
-    });
+    // Desktop timeline: each dot appears once it's scrolled up past a
+    // reading position 80% of the way down the screen — just after it comes
+    // into view; the scroll cue fades over the first bit of scroll.
+    if (expView.classList.contains('active') && !window.matchMedia('(max-width: 800px)').matches) {
+      const cards = [...expTrack.querySelectorAll('.exp-card')];
+      const still = prefersReducedMotion();
+      const reading = window.innerHeight * 0.8;
+      cards.forEach(card => {
+        const dotY = card.getBoundingClientRect().top + 20;
+        card.classList.toggle('is-reached', still || dotY <= reading);
+      });
+      const scrolled = document.querySelector('.main')?.scrollTop || 0;
+      expTrack.style.setProperty('--exp-cue', Math.max(0, 1 - scrolled / 220).toFixed(3));
+    }
+    if (!expView.classList.contains('active') && expReveal) {
+      expTrack.querySelectorAll('.exp-card.is-in').forEach(card => {
+        card.classList.remove('is-in');
+        // Re-observe so a card already on screen next visit fires again.
+        expReveal.unobserve(card);
+        expReveal.observe(card);
+      });
+    }
   }
+
+  /* Scroll give (desktop). Each scroll step pushes the cards back by a
+     fraction of how far the page moved, more for cards lower on screen, and
+     a slightly under-damped spring pulls them home — so the column trails
+     the scroll, stretches a little, and settles with a small overshoot
+     instead of moving as one rigid sheet. */
+  const EXP_LAG = 0.14;          // px of trail per px scrolled (lowest card)
+  const EXP_LAG_MAX = 44;        // px cap on the trail
+  const EXP_LAG_K = 110;         // spring stiffness
+  const EXP_LAG_C = 14;          // damping (critical ≈ 21) — the overshoot
+  const expLagCards = expTrack ? [...expTrack.querySelectorAll('.exp-card')] : [];
+  const expLag = new Map(expLagCards.map(c => [c, { y: 0, v: 0 }]));
+  const expMain = document.querySelector('.main');
+  let expLastScroll = expMain ? expMain.scrollTop : 0;
+  let expLagFrame = 0;
+  let expLagT = 0;
+
+  function stepExperienceLag(now) {
+    expLagFrame = 0;
+    const dt = Math.min(0.05, expLagT ? (now - expLagT) / 1000 : 1 / 60);
+    expLagT = now;
+    let moving = false;
+    expLag.forEach((sp, card) => {
+      for (let k = 0; k < 2; k++) {
+        const h = dt / 2;
+        sp.v += (-EXP_LAG_K * sp.y - EXP_LAG_C * sp.v) * h;
+        sp.y += sp.v * h;
+      }
+      if (Math.abs(sp.y) < 0.05 && Math.abs(sp.v) < 0.05) { sp.y = 0; sp.v = 0; }
+      else moving = true;
+      card.style.setProperty('--exp-lag', sp.y.toFixed(2) + 'px');
+    });
+    if (moving) expLagFrame = requestAnimationFrame(stepExperienceLag);
+    else expLagT = 0;
+  }
+
+  expMain?.addEventListener('scroll', () => {
+    const top = expMain.scrollTop;
+    const delta = top - expLastScroll;
+    expLastScroll = top;
+    if (!delta || !expView.classList.contains('active') || prefersReducedMotion()
+        || window.matchMedia('(max-width: 800px)').matches) return;
+    const vh = window.innerHeight;
+    expLag.forEach((sp, card) => {
+      const r = card.getBoundingClientRect();
+      if (r.bottom < -200 || r.top > vh + 200) return;
+      // Lower on screen → more trail, so the column stretches as it moves.
+      const depth = Math.min(Math.max((r.top + r.height / 2) / vh, 0), 1);
+      sp.y = Math.min(EXP_LAG_MAX, Math.max(-EXP_LAG_MAX, sp.y + delta * EXP_LAG * (0.45 + 0.55 * depth)));
+    });
+    if (!expLagFrame) expLagFrame = requestAnimationFrame(stepExperienceLag);
+  }, { passive: true });
 
   function updateExperienceTrack() {
     if (expFrame) return;
