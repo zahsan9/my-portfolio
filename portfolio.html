@@ -2047,7 +2047,9 @@
     to   { opacity: 1; translate: 0 0; scale: 1; filter: blur(0); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .exp-page.active[data-exp-stage="3"] .exp-card.is-in { animation: none; }
+    .exp-page.active[data-exp-stage="3"] .exp-card.is-in,
+    .exp-page.active[data-exp-stage="3"] .exp-track .exp-intro-panel .page-intro-copy,
+    .exp-page.active[data-exp-stage="3"] .exp-scroll-cue { animation: none; }
   }
   .exp-page.active[data-exp-stage="3"] .exp-intro-panel { transition-delay: 0ms; }
   .exp-scroll {
@@ -2221,6 +2223,17 @@
       scroll-padding-top: var(--chrome-size);
     }
     .exp-track .exp-intro-panel { scroll-snap-align: start; }
+    /* Entrance: the heading fades up through the blur like the main page,
+       then the scroll cue. Replaces the storyboard's plain slide here. */
+    .exp-page.active[data-exp-stage] .exp-track .exp-intro-panel { transform: none; transition: none; }
+    .exp-page.active[data-exp-stage="3"] .exp-track .exp-intro-panel .page-intro-copy {
+      animation: feed-in 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    /* backwards, so once it lands the cue's own scroll fade (--exp-cue)
+       takes over again. */
+    .exp-page.active[data-exp-stage="3"] .exp-scroll-cue {
+      animation: feed-in 900ms cubic-bezier(0.22, 1, 0.36, 1) 450ms backwards;
+    }
     .exp-track .exp-card { scroll-snap-align: center; scroll-snap-stop: always; }
     .exp-outro { min-height: 70vh; scroll-snap-align: center; }
   }
@@ -5966,6 +5979,31 @@
   }
   @media (min-width: 801px) {
     .feed .pin { translate: 0 var(--feed-lag, 0px); }
+  }
+  /* The same entrance on the other pages, tailored to each. CSS animations
+     restart whenever a page goes from display: none to shown, so these play
+     on every arrival. */
+  /* About: the heading fades up, the divider draws in from its centre, then
+     the deck runs its own fan-out (playAboutStackIntro). */
+  .about-page.active .ab-intro-panel .page-intro-copy {
+    animation: feed-in 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .about-page.active .ab-arrow {
+    --ab-divider-from: 1 0;
+    animation: ab-divider-in 700ms cubic-bezier(0.22, 1, 0.36, 1) 250ms both;
+  }
+  @keyframes ab-divider-in {
+    from { scale: var(--ab-divider-from); opacity: 0; }
+    to   { scale: 1 1; opacity: 1; }
+  }
+  @media (max-width: 800px) {
+    .about-page.active .ab-arrow { --ab-divider-from: 0 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.feed-play .banner > *,
+    html.feed-play .tabs,
+    .about-page.active .ab-intro-panel .page-intro-copy,
+    .about-page.active .ab-arrow { animation: none; }
   }
 
 
@@ -9985,6 +10023,13 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       }
 
       // Phase 3: show arriving view — @starting-style fires, children stagger in via CSS
+      // The feed's build-in (feedMotion) replays on every arrival, not just
+      // the opening load: it's keyed on html.feed-play, and re-showing the
+      // view restarts its CSS animations.
+      if (arriving === feedView && !prefersReducedMotion()) {
+        document.querySelectorAll('.banner > *, .tabs').forEach((el, i) => el.style.setProperty('--feed-d', (i * 90) + 'ms'));
+        document.documentElement.classList.add('feed-intro', 'feed-play');
+      }
       if (arriving === feedView) arriving.style.display = '';
       else arriving.classList.add('active');
 
