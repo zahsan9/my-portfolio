@@ -2328,6 +2328,15 @@
     text-align: center;
     color: var(--ink);
   }
+  /* Only the note is centred; the email pill hangs 30px below it, out of
+     flow, so it doesn't pull the text off the screen's centre. */
+  .exp-outro-inner { position: relative; }
+  .exp-outro-inner .exp-outro-email {
+    position: absolute;
+    top: calc(100% + 30px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
   .exp-outro-text {
     margin: 0;
     font-family: var(--serif);
@@ -6762,14 +6771,16 @@
           </div>
         </div>
         <div class="exp-outro">
-          <p class="exp-outro-text">If you've scrolled this far,<br><em>let's work together</em> :)</p>
-          <button class="exp-outro-email" type="button" data-copy-email="zahsan9@uw.edu" aria-label="Copy email address zahsan9@uw.edu">
-            <span class="exp-email-states" aria-hidden="true">
-              <span class="exp-email-state exp-email-state--idle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="m3.6 6.4 8.4 6.6 8.4-6.6"/></svg>zahsan9@uw.edu</span>
-              <span class="exp-email-state exp-email-state--copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2.4"/><path d="M14.5 4.5H6.3A1.8 1.8 0 0 0 4.5 6.3v8.2"/></svg>Copy email</span>
-              <span class="exp-email-state exp-email-state--check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>Copied</span>
-            </span>
-          </button>
+          <div class="exp-outro-inner">
+            <p class="exp-outro-text">If you've scrolled this far,<br><em>let's work together</em> :)</p>
+            <button class="exp-outro-email" type="button" data-copy-email="zahsan9@uw.edu" aria-label="Copy email address zahsan9@uw.edu">
+              <span class="exp-email-states" aria-hidden="true">
+                <span class="exp-email-state exp-email-state--idle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="m3.6 6.4 8.4 6.6 8.4-6.6"/></svg>zahsan9@uw.edu</span>
+                <span class="exp-email-state exp-email-state--copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2.4"/><path d="M14.5 4.5H6.3A1.8 1.8 0 0 0 4.5 6.3v8.2"/></svg>Copy email</span>
+                <span class="exp-email-state exp-email-state--check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>Copied</span>
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </section>
