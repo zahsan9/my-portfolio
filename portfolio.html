@@ -5867,14 +5867,14 @@
       height: auto;
       overflow: visible;
       display: block;
-      padding: 40px 0 0;
+      padding: 24px 0 0;
     }
     .exp-track {
-      --exp-m-line: 24px;
-      --exp-m-indent: 52px;
+      --exp-m-line: 20px;
+      --exp-m-indent: 44px;
       display: grid;
       grid-template-columns: minmax(0, 1fr);
-      row-gap: 84px;
+      row-gap: 64px;
       width: auto;
       padding: 0 20px 0 var(--exp-m-indent);
       transform: none !important;
@@ -5887,22 +5887,33 @@
       align-self: stretch;
       width: 1px;
       /* Starts at the first card's dot, not its top edge. */
-      margin: -44px 0 0 calc(var(--exp-m-line) - var(--exp-m-indent));
+      margin: -40px 0 0 calc(var(--exp-m-line) - var(--exp-m-indent));
       background: color-mix(in oklch, var(--ink) 22%, transparent);
     }
     /* Placed explicitly: the line above occupies these rows, which would
        otherwise push auto-placed cards past it. */
+    /* Compact on a phone: the card sizes to its content (no 4:5 box with
+       an empty top half), with tighter type and padding. */
     .exp-track .exp-card:nth-of-type(n) {
       grid-column: 1;
       margin-top: 0;
       width: 100%;
       max-width: 340px;
+      aspect-ratio: auto;
+      padding: 18px;
+      border-radius: 14px;
+      box-shadow: none;
     }
+    .exp-track .exp-card h3 { font-size: 26px; margin: 18px 0 14px; }
+    .exp-track .exp-card h3 span { font-size: 12px; margin-top: 6px; }
+    .exp-track .exp-card ul { font-size: 12px; gap: 7px; padding-top: 12px; }
+    .exp-track .exp-card-logo { width: 26px; }
+    .exp-track .exp-card-logo--godaddy { width: 32px; }
     .exp-track .exp-card:nth-of-type(1) { grid-row: 2; }
     .exp-track .exp-card:nth-of-type(2) { grid-row: 3; }
     .exp-track .exp-card:nth-of-type(3) { grid-row: 4; }
     .exp-track .exp-card:nth-of-type(4) { grid-row: 5; }
-    .exp-track .exp-card:nth-of-type(n) .yr { top: auto; bottom: calc(100% + 12px); left: 0; right: auto; text-align: left; }
+    .exp-track .exp-card:nth-of-type(n) .yr { top: auto; bottom: calc(100% + 10px); left: 0; right: auto; text-align: left; font-size: 10px; }
     .exp-card .yr::before {
       content: '';
       position: absolute;
@@ -5934,7 +5945,7 @@
       align-items: center;
       margin: 0 0 0 calc(20px - var(--exp-m-indent));
     }
-    .exp-intro-panel h3 { font-size: 40px; max-width: 9ch; text-align: center; }
+    .exp-intro-panel h3 { font-size: 32px; max-width: 9ch; text-align: center; }
     .exp-arrow { display: none; }
     /* About starts lower on phones — more air under the top bar. */
     .about-page.active { padding-top: 104px; }
