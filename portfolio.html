@@ -2040,9 +2040,47 @@
   @media (prefers-reduced-motion: reduce) {
     .exp-scroll-cue-line::after { animation: none; }
   }
-  /* Desktop-only; the mobile swipe strip has its own intro slide. */
-  .exp-scroll-cue { display: none; }
-  @media (min-width: 801px) { .exp-scroll-cue { display: flex; } }
+  /* Scroll cue at the bottom of the timeline's heading screen (desktop and
+     mobile): a "Scroll" label over a short line with a pulse running down
+     it, flush with the screen's bottom so it runs into the timeline line. */
+  .exp-scroll-cue {
+    position: absolute;
+    left: 50%;
+    /* Flush with the heading screen's bottom edge, so its line (and the
+       pulse running down it) covers the whole visible stretch of the
+       timeline line before you scroll. */
+    bottom: 0;
+    /* transform, not translate: the entrance animates translate, which
+       dropped this centring mid-animation and slid the cue sideways. */
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-label);
+    color: var(--ink-mid);
+    opacity: var(--exp-cue, 1);
+    transition: opacity 300ms ease-out;
+  }
+  .exp-scroll-cue-line {
+    position: relative;
+    width: 1px;
+    height: 72px;
+    overflow: hidden;
+    /* Same colour as the timeline line it runs into. */
+    background: color-mix(in oklch, var(--ink) 22%, transparent);
+  }
+  .exp-scroll-cue-line::after {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 40%;
+    background: var(--ink-mid);
+    animation: exp-cue-drop 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
   @keyframes exp-card-in {
     from { opacity: 0; translate: 0 18px; scale: 0.985; filter: blur(6px); }
     to   { opacity: 1; translate: 0 0; scale: 1; filter: blur(0); }
@@ -2133,44 +2171,6 @@
       margin: -48px 0 0;
       padding-bottom: var(--chrome-size);
       box-sizing: border-box;
-    }
-    .exp-scroll-cue {
-      position: absolute;
-      left: 50%;
-      /* Flush with the heading screen's bottom edge, so its line (and the
-         pulse running down it) covers the whole visible stretch of the
-         timeline line before you scroll. */
-      bottom: 0;
-      /* transform, not translate: the entrance animates translate, which
-         dropped this centring mid-animation and slid the cue sideways. */
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--mono);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-label);
-      color: var(--ink-mid);
-      opacity: var(--exp-cue, 1);
-      transition: opacity 300ms ease-out;
-    }
-    .exp-scroll-cue-line {
-      position: relative;
-      width: 1px;
-      height: 72px;
-      overflow: hidden;
-      /* Same colour as the timeline line it runs into. */
-      background: color-mix(in oklch, var(--ink) 22%, transparent);
-    }
-    .exp-scroll-cue-line::after {
-      content: '';
-      position: absolute;
-      inset: 0 0 auto;
-      height: 40%;
-      background: var(--ink-mid);
-      animation: exp-cue-drop 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
     }
     /* Beats the base odd/even ±32px rise-and-fall (same specificity, later
        in the file), so the line starts at Tesla's top edge and the gaps
@@ -5885,10 +5885,11 @@
       justify-self: center;
       align-self: stretch;
       width: 1px;
-      /* Starts at the first card's dot, and ends at the last card's bottom
-         edge rather than under its TL;DR (--exp-m-tail = that card's
-         TL;DR room, set by layoutMobileReveals). */
-      margin-top: -76px;
+      /* Reaches up through the gap above Tesla to the scroll cue's line, so
+         the two read as one, and ends at the last card's bottom edge rather
+         than under its TL;DR (--exp-m-tail = that card's TL;DR room, set by
+         layoutMobileReveals). */
+      margin-top: -128px;
       margin-bottom: var(--exp-m-tail, 0px);
       background: color-mix(in oklch, var(--ink) 22%, transparent);
     }
@@ -5940,6 +5941,10 @@
         opacity 400ms ease-out;
     }
     .exp-card.is-reached .yr::before { scale: 1; opacity: 1; }
+    /* Alternate sides: even cards put their date to the left of the line,
+       right-aligned into the dot. */
+    .exp-track .exp-card:nth-of-type(even) .yr { left: auto; right: 50%; padding: 0 18px 0 0; text-align: right; }
+    .exp-track .exp-card:nth-of-type(even) .yr::before { left: 100%; }
     /* TL;DR centred under the card, on a patch of page colour so the line
        passes behind it. The space under the card is measured to fit it
        (layoutMobileReveals). Fades in just after the dot. */
@@ -5999,18 +6004,25 @@
     @media (prefers-reduced-motion: reduce) {
       .exp-reveal { translate: none; filter: none; }
     }
+    /* The heading gets the first screen to itself, centred between the top
+       bar and the bottom nav (76px), with the scroll cue at its foot — like
+       desktop. Pulled up over the viewport's 24px top padding. */
     .exp-track .exp-intro-panel {
       grid-column: 1;
       grid-row: 1;
+      position: relative;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      margin: 0;
+      min-height: calc(100dvh - var(--chrome-size) - 76px);
+      margin: -24px 0 0;
     }
     .exp-intro-panel h3 { font-size: 32px; max-width: 9ch; text-align: center; }
     .exp-arrow { display: none; }
-    /* About starts lower on phones — more air under the top bar. */
-    .about-page.active { padding-top: 104px; }
+    /* About opens on its heading, centred on the first screen (between
+       the top bar and the 76px bottom nav); the cards follow below. */
+    .about-page.active { padding-top: 0; }
+    .ab-intro-panel { min-height: calc(100dvh - var(--chrome-size) - 76px); justify-content: center; }
     /* Intro panel: "A little about me" over a down arrow, whole row centred,
        with even breathing room above and below the arrow. */
     .ab-page-row { flex-direction: column; gap: 44px; align-items: center; }
