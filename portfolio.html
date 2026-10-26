@@ -3409,9 +3409,23 @@
     font-weight: 700;
     margin-bottom: 4px;
   }
-  /* Diamond marker to match .exp-card li::before on the Experience timeline */
+  /* Each point opens on a small round dot — the same bullet as the
+     Experience cards (.exp-card li::before). */
+  .ab-stack-item-label::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    vertical-align: 0.2em;
+  }
   .ab-stack-list.is-diamond li::before {
-    content: '✦'; font-size: 13px; top: 2px; opacity: 0.6;
+    content: '';
+    width: 4px; height: 4px; border-radius: 50%;
+    background: currentColor;
+    top: 0.6em; opacity: 1;
   }
   .ab-stack-quote {
     font-family: var(--sans); font-size: 14px; font-style: italic;
