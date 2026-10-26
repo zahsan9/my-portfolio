@@ -2125,10 +2125,13 @@
       grid-row: 1;
       justify-self: stretch;
       position: relative;
-      /* A full screen tall, pulled up over the viewport's 48px top padding,
-         so the heading sits at the true centre of what's visible. */
+      /* A full screen tall, pulled up over the viewport's 48px top padding.
+         The bottom padding matches the top bar, so the heading centres on
+         the whole window (top bar included), not just the area under it. */
       min-height: calc(100vh - var(--chrome-size));
       margin: -48px 0 0;
+      padding-bottom: var(--chrome-size);
+      box-sizing: border-box;
     }
     .exp-scroll-cue {
       position: absolute;
@@ -2224,10 +2227,9 @@
     .exp-card:nth-of-type(even) .yr::before { left: calc(100% + 18px); }
     /* The arrow pointed along the old sideways track. */
     .exp-arrow { display: none; }
-    /* Hover reveal on the card's empty side: a TL;DR of the case study and
-       a link to it, under the date. It's the card's own child, so pointing
-       at it keeps the card hovered; hiding waits 400ms (visibility flips at
-       the end of the delay) as a grace period on top of the hit area below. */
+    /* The TL;DR on the card's empty side, under the date. It fades in on
+       scroll, just after the card's dot pops in (.is-reached, set by
+       updateExperienceTrackNow) — no hover behaviour. */
     .exp-reveal {
       position: absolute;
       top: calc(20px * var(--exp-s) + 56px);
@@ -2237,39 +2239,20 @@
       gap: 10px;
       color: var(--ink);
       opacity: 0;
-      visibility: hidden;
       translate: 0 8px;
       filter: blur(4px);
       transition:
-        opacity 350ms cubic-bezier(0.22, 1, 0.36, 1) 400ms,
-        translate 450ms cubic-bezier(0.22, 1, 0.36, 1) 400ms,
-        filter 350ms cubic-bezier(0.22, 1, 0.36, 1) 400ms,
-        visibility 0s linear 750ms;
+        opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+        translate 700ms cubic-bezier(0.22, 1, 0.36, 1),
+        filter 600ms cubic-bezier(0.22, 1, 0.36, 1);
     }
-    /* Once the card is hovered, the whole revealed side counts as the card:
-       a hit area (behind its content, so the link still takes clicks)
-       spanning from the card across the line to past the TL;DR, the card's
-       full height and a little more. Moving over to the link never leaves
-       the hover. Only while hovered, so it doesn't widen what starts it. */
-    .exp-card:has(.exp-reveal):hover::after {
-      content: '';
-      position: absolute;
-      top: -24px;
-      bottom: -24px;
-      width: calc(var(--exp-line-gap) / 2 + 18px + min(300px, calc(var(--exp-card-w) - 40px)) + 32px);
-      z-index: -1;
-    }
-    .exp-card:nth-of-type(even):has(.exp-reveal):hover::after { right: 100%; }
-    .exp-card:nth-of-type(odd):has(.exp-reveal):hover::after { left: 100%; }
     .exp-card:nth-of-type(even) .exp-reveal { right: calc(100% + var(--exp-line-gap) / 2 + 18px); text-align: right; align-items: flex-end; }
     .exp-card:nth-of-type(odd) .exp-reveal { left: calc(100% + var(--exp-line-gap) / 2 + 18px); }
-    .exp-card:hover .exp-reveal,
-    .exp-card:focus-within .exp-reveal {
+    .exp-card.is-reached .exp-reveal {
       opacity: 1;
-      visibility: visible;
       translate: 0 0;
       filter: blur(0);
-      transition-delay: 0s;
+      transition-delay: 200ms;
     }
     .exp-reveal-label {
       margin: 0;
@@ -2323,7 +2306,15 @@
       animation: feed-in 900ms cubic-bezier(0.22, 1, 0.36, 1) 450ms backwards;
     }
     .exp-track .exp-card { scroll-snap-align: center; scroll-snap-stop: always; }
-    .exp-outro { min-height: 70vh; scroll-snap-align: center; }
+    /* The closing note is the last full screen: it snaps flush to the
+       bottom, and like the heading its text centres on the whole window,
+       top bar included (bottom padding = the bar's height). */
+    .exp-page .exp-outro {
+      min-height: calc(100vh - var(--chrome-size));
+      box-sizing: border-box;
+      padding: 0 24px var(--chrome-size);
+      scroll-snap-align: end;
+    }
   }
   /* Closing note under the timeline — the last scroll stop on desktop. */
   .exp-outro {
@@ -2460,9 +2451,7 @@
   }
   .exp-card:nth-of-type(odd) { margin-top: -32px; }
   .exp-card:nth-of-type(even) { margin-top: 32px; }
-  /* No hover state on purpose: the lift read as bouncy for no reason.
-     (The desktop timeline's hover reveal, .exp-reveal, is the one exception
-     — it shows content beside the card, the card itself doesn't move.) */
+  /* No hover state on purpose: the lift read as bouncy for no reason. */
   .exp-reveal { display: none; }
   @media (min-width: 801px) { .exp-reveal { display: flex; } }
   /* The date sits outside the card, on the side facing away from the row's
@@ -6278,9 +6267,9 @@
           </article>
 
           <!-- The CROW redesign -->
-          <article class="pin" data-cat="ux studio" data-page="crow" data-title="The CROW" data-year="2026" aria-label="Open the CROW journal redesign case study">
+          <article class="pin" data-cat="ux studio" data-page="crow" data-title="The CROW" data-year="2026" data-cursor-label="Under construction" aria-label="The CROW, work in progress">
             <div class="art art-plum art-crow ar-45">
-              <div class="pin-meta">Product / UX · WIIRED Studio</div>
+              <div class="pin-meta">WIP · Product / UX</div>
               <h3>The<br>CROW</h3>
             </div>
           </article>
@@ -6372,9 +6361,9 @@
           </article>
 
           <!-- DreamCatcher -->
-          <article class="pin" data-cat="ux" data-page="dreamcatcher" data-title="DreamCatcher" data-year="2026" aria-label="Open the DreamCatcher product case study">
+          <article class="pin" data-cat="ux" data-page="dreamcatcher" data-title="DreamCatcher" data-year="2026" data-cursor-label="Under construction" aria-label="DreamCatcher, work in progress">
             <div class="art art-charcoal art-dreamcatcher ar-1">
-              <div class="pin-meta">Product / UX</div>
+              <div class="pin-meta">WIP · Product / UX</div>
               <div class="dream-stickers" aria-hidden="true">
                 <img class="dream-sticker dream-sticker-1" src="assets/images/dreamcatcher-sticker-1.png" alt="">
                 <img class="dream-sticker dream-sticker-2" src="assets/images/dreamcatcher-sticker-2.png" alt="">
@@ -6623,7 +6612,6 @@
                 <div class="exp-reveal">
                   <p class="exp-reveal-label">TL;DR</p>
                   <p class="exp-reveal-text">I co-founded a bootstrapped, two-person design engineering studio. We take brand identities, websites, web apps, and design systems from discovery to launch, with no outside capital or contractors.</p>
-                  <a class="exp-reveal-link" href="#work/wiired" data-open-case="wiired" data-cursor-link="↗ case study">Read the case study →</a>
                 </div>
               </article>
               <article class="exp-card art-charcoal">
@@ -7339,6 +7327,7 @@
     },
     dreamcatcher: {
       meta: 'Product / UX · FigBuild 2026',
+      wip: true,
       eyebrow: 'Product Case Study',
       custom: `
         <div class="cs-hero cs-hero--dreamcatcher">
@@ -7585,6 +7574,7 @@
     },
     crow: {
       meta: 'Product / UX · WIIRED Studio',
+      wip: true,
       eyebrow: 'Client Project',
       custom: `
         <div class="cs-hero cs-hero--crow">
