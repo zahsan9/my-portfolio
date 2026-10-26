@@ -2007,11 +2007,10 @@
     opacity: var(--scroll-reveal-opacity);
     transform: translateY(0);
   }
-  /* Desktop: a vertical zig-zag timeline (layout further down). Each card
-     fades in as it scrolls into view — .is-in, added by an
-     IntersectionObserver in the experience script — rising a few px on a
-     long, soft ease-out. */
-  @media (min-width: 801px) {
+  /* Timeline cards (desktop zig-zag and the mobile column) fade in as they
+     scroll into view — .is-in, added by an IntersectionObserver in the
+     experience script — rising a few px on a long, soft ease-out. */
+  @media all {
     .exp-card {
       --scroll-reveal-opacity: 1;
       --scroll-reveal-y: 0px;
@@ -2454,8 +2453,6 @@
   .exp-card:nth-of-type(odd) { margin-top: -32px; }
   .exp-card:nth-of-type(even) { margin-top: 32px; }
   /* No hover state on purpose: the lift read as bouncy for no reason. */
-  .exp-reveal { display: none; }
-  @media (min-width: 801px) { .exp-reveal { display: flex; } }
   /* The date sits outside the card, on the side facing away from the row's
      centre line — above the high cards, below the low ones — so the dates
      zig-zag along the row like a timeline. It's still the card's own child,
@@ -5888,8 +5885,11 @@
       justify-self: center;
       align-self: stretch;
       width: 1px;
-      /* Starts at the first card's dot. */
+      /* Starts at the first card's dot, and ends at the last card's bottom
+         edge rather than under its TL;DR (--exp-m-tail = that card's
+         TL;DR room, set by layoutMobileReveals). */
       margin-top: -76px;
+      margin-bottom: var(--exp-m-tail, 0px);
       background: color-mix(in oklch, var(--ink) 22%, transparent);
     }
     /* Placed explicitly: the line above occupies these rows, which would
@@ -5906,38 +5906,99 @@
     .exp-track .exp-card:nth-of-type(2) { grid-row: 3; }
     .exp-track .exp-card:nth-of-type(3) { grid-row: 4; }
     .exp-track .exp-card:nth-of-type(4) { grid-row: 5; }
+    /* Date + length beside the dot, to the right of the line — the dot
+       sits on the line (the card's centre), the text never crosses it. */
     .exp-track .exp-card:nth-of-type(n) .yr {
       top: auto;
-      bottom: calc(100% + 14px);
+      bottom: calc(100% + 18px);
       left: 50%;
       right: auto;
-      translate: -50% 0;
-      text-align: center;
+      text-align: left;
       font-size: 10px;
-      padding: 2px 10px;
-      background: var(--paper);
+      padding-left: 18px;
+      /* Wraps within the half of the screen right of the line, so a long
+         date ("… (Expected Jun 2028)") never runs off the edge. */
+      white-space: normal;
+      width: calc(50vw - 24px);
     }
     .exp-card .yr::before {
       content: '';
       position: absolute;
-      top: -16px;
-      left: 50%;
+      top: 0.675em;
+      left: 0;
       width: 11px;
       height: 11px;
       border-radius: 50%;
       background: var(--exp-dot, var(--ink));
       box-shadow: 0 0 0 1px color-mix(in oklch, var(--ink) 28%, transparent);
       translate: -50% -50%;
+      /* Pops in once the card's reached (.is-reached), like desktop. */
+      scale: 0;
+      opacity: 0;
+      transition:
+        scale 600ms cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 400ms ease-out;
+    }
+    .exp-card.is-reached .yr::before { scale: 1; opacity: 1; }
+    /* TL;DR centred under the card, on a patch of page colour so the line
+       passes behind it. The space under the card is measured to fit it
+       (layoutMobileReveals). Fades in just after the dot. */
+    .exp-reveal {
+      display: flex;
+      position: absolute;
+      top: calc(100% + 22px);
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 0;
+      text-align: center;
+      background: var(--paper);
+      color: var(--ink);
+      opacity: 0;
+      translate: 0 8px;
+      filter: blur(4px);
+      transition:
+        opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+        translate 700ms cubic-bezier(0.22, 1, 0.36, 1),
+        filter 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .exp-card.is-reached .exp-reveal { opacity: 1; translate: 0 0; filter: blur(0); transition-delay: 200ms; }
+    .exp-reveal-label {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+      color: color-mix(in oklch, var(--ink) 50%, transparent);
+    }
+    .exp-reveal-text {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: color-mix(in oklch, var(--ink) 82%, transparent);
+      text-wrap: pretty;
+    }
+    .exp-reveal-link {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: underline;
+      text-decoration-color: color-mix(in oklch, var(--ink) 35%, transparent);
+      text-underline-offset: 4px;
     }
     .exp-card.art-cream    { --exp-dot: var(--c-cream); }
     .exp-card.art-yellow   { --exp-dot: var(--c-yellow); }
     .exp-card.art-sage     { --exp-dot: var(--c-sage); }
     .exp-card.art-charcoal { --exp-dot: var(--c-charcoal); }
     [data-theme="dark"] .exp-card.art-charcoal { --exp-dot: oklch(0.38 0.015 60); }
-    /* Always visible here — the desktop storyboard and scroll reveals don't
-       run at this width. */
-    .exp-page.active .exp-card,
     .exp-page.active .exp-intro-panel { opacity: 1 !important; transform: none !important; }
+    @media (prefers-reduced-motion: reduce) {
+      .exp-reveal { translate: none; filter: none; }
+    }
     .exp-track .exp-intro-panel {
       grid-column: 1;
       grid-row: 1;
@@ -9990,8 +10051,9 @@ const expScroll   = document.getElementById('expScroll');
     // Desktop timeline: each dot appears once it's scrolled up past a
     // reading position 80% of the way down the screen — just after it comes
     // into view; the scroll cue fades over the first bit of scroll.
-    if (expView.classList.contains('active') && !window.matchMedia('(max-width: 800px)').matches) {
+    if (expView.classList.contains('active')) {
       const cards = [...expTrack.querySelectorAll('.exp-card')];
+      layoutMobileReveals(cards);
       const still = prefersReducedMotion();
       const reading = window.innerHeight * 0.8;
       cards.forEach(card => {
@@ -10011,7 +10073,21 @@ const expScroll   = document.getElementById('expScroll');
     }
   }
 
-  /* Scroll give (desktop). Each scroll step pushes the cards back by a
+  // Mobile: each TL;DR hangs below its card (absolutely placed), so the card
+  // gets just enough bottom margin to fit it before the next entry.
+  const expMobileQuery = window.matchMedia('(max-width: 800px)');
+  function layoutMobileReveals(cards) {
+    cards.forEach(card => {
+      const reveal = card.querySelector('.exp-reveal');
+      const want = expMobileQuery.matches && reveal ? (reveal.offsetHeight + 22) + 'px' : '';
+      if (card.style.marginBottom !== want) card.style.marginBottom = want;
+    });
+    const tail = cards[cards.length - 1]?.style.marginBottom || '';
+    if (tail) expTrack.style.setProperty('--exp-m-tail', tail);
+    else expTrack.style.removeProperty('--exp-m-tail');
+  }
+
+  /* Scroll give (desktop and mobile). Each scroll step pushes the cards back by a
      fraction of how far the page moved, more for cards lower on screen, and
      a slightly under-damped spring pulls them home — so the column trails
      the scroll, stretches a little, and settles with a small overshoot
@@ -10050,15 +10126,16 @@ const expScroll   = document.getElementById('expScroll');
     const top = expMain.scrollTop;
     const delta = top - expLastScroll;
     expLastScroll = top;
-    if (!delta || !expView.classList.contains('active') || prefersReducedMotion()
-        || window.matchMedia('(max-width: 800px)').matches) return;
+    if (!delta || !expView.classList.contains('active') || prefersReducedMotion()) return;
     const vh = window.innerHeight;
+    // Gentler on a phone, where touch momentum is already doing a lot.
+    const lag = expMobileQuery.matches ? EXP_LAG * 0.6 : EXP_LAG;
     expLag.forEach((sp, card) => {
       const r = card.getBoundingClientRect();
       if (r.bottom < -200 || r.top > vh + 200) return;
       // Lower on screen → more trail, so the column stretches as it moves.
       const depth = Math.min(Math.max((r.top + r.height / 2) / vh, 0), 1);
-      sp.y = Math.min(EXP_LAG_MAX, Math.max(-EXP_LAG_MAX, sp.y + delta * EXP_LAG * (0.45 + 0.55 * depth)));
+      sp.y = Math.min(EXP_LAG_MAX, Math.max(-EXP_LAG_MAX, sp.y + delta * lag * (0.45 + 0.55 * depth)));
     });
     if (!expLagFrame) expLagFrame = requestAnimationFrame(stepExperienceLag);
   }, { passive: true });
