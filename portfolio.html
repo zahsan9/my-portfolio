@@ -1450,7 +1450,9 @@
     /* Same 24px inset as .pin .art's own padding, so this lines up with the
        card's real edge rather than just trailing the WIP label's line box. */
     position: absolute; top: 30px; right: 30px;
-    width: 21%; height: auto; display: block;
+    /* Same size as the GoDaddy logo on the Experience timeline card
+       (44px × its --exp-s of 1.12), so the mark reads as one thing. */
+    width: 49px; height: auto; display: block;
     opacity: 0.95;
   }
   .art-godaddy h3 { font-size: 44px; }
@@ -5857,10 +5859,12 @@
       justify-content: center; flex-wrap: nowrap; gap: 24px;
     }
     .tab { min-height: 40px; }
-    /* Experience on mobile: the desktop timeline in one column. A line runs
-       down the left (--exp-m-line); each card sits to its right
-       (--exp-m-indent) with its date and coloured dot above it. The heading
-       leads, the closing note ends it; no swipe strip, no hover reveals. */
+    /* Experience on mobile: the timeline in one column, its line running
+       down the middle behind the cards (it shows in the gaps). Each card is
+       centred on the line, with its dot on the line and its date just
+       under the dot — the date sits on a patch of page colour so the line
+       doesn't run through the text. The heading leads, the closing note
+       ends it; no swipe strip, no hover reveals. */
     .exp-scroll { height: auto; }
     .exp-viewport {
       position: static;
@@ -5870,55 +5874,63 @@
       padding: 24px 0 0;
     }
     .exp-track {
-      --exp-m-line: 20px;
-      --exp-m-indent: 44px;
       display: grid;
       grid-template-columns: minmax(0, 1fr);
-      row-gap: 64px;
+      row-gap: 128px;
       width: auto;
-      padding: 0 20px 0 var(--exp-m-indent);
+      padding: 0 24px;
       transform: none !important;
     }
     .exp-track::before {
       content: '';
       grid-column: 1;
       grid-row: 2 / 6;
-      justify-self: start;
+      justify-self: center;
       align-self: stretch;
       width: 1px;
-      /* Starts at the first card's dot, not its top edge. */
-      margin: -40px 0 0 calc(var(--exp-m-line) - var(--exp-m-indent));
+      /* Starts at the first card's dot. */
+      margin-top: -76px;
       background: color-mix(in oklch, var(--ink) 22%, transparent);
     }
     /* Placed explicitly: the line above occupies these rows, which would
-       otherwise push auto-placed cards past it. */
-    /* Compact on a phone: the card sizes to its content (no 4:5 box with
-       an empty top half), with tighter type and padding. */
+       otherwise push auto-placed cards past it. Compact on a phone: the
+       card sizes to its content (no 4:5 box with an empty top half). */
     .exp-track .exp-card:nth-of-type(n) {
       grid-column: 1;
+      justify-self: center;
       margin-top: 0;
       width: 100%;
-      max-width: 340px;
+      max-width: 320px;
       aspect-ratio: auto;
       padding: 18px;
       border-radius: 14px;
       box-shadow: none;
     }
+    .exp-track .exp-card:nth-of-type(1) { grid-row: 2; }
+    .exp-track .exp-card:nth-of-type(2) { grid-row: 3; }
+    .exp-track .exp-card:nth-of-type(3) { grid-row: 4; }
+    .exp-track .exp-card:nth-of-type(4) { grid-row: 5; }
     .exp-track .exp-card h3 { font-size: 26px; margin: 18px 0 14px; }
     .exp-track .exp-card h3 span { font-size: 12px; margin-top: 6px; }
     .exp-track .exp-card ul { font-size: 12px; gap: 7px; padding-top: 12px; }
     .exp-track .exp-card-logo { width: 26px; }
     .exp-track .exp-card-logo--godaddy { width: 32px; }
-    .exp-track .exp-card:nth-of-type(1) { grid-row: 2; }
-    .exp-track .exp-card:nth-of-type(2) { grid-row: 3; }
-    .exp-track .exp-card:nth-of-type(3) { grid-row: 4; }
-    .exp-track .exp-card:nth-of-type(4) { grid-row: 5; }
-    .exp-track .exp-card:nth-of-type(n) .yr { top: auto; bottom: calc(100% + 10px); left: 0; right: auto; text-align: left; font-size: 10px; }
+    .exp-track .exp-card:nth-of-type(n) .yr {
+      top: auto;
+      bottom: calc(100% + 14px);
+      left: 50%;
+      right: auto;
+      translate: -50% 0;
+      text-align: center;
+      font-size: 10px;
+      padding: 2px 10px;
+      background: var(--paper);
+    }
     .exp-card .yr::before {
       content: '';
       position: absolute;
-      top: 0.675em;
-      left: calc(var(--exp-m-line) - var(--exp-m-indent));
+      top: -16px;
+      left: 50%;
       width: 11px;
       height: 11px;
       border-radius: 50%;
@@ -5935,15 +5947,13 @@
        run at this width. */
     .exp-page.active .exp-card,
     .exp-page.active .exp-intro-panel { opacity: 1 !important; transform: none !important; }
-    /* Heading: centred on the screen (the track's padding is lopsided for
-       the line, so pull it back to a symmetric 20px each side). */
     .exp-track .exp-intro-panel {
       grid-column: 1;
       grid-row: 1;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      margin: 0 0 0 calc(20px - var(--exp-m-indent));
+      margin: 0;
     }
     .exp-intro-panel h3 { font-size: 32px; max-width: 9ch; text-align: center; }
     .exp-arrow { display: none; }
