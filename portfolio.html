@@ -5893,28 +5893,19 @@
       background: color-mix(in oklch, var(--ink) 22%, transparent);
     }
     /* Placed explicitly: the line above occupies these rows, which would
-       otherwise push auto-placed cards past it. Compact on a phone: the
-       card sizes to its content (no 4:5 box with an empty top half). */
+       otherwise push auto-placed cards past it. Full cards, same as
+       desktop's base card (4:5, its own type and padding). */
     .exp-track .exp-card:nth-of-type(n) {
       grid-column: 1;
       justify-self: center;
       margin-top: 0;
       width: 100%;
-      max-width: 320px;
-      aspect-ratio: auto;
-      padding: 18px;
-      border-radius: 14px;
-      box-shadow: none;
+      max-width: 340px;
     }
     .exp-track .exp-card:nth-of-type(1) { grid-row: 2; }
     .exp-track .exp-card:nth-of-type(2) { grid-row: 3; }
     .exp-track .exp-card:nth-of-type(3) { grid-row: 4; }
     .exp-track .exp-card:nth-of-type(4) { grid-row: 5; }
-    .exp-track .exp-card h3 { font-size: 26px; margin: 18px 0 14px; }
-    .exp-track .exp-card h3 span { font-size: 12px; margin-top: 6px; }
-    .exp-track .exp-card ul { font-size: 12px; gap: 7px; padding-top: 12px; }
-    .exp-track .exp-card-logo { width: 26px; }
-    .exp-track .exp-card-logo--godaddy { width: 32px; }
     .exp-track .exp-card:nth-of-type(n) .yr {
       top: auto;
       bottom: calc(100% + 14px);
