@@ -5857,65 +5857,87 @@
       justify-content: center; flex-wrap: nowrap; gap: 24px;
     }
     .tab { min-height: 40px; }
-    /* Experience: the desktop track is scroll-hijacked horizontally as you
-       scroll the page down. On mobile that fights the native vertical
-       scroll, so switch to a plain horizontal swipe strip, centred in the
-       space between the top bar and the bottom nav. */
+    /* Experience on mobile: the desktop timeline in one column. A line runs
+       down the left (--exp-m-line); each card sits to its right
+       (--exp-m-indent) with its date and coloured dot above it. The heading
+       leads, the closing note ends it; no swipe strip, no hover reveals. */
     .exp-scroll { height: auto; }
     .exp-viewport {
       position: static;
       height: auto;
-      min-height: calc(100dvh - 124px);
-      overflow-x: auto;
-      overflow-y: hidden;
-      overscroll-behavior-x: contain;
-      -webkit-overflow-scrolling: touch;
-      /* No scroll snapping: any snap target near the origin makes the strip
-         auto-scroll off the centred intro on load. Plain free swipe. */
-      align-items: center;
-      padding: 16px 0;
+      overflow: visible;
+      display: block;
+      padding: 40px 0 0;
     }
     .exp-track {
+      --exp-m-line: 24px;
+      --exp-m-indent: 52px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 84px;
+      width: auto;
+      padding: 0 20px 0 var(--exp-m-indent);
       transform: none !important;
-      align-items: center;
-      padding: 0 18px;
-      gap: 24px;
     }
-    .exp-card { flex-basis: 264px; }
-    /* Keep the alternating rise and fall — it's the timeline's signature, and
-       flattening it here made the swipe strip read as a plain carousel. The
-       amplitude comes down from the desktop 52px because the strip is
-       overflow-y: hidden and the cards are centred in it: a phone-height
-       offset that large clips the low card's footer. These selectors have to
-       match the desktop pair's specificity to win, which is why they aren't
-       just a margin on .exp-card. */
-    .exp-card:nth-of-type(odd) { margin-top: -20px; }
-    .exp-card:nth-of-type(even) { margin-top: 20px; }
-    /* Cards + intro panel are all reachable by swipe now — the desktop
-       track's scroll-driven reveal never runs here, so force them visible
-       regardless of the storyboard stage. */
+    .exp-track::before {
+      content: '';
+      grid-column: 1;
+      grid-row: 2 / 6;
+      justify-self: start;
+      align-self: stretch;
+      width: 1px;
+      /* Starts at the first card's dot, not its top edge. */
+      margin: -44px 0 0 calc(var(--exp-m-line) - var(--exp-m-indent));
+      background: color-mix(in oklch, var(--ink) 22%, transparent);
+    }
+    /* Placed explicitly: the line above occupies these rows, which would
+       otherwise push auto-placed cards past it. */
+    .exp-track .exp-card:nth-of-type(n) {
+      grid-column: 1;
+      margin-top: 0;
+      width: 100%;
+      max-width: 340px;
+    }
+    .exp-track .exp-card:nth-of-type(1) { grid-row: 2; }
+    .exp-track .exp-card:nth-of-type(2) { grid-row: 3; }
+    .exp-track .exp-card:nth-of-type(3) { grid-row: 4; }
+    .exp-track .exp-card:nth-of-type(4) { grid-row: 5; }
+    .exp-track .exp-card:nth-of-type(n) .yr { top: auto; bottom: calc(100% + 12px); left: 0; right: auto; text-align: left; }
+    .exp-card .yr::before {
+      content: '';
+      position: absolute;
+      top: 0.675em;
+      left: calc(var(--exp-m-line) - var(--exp-m-indent));
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--exp-dot, var(--ink));
+      box-shadow: 0 0 0 1px color-mix(in oklch, var(--ink) 28%, transparent);
+      translate: -50% -50%;
+    }
+    .exp-card.art-cream    { --exp-dot: var(--c-cream); }
+    .exp-card.art-yellow   { --exp-dot: var(--c-yellow); }
+    .exp-card.art-sage     { --exp-dot: var(--c-sage); }
+    .exp-card.art-charcoal { --exp-dot: var(--c-charcoal); }
+    [data-theme="dark"] .exp-card.art-charcoal { --exp-dot: oklch(0.38 0.015 60); }
+    /* Always visible here — the desktop storyboard and scroll reveals don't
+       run at this width. */
     .exp-page.active .exp-card,
     .exp-page.active .exp-intro-panel { opacity: 1 !important; transform: none !important; }
-    /* The "Experience timeline" title + arrow is a full-screen first slide
-       (mirrors the About intro: heading, then an arrow beneath it), centred
-       in the viewport until the user swipes right into the cards. The arrow
-       points right, toward the strip. It's the leftmost snap target so the
-       strip opens on it. */
-    .exp-intro-panel {
-      flex: 0 0 auto;
+    /* Heading: centred on the screen (the track's padding is lopsided for
+       the line, so pull it back to a symmetric 20px each side). */
+    .exp-track .exp-intro-panel {
+      grid-column: 1;
+      grid-row: 1;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 18px;
-      /* Centre the ~124px title block on screen (18px = .exp-track's own
-         padding-left, 80px ≈ half the block). */
-      margin-left: calc(50vw - 80px);
-      /* First card sits 44px off the block — same arrow-to-card gap as the
-         About intro. (+20 on top of the track's 24px gap.) */
-      margin-right: 20px;
+      margin: 0 0 0 calc(20px - var(--exp-m-indent));
     }
-    .exp-intro-panel h3 { font-size: 30px; max-width: 9ch; text-align: center; }
-    .exp-arrow { width: 52px; height: 28px; }
+    .exp-intro-panel h3 { font-size: 40px; max-width: 9ch; text-align: center; }
+    .exp-arrow { display: none; }
+    /* About starts lower on phones — more air under the top bar. */
+    .about-page.active { padding-top: 104px; }
     /* Intro panel: "A little about me" over a down arrow, whole row centred,
        with even breathing room above and below the arrow. */
     .ab-page-row { flex-direction: column; gap: 44px; align-items: center; }
@@ -6060,6 +6082,13 @@
   }
   @media (min-width: 801px) {
     .feed .pin { translate: 0 var(--feed-lag, 0px); }
+  }
+  /* Not on the mobile feed: its cards ride the scroll wheel (rotateX +
+     opacity on .art), and a fade/blur on the same cards on top of that
+     flickered. The banner entrance still plays. */
+  @media (max-width: 800px) {
+    .feed.has-reveal .pin,
+    .feed.has-reveal .pin.is-in { opacity: 1; animation: none; }
   }
   /* The same entrance on the other pages, tailored to each. CSS animations
      restart whenever a page goes from display: none to shown, so these play
