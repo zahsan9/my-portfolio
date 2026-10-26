@@ -10512,7 +10512,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
 
     // Hover grow on interactive elements. Within the Overlap widget, only
     // the pill cloud is active because that region drives the pill physics.
-    document.querySelectorAll('button, a:not(.cs-image-link), [role="button"], .pin[data-page]:not([data-cursor-label]), .skill-cloud, .ab-stack-card, .exp-card:not([data-cursor-link]), .rail-btn, .tab-btn, .em-btn, .sheet-close').forEach(el => {
+    document.querySelectorAll('button, a:not(.cs-image-link), [role="button"], .pin[data-page]:not([data-cursor-label]), .skill-cloud, .ab-stack-card, .rail-btn, .tab-btn, .em-btn, .sheet-close').forEach(el => {
       el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
     });
