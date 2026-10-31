@@ -1277,18 +1277,48 @@
       box-shadow var(--motion-med) var(--ease-out),
       filter var(--motion-med) ease;
   }
-  .feed:not(.has-open) .pin[data-page]:hover .art,
+  /* Hover states only where there is a real hover: on touch, :hover
+     sticks after a tap and leaves the card lifted. */
   .feed:not(.has-open) .pin[data-page]:focus-visible .art {
     transform: translateY(-4px);
     box-shadow: 0 12px 32px -8px oklch(0.1 0.005 60 / 0.18);
   }
-  .pin[data-page]:active .art {
-    transform: translateY(-2px);
-    transition-duration: 120ms;
+  @media (hover: hover) {
+    .feed:not(.has-open) .pin[data-page]:hover .art {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px -8px oklch(0.1 0.005 60 / 0.18);
+    }
+    .pin[data-page]:active .art {
+      transform: translateY(-2px);
+      transition-duration: 120ms;
+    }
   }
   /* Aspect ratios */
   .ar-1  { aspect-ratio: 1; }
   .ar-45 { aspect-ratio: 4 / 5; }
+
+  /* Touch: tapping a WIP card shows the desktop cursor's "Under
+     construction" pill where the finger landed, then lets it go. Same
+     frosted pill, type and contrast-flip as #site-cursor.is-pill. */
+  .pin-tap-pill {
+    position: absolute; z-index: 6; pointer-events: none;
+    left: var(--tap-x, 50%); top: var(--tap-y, 50%);
+    translate: -50% -50%;
+    height: 26px; padding: 0 12px; border-radius: 999px;
+    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    line-height: 26px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
+    background: color-mix(in oklch, oklch(0.13 0 0) 88%, transparent);
+    color: oklch(0.97 0 0);
+    backdrop-filter: blur(10px) saturate(1.1);
+    -webkit-backdrop-filter: blur(10px) saturate(1.1);
+    opacity: 0; scale: 0.85;
+    transition: opacity 180ms var(--ease-out), scale 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .pin-tap-pill.is-on-dark {
+    background: color-mix(in oklch, oklch(0.97 0 0) 88%, transparent);
+    color: oklch(0.13 0 0);
+  }
+  .pin-tap-pill.is-shown { opacity: 1; scale: 1; }
 
   /* Art backgrounds */
   .art-clay    { background: var(--c-clay);    color: var(--card-ink); }
@@ -1309,9 +1339,13 @@
     filter: drop-shadow(1px 8px 10px oklch(0 0 0 / 0.32)) drop-shadow(0 1px 1px oklch(0 0 0 / 0.25));
     transition: opacity var(--motion-med) ease, filter var(--motion-med) ease;
   }
-  .feed:not(.has-open) .pin[class*="frame-"][data-page]:hover,
   .feed:not(.has-open) .pin[class*="frame-"][data-page]:focus-visible {
     filter: drop-shadow(3px 20px 20px oklch(0 0 0 / 0.36)) drop-shadow(0 2px 2px oklch(0 0 0 / 0.25));
+  }
+  @media (hover: hover) {
+    .feed:not(.has-open) .pin[class*="frame-"][data-page]:hover {
+      filter: drop-shadow(3px 20px 20px oklch(0 0 0 / 0.36)) drop-shadow(0 2px 2px oklch(0 0 0 / 0.25));
+    }
   }
   /* Frames are drawn inside the card's own box (inset rings), so every
      card keeps its size and the columns stay level top and bottom. The
@@ -1363,10 +1397,12 @@
     background: oklch(0.92 0.02 80);
     transition-delay: 40ms;
   }
-  .feed:not(.has-open) .pin.frame-folder:hover .folder-sheet,
   .feed:not(.has-open) .pin.frame-folder:focus-visible .folder-sheet { translate: 0 -12px; }
-  .feed:not(.has-open) .pin.frame-folder:hover .folder-sheet-back,
   .feed:not(.has-open) .pin.frame-folder:focus-visible .folder-sheet-back { translate: 0 -8px; }
+  @media (hover: hover) {
+    .feed:not(.has-open) .pin.frame-folder:hover .folder-sheet { translate: 0 -12px; }
+    .feed:not(.has-open) .pin.frame-folder:hover .folder-sheet-back { translate: 0 -8px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     .pin.frame-folder .folder-sheet { transition: none; }
   }
@@ -3379,6 +3415,7 @@
      (The arrow SVGs stay in the markup, hidden.) */
   .ab-arrow { width: 1px; height: 120px; flex: 0 0 auto; background: var(--line); }
   .ab-arrow svg { display: none; }
+  .ab-scroll-cue { display: none; }
 
   /* ── About stack ── */
   .ab-stack {
@@ -6141,7 +6178,12 @@
        with even breathing room above and below the arrow. */
     .ab-page-row { flex-direction: column; gap: 44px; align-items: center; }
     .ab-intro-panel { flex-direction: column; gap: 18px; margin-right: 0; align-items: center; }
-    .ab-arrow { width: 48px; height: 1px; }
+    /* Mobile About matches mobile Experience: the heading alone on its
+       first screen with the same "Scroll" cue at its foot, in place of
+       the short divider. */
+    .ab-intro-panel { position: relative; }
+    .ab-arrow { display: none; }
+    .ab-scroll-cue { display: flex; }
     /* The About deck is a pointer-driven fan (hover-lift, click-to-cycle).
        Flatten it to a plain vertical read on mobile — cards held near the
        feed/experience card width, full content, in flow. The stack JS is
@@ -6280,6 +6322,17 @@
     animation-delay: var(--feed-d, 0ms);
   }
   .feed .pin { translate: 0 var(--feed-lag, 0px); }
+  /* Phones: the same fade up, without the blur. Animating filter on every
+     card while the page scrolls flickered on mobile Safari, and so did a
+     drop-shadow filter repainting under it, so shaped cards drop theirs. */
+  @media (max-width: 800px) {
+    .feed.has-reveal .pin.is-in { animation-name: feed-pin-in; }
+    .feed .pin[class*="frame-"] { filter: none; }
+  }
+  @keyframes feed-pin-in {
+    from { opacity: 0; translate: 0 16px; }
+    to   { opacity: 1; translate: 0 0; }
+  }
   /* The same entrance on the other pages, tailored to each. CSS animations
      restart whenever a page goes from display: none to shown, so these play
      on every arrival. */
@@ -6669,6 +6722,7 @@
               <path d="M22 4V76M6 58l16 18 16-18"/>
             </svg>
           </div>
+          <div class="exp-scroll-cue ab-scroll-cue" aria-hidden="true"><span>Scroll</span><span class="exp-scroll-cue-line"></span></div>
         </div>
       <div class="ab-stack">
         <div class="ab-stack-card art-blue" role="button" tabindex="0">
@@ -9190,13 +9244,42 @@
       closeSheet();
     }
   });
+  const touchOnly = matchMedia('(hover: none)');
+  function showTapPill(pin, e) {
+    let pill = pin.querySelector('.pin-tap-pill');
+    if (!pill) {
+      pill = document.createElement('span');
+      pill.className = 'pin-tap-pill';
+      pill.setAttribute('aria-hidden', 'true');
+      pin.appendChild(pill);
+    }
+    pill.textContent = pin.dataset.cursorLabel;
+    const art = pin.querySelector('.art');
+    pill.classList.toggle('is-on-dark', !!art && /\bart-(charcoal|noir|blue)\b/.test(art.className));
+    const r = pin.getBoundingClientRect();
+    const x = e.clientX ? e.clientX - r.left : r.width / 2;
+    const y = e.clientY ? e.clientY - r.top : r.height / 2;
+    // Keep the pill inside the card when the tap lands near an edge.
+    pill.style.setProperty('--tap-x', Math.min(Math.max(x, 80), r.width - 80) + 'px');
+    pill.style.setProperty('--tap-y', Math.min(Math.max(y, 20), r.height - 20) + 'px');
+    clearTimeout(pill._hide);
+    pill.classList.remove('is-shown');
+    void pill.offsetWidth;
+    pill.classList.add('is-shown');
+    pill._hide = setTimeout(() => pill.classList.remove('is-shown'), 1400);
+  }
   document.querySelectorAll('.pin[data-page]').forEach(el => {
     el.setAttribute('tabindex', '0');
     el.setAttribute('role', 'button');
     const label = el.querySelector('h3, .title')?.textContent?.trim().replace(/\s+/g, ' ');
     if (label) el.setAttribute('aria-label', label);
     const isUnderConstruction = () => el.dataset.cursorLabel === 'Under construction';
-    el.addEventListener('click', () => { if (!isUnderConstruction()) { sheetOpenedFrom = 'feed'; openSheet(el.dataset.page, el); } });
+    el.addEventListener('click', e => {
+      if (!isUnderConstruction()) { sheetOpenedFrom = 'feed'; openSheet(el.dataset.page, el); return; }
+      // No custom cursor on touch to say why nothing opens, so say it here.
+      if (!touchOnly.matches) return;
+      showTapPill(el, e);
+    });
     el.addEventListener('keydown', e => {
       if ((e.key === 'Enter' || e.key === ' ') && !isUnderConstruction()) { e.preventDefault(); sheetOpenedFrom = 'feed'; openSheet(el.dataset.page, el); }
     });
@@ -11035,8 +11118,9 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       root.classList.remove('feed-intro');
     }
 
-    // Scroll give: cards trail the scroll and spring home, lower cards a
-    // little more, like the Experience timeline (gentler on phones).
+    // Scroll give (desktop): cards trail the scroll and spring home, lower
+    // cards a little more, like the Experience timeline. Not on phones: on
+    // top of momentum scrolling it read as lag.
     const LAG = 0.12, LAG_MAX = 40, K = 110, C = 15;
     const springs = new Map(pins.map(p => [p, { y: 0, v: 0 }]));
     let last = mainEl.scrollTop, frame = 0, t0 = 0;
@@ -11064,9 +11148,10 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       const delta = top - last;
       last = top;
       if (!delta || still || currentRouteName !== 'feed'
+          || window.matchMedia('(max-width: 800px)').matches
           || document.querySelector('.app.sheet-open')) return;
       const vh = window.innerHeight;
-      const lag = LAG * (window.matchMedia('(max-width: 800px)').matches ? 0.6 : 1);
+      const lag = LAG;
       springs.forEach((sp, pin) => {
         const r = pin.getBoundingClientRect();
         if (!r.height || r.bottom < -200 || r.top > vh + 200) return;
