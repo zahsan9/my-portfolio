@@ -1314,6 +1314,64 @@
   .art-charcoal{ background: var(--c-charcoal);color: oklch(0.94 0.005 80); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.1); }
   .art-paper   { background: oklch(0.88 0 0); color: var(--card-ink); box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.1); }
 
+  /* Wall-collage frames — project cards hang like a gallery wall, each in
+     its own frame or object (.pin.frame-*; component cards stay plain).
+     Desktop only: the mobile feed already animates .art on its scroll wheel.
+     Frames hang straight; hover deepens the shadow. The shadow is a drop-shadow on the .pin so it follows any shape,
+     including the folder outline and the clipped pixel corners. */
+  @media (min-width: 801px) {
+    .pin[class*="frame-"] {
+      filter: drop-shadow(1px 8px 10px oklch(0 0 0 / 0.32)) drop-shadow(0 1px 1px oklch(0 0 0 / 0.25));
+      transition: opacity var(--motion-med) ease, filter var(--motion-med) ease;
+    }
+    .feed:not(.has-open) .pin[class*="frame-"][data-page]:hover,
+    .feed:not(.has-open) .pin[class*="frame-"][data-page]:focus-visible {
+      filter: drop-shadow(3px 20px 20px oklch(0 0 0 / 0.36)) drop-shadow(0 2px 2px oklch(0 0 0 / 0.25));
+    }
+    /* Frames are drawn inside the card's own box (inset rings), so every
+       card keeps its size and the columns stay level top and bottom. The
+       card still lifts on hover like every other card; only its shadow
+       moves to the .pin's drop-shadow above, since a mask or clip-path
+       would cut a box-shadow off. */
+    .pin[class*="frame-"] .art,
+    .feed:not(.has-open) .pin[class*="frame-"][data-page]:hover .art,
+    .feed:not(.has-open) .pin[class*="frame-"][data-page]:focus-visible .art {
+      box-shadow: var(--frame-ring, none);
+    }
+    .pin[class*="frame-"] .art::after { /* paper grain on every print */
+      content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+      opacity: 0.16; mix-blend-mode: multiply;
+    }
+
+    /* WIIRED: a folder, with its tab rising on the right. The outline is
+       a clip-path path() drawn in px by sizeFolderTabs(), so the corner
+       radii and the tab's slope stay true at any card size. The lower
+       shoulder is --folder-tab tall; the content clears it. */
+    .pin.frame-folder .art {
+      --folder-tab: 26px;
+      border-radius: 0;
+      padding-top: calc(24px + var(--folder-tab));
+    }
+
+    /* Habitat: stepped pixel corners. */
+    .pin.frame-pixel .art {
+      --s: 6px; border-radius: 0;
+      clip-path: polygon(
+        calc(var(--s)*3) 0, calc(100% - var(--s)*3) 0,
+        calc(100% - var(--s)*3) var(--s), calc(100% - var(--s)) var(--s),
+        calc(100% - var(--s)) calc(var(--s)*3), 100% calc(var(--s)*3),
+        100% calc(100% - var(--s)*3), calc(100% - var(--s)) calc(100% - var(--s)*3),
+        calc(100% - var(--s)) calc(100% - var(--s)), calc(100% - var(--s)*3) calc(100% - var(--s)),
+        calc(100% - var(--s)*3) 100%, calc(var(--s)*3) 100%,
+        calc(var(--s)*3) calc(100% - var(--s)), var(--s) calc(100% - var(--s)),
+        var(--s) calc(100% - var(--s)*3), 0 calc(100% - var(--s)*3),
+        0 calc(var(--s)*3), var(--s) calc(var(--s)*3),
+        var(--s) var(--s), calc(var(--s)*3) var(--s));
+    }
+
+  }
+
   /* Pin typography */
   .pin h3 {
     font-family: var(--serif); font-weight: 400;
@@ -6391,11 +6449,14 @@
             </div>
           </article>
 
-          <!-- The CROW redesign -->
-          <article class="pin" data-cat="ux studio" data-page="crow" data-title="The CROW" data-year="2026" data-cursor-label="Under construction" aria-label="The CROW, work in progress">
-            <div class="art art-plum art-crow ar-45">
-              <div class="pin-meta">WIP · Product / UX</div>
-              <h3>The<br>CROW</h3>
+          <!-- Habitat -->
+          <article class="pin frame-pixel" data-cat="ux swe" data-page="habitat" data-title="Habitat" data-year="2026" aria-label="Open the Habitat habit-tracker case study">
+            <div class="art art-blue art-habitat ar-45">
+              <div class="pin-meta">Product / UX · SWE</div>
+              <div class="habitat-mark">
+                <img class="habitat-logo-mark" src="assets/images/habitat-logo.png" alt="HABITAT">
+                <span class="habitat-caption">Habit Tracker /<br>Pixel World</span>
+              </div>
             </div>
           </article>
 
@@ -6459,29 +6520,11 @@
             </div>
           </article>
 
-          <!-- ESD climate survey case study -->
-          <article class="pin" data-cat="viz" data-page="climate" data-title="The Neutral Response" data-year="2026">
-            <div class="art art-yellow ar-45">
-              <div class="pin-meta">Data</div>
-              <div class="climate-mark">
-                <h3>
-                  <span class="climate-title">The Neutral Response</span>
-                </h3>
-                <span class="climate-caption">ESD Family Survey Analysis</span>
-              </div>
-              <div class="climate-etched-graphic" aria-hidden="true">
-                <svg viewBox="0 0 320 82" preserveAspectRatio="none">
-                  <defs>
-                    <clipPath id="climate-fill-clip" clipPathUnits="userSpaceOnUse">
-                      <rect class="climate-fill-reveal" x="-4" y="0" width="334" height="82"/>
-                    </clipPath>
-                  </defs>
-                  <g clip-path="url(#climate-fill-clip)">
-                    <polygon class="climate-etched-fill" points="-4,45 42,31 82,39 124,23 161,32 202,15 244,23 282,6 330,4 330,82 -4,82" fill="oklch(0.72 0.09 90 / 0.28)"/>
-                    <polyline class="climate-trace" points="-4,45 42,31 82,39 124,23 161,32 202,15 244,23 282,6 330,4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" vector-effect="non-scaling-stroke"/>
-                  </g>
-                </svg>
-              </div>
+          <!-- The CROW redesign -->
+          <article class="pin" data-cat="ux studio" data-page="crow" data-title="The CROW" data-year="2026" data-cursor-label="Under construction" aria-label="The CROW, work in progress">
+            <div class="art art-plum art-crow ar-45">
+              <div class="pin-meta">WIP · Product / UX</div>
+              <h3>The<br>CROW</h3>
             </div>
           </article>
 
@@ -6532,20 +6575,35 @@
             </div>
           </article>
 
-          <!-- Habitat -->
-          <article class="pin" data-cat="ux swe" data-page="habitat" data-title="Habitat" data-year="2026" aria-label="Open the Habitat habit-tracker case study">
-            <div class="art art-blue art-habitat ar-45">
-              <div class="pin-meta">Product / UX · SWE</div>
-              <div class="habitat-mark">
-                <img class="habitat-logo-mark" src="assets/images/habitat-logo.png" alt="HABITAT">
-                <span class="habitat-caption">Habit Tracker /<br>Pixel World</span>
+          <!-- ESD climate survey case study -->
+          <article class="pin" data-cat="viz" data-page="climate" data-title="The Neutral Response" data-year="2026">
+            <div class="art art-yellow ar-45">
+              <div class="pin-meta">Data</div>
+              <div class="climate-mark">
+                <h3>
+                  <span class="climate-title">The Neutral Response</span>
+                </h3>
+                <span class="climate-caption">ESD Family Survey Analysis</span>
+              </div>
+              <div class="climate-etched-graphic" aria-hidden="true">
+                <svg viewBox="0 0 320 82" preserveAspectRatio="none">
+                  <defs>
+                    <clipPath id="climate-fill-clip" clipPathUnits="userSpaceOnUse">
+                      <rect class="climate-fill-reveal" x="-4" y="0" width="334" height="82"/>
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#climate-fill-clip)">
+                    <polygon class="climate-etched-fill" points="-4,45 42,31 82,39 124,23 161,32 202,15 244,23 282,6 330,4 330,82 -4,82" fill="oklch(0.72 0.09 90 / 0.28)"/>
+                    <polyline class="climate-trace" points="-4,45 42,31 82,39 124,23 161,32 202,15 244,23 282,6 330,4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" vector-effect="non-scaling-stroke"/>
+                  </g>
+                </svg>
               </div>
             </div>
           </article>
 
           <!-- Temporary WIIRED Studio card -->
-          <article class="pin" data-cat="studio" data-page="wiired" data-title="WIIRED Studio." data-year="2026" data-cursor-label="Under construction" aria-label="WIIRED Studio, work in progress">
-            <div class="art art-cream ar-45">
+          <article class="pin frame-folder" data-cat="studio" data-page="wiired" data-title="WIIRED Studio." data-year="2026" data-cursor-label="Under construction" aria-label="WIIRED Studio, work in progress">
+            <div class="art art-clay ar-45">
               <div class="pin-meta">WIP · WIIRED Studio</div>
               <h3 style="font-size:44px; margin-top:auto;">WIIRED<br><em style="font-style:italic;">Studio</em></h3>
             </div>
@@ -10934,6 +10992,26 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
   })();
 
   // ── Feed entrance, scroll reveal, scroll give ──
+  // Folder cards: draw the folder outline (rounded body, tab on the
+  // right with a soft sloped shoulder) as a px path sized to the card.
+  (function sizeFolderTabs() {
+    const folders = document.querySelectorAll('.pin.frame-folder .art');
+    if (!folders.length) return;
+    const R = 16, TAB = 26, SLOPE = 40;
+    const draw = (el) => {
+      const w = el.offsetWidth, h = el.offsetHeight;
+      if (!w || !h) return;
+      const x0 = Math.round(w * 0.44);       // where the shoulder starts rising
+      const x1 = x0 + SLOPE;                  // where the tab's top begins
+      el.style.clipPath = `path("M0 ${TAB + R} A${R} ${R} 0 0 1 ${R} ${TAB} L${x0 - 8} ${TAB} C${x0 + 6} ${TAB} ${x0 + 12} ${TAB - 3} ${x0 + SLOPE / 2} ${TAB / 2} C${x1 - 12} 3 ${x1 - 6} 0 ${x1 + 8} 0 L${w - R} 0 A${R} ${R} 0 0 1 ${w} ${R} L${w} ${h - R} A${R} ${R} 0 0 1 ${w - R} ${h} L${R} ${h} A${R} ${R} 0 0 1 0 ${h - R} Z")`;
+    };
+    folders.forEach(draw);
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(entries => entries.forEach(e => draw(e.target)));
+      folders.forEach(el => ro.observe(el));
+    }
+  })();
+
   (function feedMotion() {
     const root = document.documentElement;
     const feedEl = document.getElementById('feed');
