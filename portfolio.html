@@ -1354,20 +1354,38 @@
       padding-top: calc(24px + var(--folder-tab));
     }
 
-    /* Habitat: stepped pixel corners. */
+    /* Habitat: three-step pixel staircase at each corner, in --s blocks. */
     .pin.frame-pixel .art {
-      --s: 6px; border-radius: 0;
+      --s: 8px; border-radius: 0;
       clip-path: polygon(
-        calc(var(--s)*3) 0, calc(100% - var(--s)*3) 0,
-        calc(100% - var(--s)*3) var(--s), calc(100% - var(--s)) var(--s),
-        calc(100% - var(--s)) calc(var(--s)*3), 100% calc(var(--s)*3),
-        100% calc(100% - var(--s)*3), calc(100% - var(--s)) calc(100% - var(--s)*3),
-        calc(100% - var(--s)) calc(100% - var(--s)), calc(100% - var(--s)*3) calc(100% - var(--s)),
-        calc(100% - var(--s)*3) 100%, calc(var(--s)*3) 100%,
-        calc(var(--s)*3) calc(100% - var(--s)), var(--s) calc(100% - var(--s)),
-        var(--s) calc(100% - var(--s)*3), 0 calc(100% - var(--s)*3),
-        0 calc(var(--s)*3), var(--s) calc(var(--s)*3),
-        var(--s) var(--s), calc(var(--s)*3) var(--s));
+        0 calc(var(--s) * 4),
+        calc(var(--s) * 1) calc(var(--s) * 4),
+        calc(var(--s) * 1) calc(var(--s) * 2),
+        calc(var(--s) * 2) calc(var(--s) * 2),
+        calc(var(--s) * 2) calc(var(--s) * 1),
+        calc(var(--s) * 4) calc(var(--s) * 1),
+        calc(var(--s) * 4) 0,
+        calc(100% - var(--s) * 4) 0,
+        calc(100% - var(--s) * 4) calc(var(--s) * 1),
+        calc(100% - var(--s) * 2) calc(var(--s) * 1),
+        calc(100% - var(--s) * 2) calc(var(--s) * 2),
+        calc(100% - var(--s) * 1) calc(var(--s) * 2),
+        calc(100% - var(--s) * 1) calc(var(--s) * 4),
+        100% calc(var(--s) * 4),
+        100% calc(100% - var(--s) * 4),
+        calc(100% - var(--s) * 1) calc(100% - var(--s) * 4),
+        calc(100% - var(--s) * 1) calc(100% - var(--s) * 2),
+        calc(100% - var(--s) * 2) calc(100% - var(--s) * 2),
+        calc(100% - var(--s) * 2) calc(100% - var(--s) * 1),
+        calc(100% - var(--s) * 4) calc(100% - var(--s) * 1),
+        calc(100% - var(--s) * 4) 100%,
+        calc(var(--s) * 4) 100%,
+        calc(var(--s) * 4) calc(100% - var(--s) * 1),
+        calc(var(--s) * 2) calc(100% - var(--s) * 1),
+        calc(var(--s) * 2) calc(100% - var(--s) * 2),
+        calc(var(--s) * 1) calc(100% - var(--s) * 2),
+        calc(var(--s) * 1) calc(100% - var(--s) * 4),
+        0 calc(100% - var(--s) * 4));
     }
 
   }
