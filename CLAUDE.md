@@ -29,6 +29,8 @@ Because that push growth is real layout growth, it would also grow `.feed`'s own
 
 Filter tabs match `data-filter` against `data-cat`. Visibility changes use a FLIP animation (snapshot positions before/after, then transition with `translate`).
 
+**Shaped cards** (desktop only, `.pin.frame-*`): Habitat has stepped pixel corners (`frame-pixel`, a `clip-path` polygon) and WIIRED is a folder (`frame-folder`, clay) whose tabbed outline is a px `clip-path: path()` drawn by `sizeFolderTabs()` on a ResizeObserver, so the radii and tab slope stay true at any width. Shapes are cut inside the card's own box, never added around it, so every card keeps its aspect ratio and the columns stay level top and bottom. A clip cuts off `box-shadow`, so shaped cards take their shadow as a `drop-shadow` filter on the `.pin`; they still lift on hover like every other card. Component cards (Find me elsewhere, In the overlap) are never shaped. No tilts.
+
 ### Sheet panel
 
 `openSheet(key, srcEl)` reads from the `PAGES` object and writes HTML into `#sheetBody`. If `PAGES[key].custom` exists, that string is used verbatim (full custom layout); otherwise the default template renders `eyebrow`, `title`, `lead`, `facts`, a figure placeholder, and `body`.
