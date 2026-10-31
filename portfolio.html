@@ -1290,19 +1290,6 @@
   .ar-1  { aspect-ratio: 1; }
   .ar-45 { aspect-ratio: 4 / 5; }
 
-  @media (max-width: 800px) and (prefers-reduced-motion: no-preference) {
-    .feed.has-wheel:not(.has-open) .pin[data-page] > .art {
-      transform: perspective(var(--wheel-perspective, 1000px))
-        rotateX(var(--wheel-turn, 0deg)) scale(var(--wheel-scale, 1));
-      opacity: var(--wheel-opacity, 1);
-      transform-origin: center;
-      transition: box-shadow var(--motion-med) ease;
-    }
-  }
-  @media (max-width: 800px) and (prefers-reduced-motion: reduce) {
-    .feed .pin[data-page] > .art { transform: none; }
-  }
-
   /* Art backgrounds */
   .art-clay    { background: var(--c-clay);    color: var(--card-ink); }
   .art-blue    { background: var(--c-blue);    color: oklch(0.97 0 0); }
@@ -1314,126 +1301,121 @@
   .art-charcoal{ background: var(--c-charcoal);color: oklch(0.94 0.005 80); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.1); }
   .art-paper   { background: oklch(0.88 0 0); color: var(--card-ink); box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.1); }
 
-  .folder-sheet, .folder-front { display: none; }
-
   /* Wall-collage frames — project cards hang like a gallery wall, each in
      its own frame or object (.pin.frame-*; component cards stay plain).
-     Desktop only: the mobile feed already animates .art on its scroll wheel.
      Frames hang straight; hover deepens the shadow. The shadow is a drop-shadow on the .pin so it follows any shape,
      including the folder outline and the clipped pixel corners. */
-  @media (min-width: 801px) {
-    .pin[class*="frame-"] {
-      filter: drop-shadow(1px 8px 10px oklch(0 0 0 / 0.32)) drop-shadow(0 1px 1px oklch(0 0 0 / 0.25));
-      transition: opacity var(--motion-med) ease, filter var(--motion-med) ease;
-    }
-    .feed:not(.has-open) .pin[class*="frame-"][data-page]:hover,
-    .feed:not(.has-open) .pin[class*="frame-"][data-page]:focus-visible {
-      filter: drop-shadow(3px 20px 20px oklch(0 0 0 / 0.36)) drop-shadow(0 2px 2px oklch(0 0 0 / 0.25));
-    }
-    /* Frames are drawn inside the card's own box (inset rings), so every
-       card keeps its size and the columns stay level top and bottom. The
-       card still lifts on hover like every other card; only its shadow
-       moves to the .pin's drop-shadow above, since a mask or clip-path
-       would cut a box-shadow off. */
-    .pin[class*="frame-"] .art,
-    .feed:not(.has-open) .pin[class*="frame-"][data-page]:hover .art,
-    .feed:not(.has-open) .pin[class*="frame-"][data-page]:focus-visible .art {
-      box-shadow: var(--frame-ring, none);
-    }
-    .pin[class*="frame-"] .art::after { /* paper grain on every print */
-      content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
-      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-      opacity: 0.16; mix-blend-mode: multiply;
-    }
-
-    /* WIIRED: a folder, with its tab rising on the right. The outline is
-       a clip-path path() drawn in px by sizeFolderTabs(), so the corner
-       radii and the tab's slope stay true at any card size. The lower
-       shoulder is --folder-tab tall; the content clears it. */
-    .pin.frame-folder .art {
-      --folder-tab: 26px;
-      --folder-front: calc(var(--folder-tab) + 54px);  /* top of the front flap */
-      border-radius: 0;
-      padding-top: calc(var(--folder-front) + 22px);
-      /* The art itself is the folder's back: the card colour, a shade deeper. */
-      background: color-mix(in oklch, var(--c-clay), oklch(0.2 0.03 40) 22%);
-    }
-    /* Papers tucked inside, peeking above the front flap. The front sheet
-       reads as a handwritten page: a short squiggle heading, then
-       squiggled lines of varying length.
-       On hover they slide up out of the folder on a spring, the front
-       sheet further than the one behind it. Their rest positions sit low
-       enough that the full rise stays inside the folder's back. */
-    .pin.frame-folder .folder-sheet {
-      --sheet-spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 19.4%, 1.067, 1.099 24.3%, 1.108 26%, 1.104 27.9%, 1.075 32.7%, 1.007 41.7%, 0.987 46.8%, 0.991 57.8%, 1.002 72.8%, 1);
-      display: block; position: absolute; z-index: 0;
-      top: calc(var(--folder-tab) + 26px); left: 16px; right: 26px; height: 50%;
-      border-radius: 3px;
-      background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='110' viewBox='0 0 300 110' preserveAspectRatio='xMinYMin meet'><g fill='none' stroke='%23574a42' stroke-opacity='0.38' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M2 8 q4.9 -1.8 9.8 0.2 q3.7 3.0 7.3 -0.2 q3.6 -2.9 7.2 -0.6 q5.4 1.5 10.9 -0.5 q5.4 -3.9 10.8 -0.5 q4.4 3.3 8.8 0.5 q6.2 -2.5 12.3 0.6 q3.5 4.0 7.1 -0.3 q4.0 -1.7 8.0 -0.2 q7.3 1.9 14.7 0.1 q6.5 -2.5 12.9 0.1'/><path d='M2 26 q3.0 -1.0 5.9 -0.4 q5.5 1.8 10.9 -0.2 q5.1 -1.9 10.1 -0.2 q5.9 2.4 11.8 -0.3 q5.0 -2.0 10.1 0.5 q5.7 1.5 11.3 0.6 q3.2 -1.8 6.4 0.3 q3.3 2.0 6.6 -0.6 q5.4 -2.6 10.8 0.1 q6.2 1.6 12.5 0.2 q5.1 -2.2 10.2 -0.1 q6.1 3.0 12.2 -0.0 q5.4 -1.0 10.8 0.2 q5.3 3.1 10.6 0.4 q3.9 -1.7 7.7 0.2 q2.8 1.9 5.6 -0.4 q3.2 -1.0 6.3 0.3 q3.2 1.4 6.4 -0.1 q6.2 -1.1 12.5 -0.1 q4.9 2.8 9.9 0.4 q6.2 -1.5 12.4 -0.1 q4.2 2.8 8.3 0.5 q3.3 -1.3 6.6 -0.3 q3.6 1.9 7.3 0.1 q3.8 -0.9 7.5 -0.1 q4.2 2.1 8.4 0.5 q5.5 -2.0 11.0 0.1 q5.4 1.0 10.9 0.5 q5.9 -2.8 11.7 0.4 q4.3 1.8 8.6 -0.5'/><path d='M2 40 q5.3 -1.0 10.5 -0.5 q3.5 1.2 7.1 -0.2 q2.9 -0.9 5.8 -0.4 q3.1 1.7 6.2 -0.6 q6.2 -2.2 12.5 -0.4 q3.7 1.6 7.4 -0.2 q3.2 -2.7 6.4 0.6 q4.6 1.9 9.2 -0.5 q3.1 -1.6 6.2 -0.3 q6.1 1.2 12.1 -0.6 q6.6 -2.0 13.1 -0.4 q4.9 0.9 9.8 0.0 q6.7 -2.8 13.3 0.2 q3.8 1.7 7.5 -0.4 q5.8 -2.1 11.7 0.3 q4.0 1.4 8.1 0.4 q6.7 -2.8 13.4 0.4 q6.0 2.5 12.0 -0.3 q4.8 -1.7 9.6 -0.6 q2.8 1.5 5.6 -0.3 q5.5 -3.0 11.0 -0.1 q6.5 3.1 13.0 0.5 q4.2 -1.4 8.4 -0.3 q3.5 1.3 7.0 0.1 q6.3 -2.7 12.7 -0.0'/><path d='M2 54 q5.3 -2.6 10.7 -0.5 q5.4 2.9 10.8 0.3 q5.7 -1.9 11.5 -0.4 q5.9 1.6 11.8 0.4 q6.6 -1.8 13.3 -0.1 q6.5 2.5 13.1 -0.4 q3.2 -1.2 6.4 0.5 q6.0 1.2 11.9 0.4 q6.7 -2.3 13.3 -0.2 q4.9 1.2 9.8 -0.6 q6.6 -2.3 13.3 0.0 q6.5 1.8 13.0 0.4 q6.0 -1.3 12.1 -0.3 q3.9 1.4 7.8 0.1 q3.8 -1.8 7.5 -0.4 q6.4 1.7 12.8 -0.1 q5.1 -2.9 10.1 -0.1 q6.4 2.0 12.8 0.0 q4.8 -0.9 9.6 -0.1 q3.4 0.9 6.9 0.4 q3.4 -1.9 6.8 0.3 q5.0 1.6 9.9 0.0 q4.9 -2.6 9.9 -0.5 q5.0 1.4 9.9 -0.3 q5.8 -2.0 11.7 0.1 q5.8 2.9 11.6 -0.1 q5.2 -2.0 10.4 0.0'/><path d='M2 68 q5.5 -1.9 11.0 0.0 q4.6 3.0 9.3 0.2 q6.2 -3.0 12.5 -0.3 q5.0 3.0 9.9 0.4 q3.3 -1.1 6.5 -0.1 q3.0 1.4 6.0 -0.5 q5.4 -2.6 10.8 0.5 q3.3 2.5 6.7 0.2 q3.3 -2.8 6.6 0.6 q3.6 3.0 7.2 -0.1 q4.7 -3.1 9.3 0.4 q3.4 1.8 6.7 0.0 q4.1 -1.3 8.1 -0.2 q5.6 0.9 11.2 0.1 q4.5 -0.9 9.0 -0.2 q5.2 2.0 10.5 -0.5 q6.7 -2.6 13.4 0.6 q3.1 1.5 6.2 -0.6 q5.9 -1.5 11.7 -0.4 q4.4 2.9 8.8 0.4 q3.7 -1.2 7.5 0.5'/><path d='M2 82 q5.0 -2.4 10.0 -0.5 q2.9 2.4 5.9 -0.1 q3.0 -2.9 6.0 0.2 q5.9 1.1 11.9 0.4 q3.0 -2.8 5.9 -0.1 q4.1 2.1 8.1 0.5 q3.8 -1.2 7.6 0.0 q3.7 1.1 7.3 -0.4 q2.9 -1.3 5.8 -0.2 q3.9 2.6 7.9 -0.3 q4.7 -1.3 9.5 -0.2 q2.8 1.4 5.5 -0.6 q5.7 -2.1 11.3 -0.4 q4.6 2.9 9.2 -0.5 q6.0 -1.8 12.0 -0.0 q6.1 1.7 12.2 0.0 q5.5 -3.0 11.0 -0.2 q6.1 2.4 12.1 0.2 q4.3 -1.6 8.7 -0.5 q3.2 1.0 6.5 0.3 q3.7 -1.2 7.5 -0.5 q6.1 2.8 12.2 0.2 q3.8 -1.4 7.7 -0.2 q4.6 1.2 9.1 -0.1 q3.8 -3.0 7.5 0.6 q4.9 1.4 9.8 0.6 q4.0 -1.7 7.9 -0.6 q4.2 1.9 8.5 0.0 q3.5 -2.0 7.0 -0.6 q3.8 1.1 7.5 -0.1'/><path d='M2 96 q2.9 -0.9 5.7 -0.2 q3.6 2.2 7.3 0.0 q5.7 -2.3 11.5 0.3 q6.3 1.7 12.5 -0.2 q6.7 -1.2 13.4 0.3 q5.3 1.0 10.6 0.4 q6.3 -2.3 12.6 0.3 q6.0 1.2 12.0 0.0 q4.7 -2.7 9.5 0.4 q6.0 2.2 12.1 0.5 q5.5 -2.4 10.9 -0.3 q2.8 1.2 5.7 -0.2 q3.1 -2.7 6.2 0.1 q5.2 2.3 10.5 0.2'/></g></svg>") 16px 12px / calc(100% - 32px) auto no-repeat,
-        oklch(0.975 0.008 85);
-      box-shadow: 0 1px 2px oklch(0 0 0 / 0.14), 0 4px 10px -6px oklch(0 0 0 / 0.25);
-      transition: translate 800ms var(--sheet-spring);
-    }
-    .pin.frame-folder .folder-sheet-back {
-      top: calc(var(--folder-tab) + 16px); left: 30px; right: 14px;
-      background: oklch(0.92 0.02 80);
-      transition-delay: 40ms;
-    }
-    .feed:not(.has-open) .pin.frame-folder:hover .folder-sheet,
-    .feed:not(.has-open) .pin.frame-folder:focus-visible .folder-sheet { translate: 0 -12px; }
-    .feed:not(.has-open) .pin.frame-folder:hover .folder-sheet-back,
-    .feed:not(.has-open) .pin.frame-folder:focus-visible .folder-sheet-back { translate: 0 -8px; }
-    @media (prefers-reduced-motion: reduce) {
-      .pin.frame-folder .folder-sheet { transition: none; }
-    }
-    /* Front flap: the card colour, a hairline highlight on its lip and a
-       soft shadow cast up onto the papers behind it. */
-    .pin.frame-folder .folder-front {
-      display: block; position: absolute; z-index: 0;
-      top: var(--folder-front); left: 0; right: 0; bottom: 0;
-      border-radius: 12px 12px 0 0;
-      background: var(--c-clay);
-      box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.28), 0 -3px 10px oklch(0.2 0.03 40 / 0.22);
-    }
-    .pin.frame-folder .pin-meta,
-    .pin.frame-folder h3 { position: relative; z-index: 1; }
-
-    /* Habitat: three-step pixel staircase at each corner, in --s blocks. */
-    .pin.frame-pixel .art {
-      --s: 8px; border-radius: 0;
-      clip-path: polygon(
-        0 calc(var(--s) * 4),
-        calc(var(--s) * 1) calc(var(--s) * 4),
-        calc(var(--s) * 1) calc(var(--s) * 2),
-        calc(var(--s) * 2) calc(var(--s) * 2),
-        calc(var(--s) * 2) calc(var(--s) * 1),
-        calc(var(--s) * 4) calc(var(--s) * 1),
-        calc(var(--s) * 4) 0,
-        calc(100% - var(--s) * 4) 0,
-        calc(100% - var(--s) * 4) calc(var(--s) * 1),
-        calc(100% - var(--s) * 2) calc(var(--s) * 1),
-        calc(100% - var(--s) * 2) calc(var(--s) * 2),
-        calc(100% - var(--s) * 1) calc(var(--s) * 2),
-        calc(100% - var(--s) * 1) calc(var(--s) * 4),
-        100% calc(var(--s) * 4),
-        100% calc(100% - var(--s) * 4),
-        calc(100% - var(--s) * 1) calc(100% - var(--s) * 4),
-        calc(100% - var(--s) * 1) calc(100% - var(--s) * 2),
-        calc(100% - var(--s) * 2) calc(100% - var(--s) * 2),
-        calc(100% - var(--s) * 2) calc(100% - var(--s) * 1),
-        calc(100% - var(--s) * 4) calc(100% - var(--s) * 1),
-        calc(100% - var(--s) * 4) 100%,
-        calc(var(--s) * 4) 100%,
-        calc(var(--s) * 4) calc(100% - var(--s) * 1),
-        calc(var(--s) * 2) calc(100% - var(--s) * 1),
-        calc(var(--s) * 2) calc(100% - var(--s) * 2),
-        calc(var(--s) * 1) calc(100% - var(--s) * 2),
-        calc(var(--s) * 1) calc(100% - var(--s) * 4),
-        0 calc(100% - var(--s) * 4));
-    }
-
+  .pin[class*="frame-"] {
+    filter: drop-shadow(1px 8px 10px oklch(0 0 0 / 0.32)) drop-shadow(0 1px 1px oklch(0 0 0 / 0.25));
+    transition: opacity var(--motion-med) ease, filter var(--motion-med) ease;
   }
+  .feed:not(.has-open) .pin[class*="frame-"][data-page]:hover,
+  .feed:not(.has-open) .pin[class*="frame-"][data-page]:focus-visible {
+    filter: drop-shadow(3px 20px 20px oklch(0 0 0 / 0.36)) drop-shadow(0 2px 2px oklch(0 0 0 / 0.25));
+  }
+  /* Frames are drawn inside the card's own box (inset rings), so every
+     card keeps its size and the columns stay level top and bottom. The
+     card still lifts on hover like every other card; only its shadow
+     moves to the .pin's drop-shadow above, since a mask or clip-path
+     would cut a box-shadow off. */
+  .pin[class*="frame-"] .art,
+  .feed:not(.has-open) .pin[class*="frame-"][data-page]:hover .art,
+  .feed:not(.has-open) .pin[class*="frame-"][data-page]:focus-visible .art {
+    box-shadow: var(--frame-ring, none);
+  }
+  .pin[class*="frame-"] .art::after { /* paper grain on every print */
+    content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.16; mix-blend-mode: multiply;
+  }
+
+  /* WIIRED: a folder, with its tab rising on the right. The outline is
+     a clip-path path() drawn in px by sizeFolderTabs(), so the corner
+     radii and the tab's slope stay true at any card size. The lower
+     shoulder is --folder-tab tall; the content clears it. */
+  .pin.frame-folder .art {
+    --folder-tab: 26px;
+    --folder-front: calc(var(--folder-tab) + 54px);  /* top of the front flap */
+    border-radius: 0;
+    padding-top: calc(var(--folder-front) + 22px);
+    /* The art itself is the folder's back: the card colour, a shade deeper. */
+    background: color-mix(in oklch, var(--c-clay), oklch(0.2 0.03 40) 22%);
+  }
+  /* Papers tucked inside, peeking above the front flap. The front sheet
+     reads as a handwritten page: a short squiggle heading, then
+     squiggled lines of varying length.
+     On hover they slide up out of the folder on a spring, the front
+     sheet further than the one behind it. Their rest positions sit low
+     enough that the full rise stays inside the folder's back. */
+  .pin.frame-folder .folder-sheet {
+    --sheet-spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 19.4%, 1.067, 1.099 24.3%, 1.108 26%, 1.104 27.9%, 1.075 32.7%, 1.007 41.7%, 0.987 46.8%, 0.991 57.8%, 1.002 72.8%, 1);
+    display: block; position: absolute; z-index: 0;
+    top: calc(var(--folder-tab) + 26px); left: 16px; right: 26px; height: 50%;
+    border-radius: 3px;
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='110' viewBox='0 0 300 110' preserveAspectRatio='xMinYMin meet'><g fill='none' stroke='%23574a42' stroke-opacity='0.38' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M2 8 q4.9 -1.8 9.8 0.2 q3.7 3.0 7.3 -0.2 q3.6 -2.9 7.2 -0.6 q5.4 1.5 10.9 -0.5 q5.4 -3.9 10.8 -0.5 q4.4 3.3 8.8 0.5 q6.2 -2.5 12.3 0.6 q3.5 4.0 7.1 -0.3 q4.0 -1.7 8.0 -0.2 q7.3 1.9 14.7 0.1 q6.5 -2.5 12.9 0.1'/><path d='M2 26 q3.0 -1.0 5.9 -0.4 q5.5 1.8 10.9 -0.2 q5.1 -1.9 10.1 -0.2 q5.9 2.4 11.8 -0.3 q5.0 -2.0 10.1 0.5 q5.7 1.5 11.3 0.6 q3.2 -1.8 6.4 0.3 q3.3 2.0 6.6 -0.6 q5.4 -2.6 10.8 0.1 q6.2 1.6 12.5 0.2 q5.1 -2.2 10.2 -0.1 q6.1 3.0 12.2 -0.0 q5.4 -1.0 10.8 0.2 q5.3 3.1 10.6 0.4 q3.9 -1.7 7.7 0.2 q2.8 1.9 5.6 -0.4 q3.2 -1.0 6.3 0.3 q3.2 1.4 6.4 -0.1 q6.2 -1.1 12.5 -0.1 q4.9 2.8 9.9 0.4 q6.2 -1.5 12.4 -0.1 q4.2 2.8 8.3 0.5 q3.3 -1.3 6.6 -0.3 q3.6 1.9 7.3 0.1 q3.8 -0.9 7.5 -0.1 q4.2 2.1 8.4 0.5 q5.5 -2.0 11.0 0.1 q5.4 1.0 10.9 0.5 q5.9 -2.8 11.7 0.4 q4.3 1.8 8.6 -0.5'/><path d='M2 40 q5.3 -1.0 10.5 -0.5 q3.5 1.2 7.1 -0.2 q2.9 -0.9 5.8 -0.4 q3.1 1.7 6.2 -0.6 q6.2 -2.2 12.5 -0.4 q3.7 1.6 7.4 -0.2 q3.2 -2.7 6.4 0.6 q4.6 1.9 9.2 -0.5 q3.1 -1.6 6.2 -0.3 q6.1 1.2 12.1 -0.6 q6.6 -2.0 13.1 -0.4 q4.9 0.9 9.8 0.0 q6.7 -2.8 13.3 0.2 q3.8 1.7 7.5 -0.4 q5.8 -2.1 11.7 0.3 q4.0 1.4 8.1 0.4 q6.7 -2.8 13.4 0.4 q6.0 2.5 12.0 -0.3 q4.8 -1.7 9.6 -0.6 q2.8 1.5 5.6 -0.3 q5.5 -3.0 11.0 -0.1 q6.5 3.1 13.0 0.5 q4.2 -1.4 8.4 -0.3 q3.5 1.3 7.0 0.1 q6.3 -2.7 12.7 -0.0'/><path d='M2 54 q5.3 -2.6 10.7 -0.5 q5.4 2.9 10.8 0.3 q5.7 -1.9 11.5 -0.4 q5.9 1.6 11.8 0.4 q6.6 -1.8 13.3 -0.1 q6.5 2.5 13.1 -0.4 q3.2 -1.2 6.4 0.5 q6.0 1.2 11.9 0.4 q6.7 -2.3 13.3 -0.2 q4.9 1.2 9.8 -0.6 q6.6 -2.3 13.3 0.0 q6.5 1.8 13.0 0.4 q6.0 -1.3 12.1 -0.3 q3.9 1.4 7.8 0.1 q3.8 -1.8 7.5 -0.4 q6.4 1.7 12.8 -0.1 q5.1 -2.9 10.1 -0.1 q6.4 2.0 12.8 0.0 q4.8 -0.9 9.6 -0.1 q3.4 0.9 6.9 0.4 q3.4 -1.9 6.8 0.3 q5.0 1.6 9.9 0.0 q4.9 -2.6 9.9 -0.5 q5.0 1.4 9.9 -0.3 q5.8 -2.0 11.7 0.1 q5.8 2.9 11.6 -0.1 q5.2 -2.0 10.4 0.0'/><path d='M2 68 q5.5 -1.9 11.0 0.0 q4.6 3.0 9.3 0.2 q6.2 -3.0 12.5 -0.3 q5.0 3.0 9.9 0.4 q3.3 -1.1 6.5 -0.1 q3.0 1.4 6.0 -0.5 q5.4 -2.6 10.8 0.5 q3.3 2.5 6.7 0.2 q3.3 -2.8 6.6 0.6 q3.6 3.0 7.2 -0.1 q4.7 -3.1 9.3 0.4 q3.4 1.8 6.7 0.0 q4.1 -1.3 8.1 -0.2 q5.6 0.9 11.2 0.1 q4.5 -0.9 9.0 -0.2 q5.2 2.0 10.5 -0.5 q6.7 -2.6 13.4 0.6 q3.1 1.5 6.2 -0.6 q5.9 -1.5 11.7 -0.4 q4.4 2.9 8.8 0.4 q3.7 -1.2 7.5 0.5'/><path d='M2 82 q5.0 -2.4 10.0 -0.5 q2.9 2.4 5.9 -0.1 q3.0 -2.9 6.0 0.2 q5.9 1.1 11.9 0.4 q3.0 -2.8 5.9 -0.1 q4.1 2.1 8.1 0.5 q3.8 -1.2 7.6 0.0 q3.7 1.1 7.3 -0.4 q2.9 -1.3 5.8 -0.2 q3.9 2.6 7.9 -0.3 q4.7 -1.3 9.5 -0.2 q2.8 1.4 5.5 -0.6 q5.7 -2.1 11.3 -0.4 q4.6 2.9 9.2 -0.5 q6.0 -1.8 12.0 -0.0 q6.1 1.7 12.2 0.0 q5.5 -3.0 11.0 -0.2 q6.1 2.4 12.1 0.2 q4.3 -1.6 8.7 -0.5 q3.2 1.0 6.5 0.3 q3.7 -1.2 7.5 -0.5 q6.1 2.8 12.2 0.2 q3.8 -1.4 7.7 -0.2 q4.6 1.2 9.1 -0.1 q3.8 -3.0 7.5 0.6 q4.9 1.4 9.8 0.6 q4.0 -1.7 7.9 -0.6 q4.2 1.9 8.5 0.0 q3.5 -2.0 7.0 -0.6 q3.8 1.1 7.5 -0.1'/><path d='M2 96 q2.9 -0.9 5.7 -0.2 q3.6 2.2 7.3 0.0 q5.7 -2.3 11.5 0.3 q6.3 1.7 12.5 -0.2 q6.7 -1.2 13.4 0.3 q5.3 1.0 10.6 0.4 q6.3 -2.3 12.6 0.3 q6.0 1.2 12.0 0.0 q4.7 -2.7 9.5 0.4 q6.0 2.2 12.1 0.5 q5.5 -2.4 10.9 -0.3 q2.8 1.2 5.7 -0.2 q3.1 -2.7 6.2 0.1 q5.2 2.3 10.5 0.2'/></g></svg>") 16px 12px / calc(100% - 32px) auto no-repeat,
+      oklch(0.975 0.008 85);
+    box-shadow: 0 1px 2px oklch(0 0 0 / 0.14), 0 4px 10px -6px oklch(0 0 0 / 0.25);
+    transition: translate 800ms var(--sheet-spring);
+  }
+  .pin.frame-folder .folder-sheet-back {
+    top: calc(var(--folder-tab) + 16px); left: 30px; right: 14px;
+    background: oklch(0.92 0.02 80);
+    transition-delay: 40ms;
+  }
+  .feed:not(.has-open) .pin.frame-folder:hover .folder-sheet,
+  .feed:not(.has-open) .pin.frame-folder:focus-visible .folder-sheet { translate: 0 -12px; }
+  .feed:not(.has-open) .pin.frame-folder:hover .folder-sheet-back,
+  .feed:not(.has-open) .pin.frame-folder:focus-visible .folder-sheet-back { translate: 0 -8px; }
+  @media (prefers-reduced-motion: reduce) {
+    .pin.frame-folder .folder-sheet { transition: none; }
+  }
+  /* Front flap: the card colour, a hairline highlight on its lip and a
+     soft shadow cast up onto the papers behind it. */
+  .pin.frame-folder .folder-front {
+    display: block; position: absolute; z-index: 0;
+    top: var(--folder-front); left: 0; right: 0; bottom: 0;
+    border-radius: 12px 12px 0 0;
+    background: var(--c-clay);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.28), 0 -3px 10px oklch(0.2 0.03 40 / 0.22);
+  }
+  .pin.frame-folder .pin-meta,
+  .pin.frame-folder h3 { position: relative; z-index: 1; }
+
+  /* Habitat: three-step pixel staircase at each corner, in --s blocks. */
+  .pin.frame-pixel .art {
+    --s: 8px; border-radius: 0;
+    clip-path: polygon(
+      0 calc(var(--s) * 4),
+      calc(var(--s) * 1) calc(var(--s) * 4),
+      calc(var(--s) * 1) calc(var(--s) * 2),
+      calc(var(--s) * 2) calc(var(--s) * 2),
+      calc(var(--s) * 2) calc(var(--s) * 1),
+      calc(var(--s) * 4) calc(var(--s) * 1),
+      calc(var(--s) * 4) 0,
+      calc(100% - var(--s) * 4) 0,
+      calc(100% - var(--s) * 4) calc(var(--s) * 1),
+      calc(100% - var(--s) * 2) calc(var(--s) * 1),
+      calc(100% - var(--s) * 2) calc(var(--s) * 2),
+      calc(100% - var(--s) * 1) calc(var(--s) * 2),
+      calc(100% - var(--s) * 1) calc(var(--s) * 4),
+      100% calc(var(--s) * 4),
+      100% calc(100% - var(--s) * 4),
+      calc(100% - var(--s) * 1) calc(100% - var(--s) * 4),
+      calc(100% - var(--s) * 1) calc(100% - var(--s) * 2),
+      calc(100% - var(--s) * 2) calc(100% - var(--s) * 2),
+      calc(100% - var(--s) * 2) calc(100% - var(--s) * 1),
+      calc(100% - var(--s) * 4) calc(100% - var(--s) * 1),
+      calc(100% - var(--s) * 4) 100%,
+      calc(var(--s) * 4) 100%,
+      calc(var(--s) * 4) calc(100% - var(--s) * 1),
+      calc(var(--s) * 2) calc(100% - var(--s) * 1),
+      calc(var(--s) * 2) calc(100% - var(--s) * 2),
+      calc(var(--s) * 1) calc(100% - var(--s) * 2),
+      calc(var(--s) * 1) calc(100% - var(--s) * 4),
+      0 calc(100% - var(--s) * 4));
+  }
+
 
   /* Pin typography */
   .pin h3 {
@@ -6297,16 +6279,7 @@
     animation: feed-in 1000ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
     animation-delay: var(--feed-d, 0ms);
   }
-  @media (min-width: 801px) {
-    .feed .pin { translate: 0 var(--feed-lag, 0px); }
-  }
-  /* Not on the mobile feed: its cards ride the scroll wheel (rotateX +
-     opacity on .art), and a fade/blur on the same cards on top of that
-     flickered. The banner entrance still plays. */
-  @media (max-width: 800px) {
-    .feed.has-reveal .pin,
-    .feed.has-reveal .pin.is-in { opacity: 1; animation: none; }
-  }
+  .feed .pin { translate: 0 var(--feed-lag, 0px); }
   /* The same entrance on the other pages, tailored to each. CSS animations
      restart whenever a page goes from display: none to shown, so these play
      on every arrival. */
@@ -9669,74 +9642,6 @@
   mobileFeedQuery.addEventListener('change', syncFeedLayout);
   syncFeedLayout();
 
-  /* ── MOBILE FEED WHEEL ─────────────────────────────────────
-   * Scroll position brings each card forward as it enters:
-   *   below center  → smaller, softly faded card tilts toward you
-   *   at center     → full-size, forward-facing card
-   *   above center  → stays flat and full-size as it scrolls out
-   * Native scrolling and the cards' layout boxes stay unchanged.
-   * ───────────────────────────────────────────────────────── */
-  const FEED_WHEEL = {
-    maxTilt: 26,          // degrees at the visible edges
-    minScale: 0.84,       // smaller incoming card, full size at center
-    minOpacity: 0.65,     // soft fade that clears as the card rises
-    perspective: 1000,    // gentle perspective in pixels
-    center: 0.5,         // reading position within the viewport
-    travel: 0.5,         // half a viewport from face-on to maximum tilt
-  };
-  const wheelCards = pins.filter(pin => pin.dataset.page).map(pin => ({
-    pin, art: pin.querySelector('.art')
-  }));
-  feed.style.setProperty('--wheel-perspective', `${FEED_WHEEL.perspective}px`);
-  let feedWheelFrame = null;
-  function updateFeedWheel() {
-    feedWheelFrame = null;
-    const enabled = mobileFeedQuery.matches && !prefersReducedMotion();
-    feed.classList.toggle('has-wheel', enabled);
-    if (!enabled) {
-      wheelCards.forEach(({ art }) => {
-        art.style.removeProperty('--wheel-turn');
-        art.style.removeProperty('--wheel-scale');
-        art.style.removeProperty('--wheel-opacity');
-      });
-      return;
-    }
-    if (feed.classList.contains('has-open') || !feed.getClientRects().length) return;
-    const center = innerHeight * FEED_WHEEL.center;
-    const travel = innerHeight * FEED_WHEEL.travel;
-    // Measure the untransformed card wrappers first, then write styles.
-    const poses = wheelCards.filter(({ pin }) => pin.getClientRects().length).map(({ pin, art }) => {
-      const rect = pin.getBoundingClientRect();
-      const phase = Math.max(0, Math.min(1, (rect.top + rect.height / 2 - center) / travel));
-      return { art, phase, top: rect.top };
-    });
-    // The first card is what the feed opens on, so it always sits flat.
-    // `pins` is in desktop column order, so find it by position instead.
-    const first = poses.reduce((a, b) => (b.top < a.top ? b : a), poses[0]);
-    if (first) first.phase = 0;
-    poses.forEach(({ art, phase }) => {
-      art.style.setProperty('--wheel-turn', `${(-phase * FEED_WHEEL.maxTilt).toFixed(2)}deg`);
-      art.style.setProperty('--wheel-scale', (1 - Math.abs(phase) * (1 - FEED_WHEEL.minScale)).toFixed(4));
-      art.style.setProperty('--wheel-opacity', (1 - phase * (1 - FEED_WHEEL.minOpacity)).toFixed(4));
-    });
-    // While filter cards slide into place, keep re-posing every frame so
-    // tilt/scale follow each card instead of snapping when the FLIP settles.
-    if (performance.now() < feedWheelTrackUntil) scheduleFeedWheel();
-  }
-  let feedWheelTrackUntil = 0;
-  function scheduleFeedWheel() {
-    if (feedWheelFrame === null) feedWheelFrame = requestAnimationFrame(updateFeedWheel);
-  }
-  function trackFeedWheel(ms) {
-    feedWheelTrackUntil = performance.now() + ms;
-    scheduleFeedWheel();
-  }
-  main.addEventListener('scroll', scheduleFeedWheel, { passive: true });
-  window.addEventListener('resize', scheduleFeedWheel);
-  reducedMotionQuery.addEventListener('change', scheduleFeedWheel);
-  mobileFeedQuery.addEventListener('change', scheduleFeedWheel);
-  scheduleFeedWheel();
-
   const CAT_LABELS = {
     ux: 'Product / UX',
     swe: 'SWE',
@@ -9973,7 +9878,6 @@
     if (feedView.style.display === 'none') return;
     feed.style.height = 'auto';
     feed.style.height = feed.getBoundingClientRect().height + 'px';
-    scheduleFeedWheel();
   }
   window.addEventListener('load', lockFeedHeight);
   window.addEventListener('resize', lockFeedHeight);
@@ -10058,7 +9962,6 @@
     });
 
     feedEmpty.classList.toggle('visible', show.size === 0);
-    trackFeedWheel(motionDelay(560));
 
     filterSettleTimer = setTimeout(() => {
       filterSettleTimer = null;
@@ -11132,8 +11035,8 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       root.classList.remove('feed-intro');
     }
 
-    // Scroll give (desktop): cards trail the scroll and spring home, lower
-    // cards a little more, like the Experience timeline.
+    // Scroll give: cards trail the scroll and spring home, lower cards a
+    // little more, like the Experience timeline (gentler on phones).
     const LAG = 0.12, LAG_MAX = 40, K = 110, C = 15;
     const springs = new Map(pins.map(p => [p, { y: 0, v: 0 }]));
     let last = mainEl.scrollTop, frame = 0, t0 = 0;
@@ -11161,14 +11064,14 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       const delta = top - last;
       last = top;
       if (!delta || still || currentRouteName !== 'feed'
-          || window.matchMedia('(max-width: 800px)').matches
           || document.querySelector('.app.sheet-open')) return;
       const vh = window.innerHeight;
+      const lag = LAG * (window.matchMedia('(max-width: 800px)').matches ? 0.6 : 1);
       springs.forEach((sp, pin) => {
         const r = pin.getBoundingClientRect();
         if (!r.height || r.bottom < -200 || r.top > vh + 200) return;
         const depth = Math.min(Math.max((r.top + r.height / 2) / vh, 0), 1);
-        sp.y = Math.min(LAG_MAX, Math.max(-LAG_MAX, sp.y + delta * LAG * (0.45 + 0.55 * depth)));
+        sp.y = Math.min(LAG_MAX, Math.max(-LAG_MAX, sp.y + delta * lag * (0.45 + 0.55 * depth)));
       });
       if (!frame) frame = requestAnimationFrame(step);
     }, { passive: true });
