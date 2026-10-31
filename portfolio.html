@@ -3570,6 +3570,17 @@
     font-family: var(--sans); font-size: 13px;
     line-height: 1.48; opacity: 0.86; margin: 0;
   }
+  /* About Me's intro is a short paragraph, set a step larger than the
+     other cards' body text so it reads as the lead it is. */
+  .ab-about-copy .ab-stack-narrative { font-size: 15px; line-height: 1.5; text-wrap: pretty; }
+  /* Card height is fixed (4:5), so the copy is sized to leave the pills the
+     card's full 24px padding at the bottom, matching the left inset in the
+     corner. Check the pill's bottom inset if this text grows. */
+  .ab-about-copy .ab-stack-narrative + .ab-stack-narrative { margin-top: 8px; }
+  /* Key phrases sit at full ink over the dimmed body (colour only, no
+     added weight), so a skim picks out the gist. */
+  .ab-about-copy .ab-stack-narrative strong { font-weight: inherit; color: var(--card-paper, #fff); }
+  .ab-about-copy .ab-stack-narrative { opacity: 1; color: color-mix(in oklch, currentColor 72%, transparent); }
   /* Responsive: reduce fan spread on narrow viewports to prevent cards escaping */
   @media (max-width: 600px) {
     .ab-stack {
@@ -6225,6 +6236,7 @@
     .ab-stack-list.is-lined li { padding-top: 12px; padding-bottom: 12px; }
     .ab-stack-list.is-compact li { font-size: 12.5px; line-height: 1.5; }
     .ab-stack-narrative { font-size: 12.5px; line-height: 1.55; }
+    .ab-about-copy .ab-stack-narrative { font-size: 13px; }
     .ab-stack-item-label { font-size: 10px; margin-bottom: 5px; opacity: 0.85; }
     .ab-stack-body {
       margin-top: 18px !important;
@@ -6752,12 +6764,13 @@
         <div class="ab-stack-card art-charcoal" role="button" tabindex="0">
           <div class="ab-stack-tab" aria-hidden="true"><span>About Me</span></div>
           <div class="ab-stack-header" style="flex:1;gap:0;position:relative;">
-            <div class="ab-about-photo" style="position:absolute;top:-80px;right:-80px;width:348px;height:348px;border-radius:50%;overflow:hidden;">
+            <div class="ab-about-photo" style="position:absolute;top:-80px;right:-80px;width:324px;height:324px;border-radius:50%;overflow:hidden;">
               <img src="assets/images/about-me.jpg" alt="Zainab Ahsan" style="width:100%;height:100%;object-fit:cover;object-position:50% 18%;transform:scale(1.45);">
             </div>
-            <div class="ab-about-copy" style="margin-top:191px;padding-bottom:10px;">
+            <div class="ab-about-copy" style="margin-top:175px;">
               <div class="ab-stack-title">Hi, I'm<br><em style="font-size:1.15em;">Zainab!</em></div>
-              <p class="ab-stack-narrative" style="margin-top:14px;">I'm a third-year Computer Science student at the University of Washington, minoring in Data Science. I got into this work by noticing the small frustrations in the apps I already used, and wondering what a kinder version might look like. That curiosity turned into brew., WIIRED Studio, and a habit of designing things until they're worth building. I care about people-centered problems: cafés that are easier to discover, hackathons that are easier to run, and data that's easier to understand.</p>
+              <p class="ab-stack-narrative" style="margin-top:14px;">I'm studying <strong>computer science</strong> at the <strong>University of Washington</strong> and am drawn to the space between <strong>creativity and technology</strong>.</p>
+              <p class="ab-stack-narrative">Whether it's thinking through an <strong>interaction</strong>, making sense of <strong>data</strong>, or figuring out how a <strong>product</strong> could work better, I enjoy exploring problems from different angles and <strong>bringing ideas to life</strong>.</p>
             </div>
           </div>
           <div class="ab-stack-body">
