@@ -239,6 +239,23 @@
     pointer-events: none;
     user-select: none;
   }
+  /* The same sign-off closes About and Experience. About is one centred
+     screen on desktop, so the line pins to its foot there without moving
+     the stack; on phones it simply follows the cards. */
+  .about-page .copyright { margin-top: 0; padding: 32px 24px 44px; }
+  @media (min-width: 801px) {
+    .about-page.active { position: relative; }
+    .about-page .copyright { position: absolute; left: 0; bottom: 0; padding: 0 24px 44px; }
+  }
+  /* Experience: inside the closing note. On desktop the note is a full
+     snapped screen, so the line pins to its foot; on phones it follows the
+     email pill, which hangs out of flow 30px below the text and is 48px
+     tall, so the margin clears both with room to spare. */
+  .exp-outro { position: relative; }
+  .exp-outro .copyright { margin-top: 84px; padding: 0 24px; }
+  @media (min-width: 801px) {
+    .exp-outro .copyright { position: absolute; left: 0; bottom: 44px; margin: 0; }
+  }
   /* Custom feed scrollbar */
   .feed-scroll-track {
     position: fixed;
@@ -1418,17 +1435,12 @@
   .pin.frame-folder .pin-meta,
   .pin.frame-folder h3 { position: relative; z-index: 1; }
 
-  /* Habitat: three-step pixel staircase at each corner, in --s blocks. */
+  /* Habitat: one bold three-step pixel staircase in the top-right corner,
+     in --s blocks; the other three corners keep the card radius. */
   .pin.frame-pixel .art {
-    --s: 8px; border-radius: 0;
+    --s: 12px; border-radius: 16px 0 16px 16px;
     clip-path: polygon(
-      0 calc(var(--s) * 4),
-      calc(var(--s) * 1) calc(var(--s) * 4),
-      calc(var(--s) * 1) calc(var(--s) * 2),
-      calc(var(--s) * 2) calc(var(--s) * 2),
-      calc(var(--s) * 2) calc(var(--s) * 1),
-      calc(var(--s) * 4) calc(var(--s) * 1),
-      calc(var(--s) * 4) 0,
+      0 0,
       calc(100% - var(--s) * 4) 0,
       calc(100% - var(--s) * 4) calc(var(--s) * 1),
       calc(100% - var(--s) * 2) calc(var(--s) * 1),
@@ -1436,20 +1448,8 @@
       calc(100% - var(--s) * 1) calc(var(--s) * 2),
       calc(100% - var(--s) * 1) calc(var(--s) * 4),
       100% calc(var(--s) * 4),
-      100% calc(100% - var(--s) * 4),
-      calc(100% - var(--s) * 1) calc(100% - var(--s) * 4),
-      calc(100% - var(--s) * 1) calc(100% - var(--s) * 2),
-      calc(100% - var(--s) * 2) calc(100% - var(--s) * 2),
-      calc(100% - var(--s) * 2) calc(100% - var(--s) * 1),
-      calc(100% - var(--s) * 4) calc(100% - var(--s) * 1),
-      calc(100% - var(--s) * 4) 100%,
-      calc(var(--s) * 4) 100%,
-      calc(var(--s) * 4) calc(100% - var(--s) * 1),
-      calc(var(--s) * 2) calc(100% - var(--s) * 1),
-      calc(var(--s) * 2) calc(100% - var(--s) * 2),
-      calc(var(--s) * 1) calc(100% - var(--s) * 2),
-      calc(var(--s) * 1) calc(100% - var(--s) * 4),
-      0 calc(100% - var(--s) * 4));
+      100% 100%,
+      0 100%);
   }
 
 
@@ -1501,12 +1501,16 @@
   }
   .climate-etched-fill { opacity: 1; }
   .climate-fill-reveal { width: 334px; }
-  /* TEMP: Neutral feed-card drawing animation paused.
-  .feed:not(.has-open) .pin[data-page="climate"].motion-hovered .climate-fill-reveal,
+  /* Neutral: on hover intent (or keyboard focus) the trend line redraws
+     left to right. Hover only on devices that can hover. */
+  @media (hover: hover) {
+    .feed:not(.has-open) .pin[data-page="climate"].motion-hovered .climate-fill-reveal {
+      animation: climate-etch-reveal 3000ms var(--ease-out) both;
+    }
+  }
   .feed:not(.has-open) .pin[data-page="climate"]:focus-visible .climate-fill-reveal {
     animation: climate-etch-reveal 3000ms var(--ease-out) both;
   }
-  */
   @keyframes climate-etch-reveal {
     from { width: 0; }
     to { width: 334px; }
@@ -1560,12 +1564,60 @@
     transform-origin: 52% 72%;
     transition: transform 620ms var(--ease-soft);
   }
-  /* TEMP: Brew feed-card tilt animation paused.
-  .feed:not(.has-open) .pin[data-page="brew"].motion-hovered .brew-illustration,
-  .feed:not(.has-open) .pin[data-page="brew"]:focus-visible .brew-illustration {
-    transform: translateX(7.65%) translateY(6px) rotate(-6deg);
+  /* brew: on hover intent (or keyboard focus) the mug, handle and all,
+     fills with black coffee. The surface is three waves per mug width, five widths long,
+     drifting slowly (one width every 6s) so it never shows a seam. It rises
+     over 3000ms on --ease-out, the same as Neutral, tipping gently once as it
+     settles, then drains on leave. Hover only on devices that can hover. */
+  /* Rest sits well below the cup so the wave crests and the slosh tilt
+     can never peek through the bottom curve before the rise begins. */
+  .art-brew .brew-liquid {
+    transform: translateY(320px);
+    transition: transform 600ms cubic-bezier(0.5, 0, 0.75, 0);
   }
-  */
+  .art-brew .brew-slosh { transform-box: fill-box; transform-origin: 50% 0; }
+  .art-brew .brew-wave {
+    animation: brew-swish 6s linear infinite paused;
+  }
+  @keyframes brew-swish {
+    from { transform: translateX(0); }
+    to { transform: translateX(327.65px); }
+  }
+  @keyframes brew-slosh {
+    0% { transform: rotate(0); }
+    25% { transform: rotate(-3.5deg); }
+    55% { transform: rotate(1.8deg); }
+    80% { transform: rotate(-0.6deg); }
+    100% { transform: rotate(0); }
+  }
+  @media (hover: hover) {
+    .feed:not(.has-open) .pin[data-page="brew"].motion-hovered .brew-liquid {
+      transform: translateY(0);
+      transition: transform 3000ms var(--ease-out);
+    }
+    .feed:not(.has-open) .pin[data-page="brew"].motion-hovered .brew-slosh {
+      animation: brew-slosh 3000ms cubic-bezier(0.37, 0, 0.63, 1) both;
+    }
+    .feed:not(.has-open) .pin[data-page="brew"].motion-hovered .brew-wave {
+      animation-play-state: running;
+    }
+  }
+  .feed:not(.has-open) .pin[data-page="brew"]:focus-visible .brew-liquid {
+    transform: translateY(0);
+    transition: transform 3000ms var(--ease-out);
+  }
+  .feed:not(.has-open) .pin[data-page="brew"]:focus-visible .brew-slosh {
+    animation: brew-slosh 3000ms cubic-bezier(0.37, 0, 0.63, 1) both;
+  }
+  .feed:not(.has-open) .pin[data-page="brew"]:focus-visible .brew-wave {
+    animation-play-state: running;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .art-brew .brew-liquid { transition: none; }
+    .art-brew .brew-slosh,
+    .feed:not(.has-open) .pin[data-page="brew"] .brew-slosh { animation: none !important; }
+    .art-brew .brew-wave { animation-play-state: paused !important; }
+  }
   .art-brew .brew-mark {
     margin-top: 0; margin-bottom: auto; align-self: center;
     display: flex; flex-direction: column; align-items: center; gap: 10px;
@@ -6616,7 +6668,23 @@
           <article class="pin" data-cat="ux swe" data-page="brew" data-title="brew." data-year="2026" aria-label="Open the brew product case study">
             <div class="art art-cream art-brew ar-45">
               <div class="pin-meta">Product / UX · SWE</div>
-              <img class="brew-illustration" src="assets/images/brew-mug-icon.svg" alt="">
+              <svg class="brew-illustration" viewBox="1050.35 1606.89 327.65 242.84" aria-hidden="true">
+                <defs>
+                  <clipPath id="brew-mug-clip">
+                    <path d="M1377.83 1764.68C1377.81 1771.63 1376.41 1778.12 1373.63 1784.14C1370.84 1790.03 1366.6 1794.81 1360.91 1798.47C1355.22 1802 1348.08 1803.76 1339.49 1803.74L1257.94 1804.41L1257.99 1773.12L1343.51 1773.27C1345.1 1773.28 1346.55 1772.89 1347.87 1772.1C1349.2 1771.32 1350.26 1770.27 1351.05 1768.96C1351.85 1767.65 1352.25 1766.21 1352.25 1764.64C1352.25 1763.06 1351.86 1761.62 1351.07 1760.31C1350.28 1759 1349.22 1757.95 1347.9 1757.16C1346.58 1756.37 1345.13 1755.97 1343.54 1755.97L1309.64 1755.91C1301.44 1755.9 1294.5 1754.18 1288.83 1750.76C1283.15 1747.34 1278.86 1742.68 1275.96 1736.78C1272.94 1730.74 1271.43 1723.99 1271.44 1716.52C1271.45 1709.05 1272.99 1702.37 1276.04 1696.47C1278.96 1690.58 1283.26 1685.93 1288.95 1682.54C1294.64 1679.14 1301.58 1677.45 1309.78 1677.46L1343.68 1677.52C1345.27 1677.52 1346.72 1677.13 1348.05 1676.35C1349.37 1675.57 1350.43 1674.52 1351.22 1673.21C1352.02 1671.77 1352.42 1670.26 1352.42 1668.69C1352.43 1667.12 1352.03 1665.67 1351.24 1664.36C1350.45 1663.05 1349.39 1662 1348.07 1661.21C1346.75 1660.42 1345.3 1660.03 1343.71 1660.02L1273.92 1659.9L1273.98 1629.42L1339.8 1629.54C1348.4 1629.56 1355.53 1631.4 1361.21 1635.08C1366.88 1638.63 1371.11 1643.43 1373.87 1649.46C1376.64 1655.36 1378.01 1661.79 1378 1668.74C1377.99 1675.68 1376.59 1682.17 1373.8 1688.19C1371.01 1694.09 1366.78 1698.86 1361.09 1702.52C1355.4 1706.18 1348.25 1708.01 1339.66 1707.99L1305.96 1707.93C1304.24 1707.93 1302.72 1708.32 1301.39 1709.1C1300.07 1709.89 1299.01 1710.93 1298.22 1712.24C1297.42 1713.55 1297.02 1714.99 1297.02 1716.57C1297.02 1718.14 1297.41 1719.65 1298.2 1721.09C1298.99 1722.4 1300.05 1723.45 1301.37 1724.24C1302.69 1725.03 1304.21 1725.43 1305.92 1725.43L1339.63 1725.49C1348.22 1725.5 1355.36 1727.35 1361.03 1731.03C1366.71 1734.58 1370.93 1739.37 1373.7 1745.41C1376.46 1751.31 1377.84 1757.74 1377.83 1764.68Z"/>
+                    <rect x="1050.35" y="1606.89" width="209.14" height="197.521"/>
+                    <rect x="1050.35" y="1625.48" width="209.14" height="224.245" rx="40"/>
+                  </clipPath>
+                </defs>
+                <g clip-path="url(#brew-mug-clip)">
+                  <rect x="1050.35" y="1606.89" width="327.65" height="242.84" fill="#d6cbb8"/>
+                  <g class="brew-liquid">
+                    <g class="brew-slosh">
+                      <path class="brew-wave" fill="#000" d="M395.05 1620 q 27.304 -6 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 t 54.608 0 L2033.30 1900 L395.05 1900 Z"/>
+                    </g>
+                  </g>
+                </g>
+              </svg>
               <div class="brew-mark">
                 <img class="brew-logo" src="assets/images/brew-logo.png" alt="brew.">
                 <span class="brew-caption">Cafe Discovery /<br>Design + Code</span>
@@ -6704,7 +6772,7 @@
 
       </div>
       <div class="feed-empty" id="feedEmpty" aria-live="polite">Nothing in this board yet.</div>
-      <div class="copyright" aria-hidden="true">© 2026 Zainab Ahsan, All Rights Reserved</div>
+      <footer class="copyright">© 2026 Zainab Ahsan</footer>
     </section>
 
     <!-- ═══ ABOUT PAGE ═══ -->
@@ -6823,6 +6891,7 @@
       </div>
       </div>
 
+      <footer class="copyright">© 2026 Zainab Ahsan</footer>
     </section>
 
 
@@ -6920,6 +6989,7 @@
               </span>
             </button>
           </div>
+          <footer class="copyright">© 2026 Zainab Ahsan</footer>
         </div>
       </div>
     </section>
