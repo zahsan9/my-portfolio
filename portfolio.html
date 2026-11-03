@@ -1792,10 +1792,6 @@
   .contact-card:has(.social-tile:focus-visible) .social-tile:nth-child(3) {
     transform: translate(-10px, 2px) rotate(-9deg);
   }
-  .contact-card:hover .social-tile:nth-child(4),
-  .contact-card:has(.social-tile:focus-visible) .social-tile:nth-child(4) {
-    transform: translate(-2px, 1px);
-  }
   .contact-card:hover .social-tile,
   .contact-card:has(.social-tile:focus-visible) .social-tile {
     color: var(--card-ink);
@@ -6504,10 +6500,7 @@
           </svg>
         </a>
         <span class="topbar-divider" aria-hidden="true">|</span>
-        <!-- The month here is the fallback that ships in the file: it renders
-             offline and on file://, and refreshUpdatedTag() replaces it with
-             the date of the latest public push when GitHub answers. -->
-        <span class="topbar-updated" id="topbarUpdated">Updated Sep 26</span>
+        <span class="topbar-updated">Work in progress</span>
       </div>
     </header>
 
@@ -10097,59 +10090,6 @@
   mobileFeedQuery.addEventListener('change', syncMobileFilter);
   syncMobileFilter();
 
-  /* ── "Updated" tag ──
-     The month shipped in the markup is the source of truth offline; this only
-     upgrades it when GitHub answers. It reads the public events feed (no key,
-     no backend — CORS-open, and a portfolio's traffic stays far under the
-     unauthenticated limit) and takes the newest push. That feed only reaches
-     back ~90 days, so a quiet stretch leaves the shipped month standing
-     rather than showing a stale-looking gap. The answer is cached for half a
-     day so a visitor clicking around spends one request, not one per view.
-     Every failure path is silent: a portfolio header is not the place to
-     report that an API is down. */
-  const GITHUB_USER = 'zahsan9';
-  const UPDATED_CACHE_KEY = 'za:lastPush';
-  const UPDATED_CACHE_MS = 12 * 60 * 60 * 1000;
-
-  function formatUpdated(iso) {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return null;
-    const month = d.toLocaleString('en-US', { month: 'short' });
-    return `Updated ${month} ${String(d.getFullYear()).slice(-2)}`;
-  }
-
-  async function refreshUpdatedTag() {
-    const el = document.getElementById('topbarUpdated');
-    if (!el) return;
-
-    let cached = null;
-    try { cached = JSON.parse(localStorage.getItem(UPDATED_CACHE_KEY) || 'null'); } catch (e) {}
-    if (cached?.iso) {
-      const label = formatUpdated(cached.iso);
-      if (label) el.textContent = label;
-      if (Date.now() - (cached.at || 0) < UPDATED_CACHE_MS) return;
-    }
-
-    try {
-      const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/events/public?per_page=100`, {
-        headers: { Accept: 'application/vnd.github+json' },
-      });
-      if (!res.ok) return;
-      const events = await res.json();
-      if (!Array.isArray(events)) return;
-      const push = events.find(e => e.type === 'PushEvent' && e.created_at);
-      if (!push) return;
-      const label = formatUpdated(push.created_at);
-      if (!label) return;
-      el.textContent = label;
-      try {
-        localStorage.setItem(UPDATED_CACHE_KEY, JSON.stringify({ iso: push.created_at, at: Date.now() }));
-      } catch (e) {}
-    } catch (e) {
-      /* offline, rate-limited, or blocked — the shipped month stands */
-    }
-  }
-  refreshUpdatedTag();
 
   // ── Routing ──
   const feedView        = document.getElementById('feedView');
