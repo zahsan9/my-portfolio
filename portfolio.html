@@ -5038,20 +5038,10 @@
     margin: 0; font-size: 13px; line-height: 1.58; color: var(--ink-mid); text-wrap: pretty;
   }
 
-  /* Team and status on every piece of work, since that is most of what a
-     skim takes away. Outlined so they don't read as buttons, and the status
-     chip in the accent so it stands apart from the team. */
-  .sheet[data-page="godaddy"] .cs-gd-tags {
-    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 13px;
-  }
-  .sheet[data-page="godaddy"] .cs-gd-tag {
-    padding: 4px 8px 5px; border: 1px solid var(--line); border-radius: 999px;
-    font-family: var(--mono); font-size: 9px; font-weight: 700; line-height: 1;
-    letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--ink-mid);
-  }
-  .sheet[data-page="godaddy"] .cs-gd-tag--status {
-    border-color: color-mix(in oklab, var(--gd-accent) 55%, transparent);
-    color: color-mix(in oklab, var(--gd-accent) 60%, var(--ink));
+  /* Team and when, as a quiet line over the headline. Time rather than
+     status: the body copy already says what is still being built. */
+  .sheet[data-page="godaddy"] p.cs-gd-meta {
+    margin: 0 0 6px; font-size: 13px; line-height: 1.4; color: var(--ink-low);
   }
 
   /* Full width to match the project rows, and two columns so the panel is
@@ -8073,12 +8063,12 @@
 
           <div class="cs-gd-now">
             <div class="cs-gd-now-item">
-              <div class="cs-gd-tags"><span class="cs-gd-tag">Media Solutions</span><span class="cs-gd-tag cs-gd-tag--status">Ongoing</span></div>
+              <p class="cs-gd-meta">Media Solutions · Fall 2026</p>
               <h3>Sole analyst for Media Solutions</h3>
               <p>I own KPI reporting for the domain marketing team end to end: the databases, queries, scheduled runs, dashboard improvements, and which stakeholder requests go first.</p>
             </div>
             <div class="cs-gd-now-item">
-              <div class="cs-gd-tags"><span class="cs-gd-tag">Commerce</span><span class="cs-gd-tag cs-gd-tag--status">Ongoing</span></div>
+              <p class="cs-gd-meta">Commerce · Summer 2026 to now</p>
               <h3>Catching where a production LLM agent fails</h3>
               <p>I designed an evaluation framework that flags routing, retrieval, and generation errors in live traffic, and I&rsquo;m now building it on Langfuse with engineering. A paired taxonomy breaks conversation quality down by topic, business vertical, and customer segment.</p>
             </div>
@@ -8105,7 +8095,7 @@
               </div>
             </div>
             <div>
-              <div class="cs-gd-tags"><span class="cs-gd-tag">Commerce</span><span class="cs-gd-tag cs-gd-tag--status">Shipped</span></div>
+              <p class="cs-gd-meta">Commerce · Summer 2026</p>
               <h3>Experiment readouts: weeks &rarr; minutes</h3>
               <p>The experimentation platform couldn&rsquo;t conclude tests on our conversion metric because it has several parts. I built SQL and Python pipelines in Redshift that calculate it along with engagement and KPI performance, then automated the readouts. Results go into QuickSight dashboards and executive presentations.</p>
             </div>
