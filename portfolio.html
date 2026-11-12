@@ -4801,8 +4801,8 @@
      is none. What stays visible is what the work produced; what is gone is
      what belongs to GoDaddy.
 
-     Deliberately the plainest study on the site: hero, overview with a
-     stat strip, one list of work, contact. No question section, no decision blocks, no impact
+     Deliberately the plainest study on the site: hero, overview, one
+     list of work, contact. No question section, no decision blocks, no impact
      panel. When the artifacts can't carry the story, more scaffolding
      around them reads as padding, not depth.
 
@@ -5035,20 +5035,6 @@
     margin: 0; font-size: 13px; line-height: 1.58; color: var(--ink-mid); text-wrap: pretty;
   }
 
-  /* The page's only numbers, pulled out of the prose so a skim catches
-     them. Three peers on one hairline, the headline figure set at the
-     project-title weight so the strip reads as part of the overview. */
-  .sheet[data-page="godaddy"] .cs-gd-stats {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
-    margin: 36px 0 0; padding-top: 22px; border-top: 1px solid var(--line);
-  }
-  .sheet[data-page="godaddy"] .cs-gd-stats dt {
-    margin-bottom: 6px; font-family: var(--sans); font-size: 22px;
-    font-weight: 700; line-height: 1.15; letter-spacing: -.02em; color: var(--ink);
-  }
-  .sheet[data-page="godaddy"] .cs-gd-stats dd {
-    margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink-mid);
-  }
   /* Team and status on every piece of work, since that is most of what a
      skim takes away. Outlined so they don't read as buttons, and the status
      chip in the accent so it stands apart from the team. */
@@ -5083,7 +5069,6 @@
       grid-template-columns: 1fr; gap: 24px;
     }
     .sheet[data-page="godaddy"] .cs-gd-project:nth-of-type(even) > :first-child { order: 0; }
-    .sheet[data-page="godaddy"] .cs-gd-stats { grid-template-columns: 1fr; }
     .sheet[data-page="godaddy"] .cs-gd-contact { grid-template-columns: 1fr; gap: 14px; }
   }
   @media (max-width: 640px) {
@@ -8076,11 +8061,6 @@
           <div class="cs-copy cs-overview">
             <p>I work with two product teams at GoDaddy. On Media Solutions, I own the team&rsquo;s SQL queries, datasets, dashboards, and KPI reporting, and I&rsquo;ve been fixing data mapping issues to make that reporting more accurate. On Commerce, I built the experiment analysis pipelines and designed an evaluation framework for a production LLM agent, which I&rsquo;m now implementing with engineering.</p>
           </div>
-          <dl class="cs-gd-stats">
-            <div><dt>Weeks &rarr; minutes</dt><dd>experiment readout turnaround</dd></div>
-            <div><dt>3 stages</dt><dd>checked in live LLM agent traffic</dd></div>
-            <div><dt>Sole analyst</dt><dd>Media Solutions KPI reporting</dd></div>
-          </dl>
         </div>
 
         <div class="cs-section">
