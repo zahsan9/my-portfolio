@@ -5021,8 +5021,11 @@
     background: var(--gd-bar); opacity: .68;
   }
   .sheet[data-page="godaddy"] .cs-gd-chart i.is-hi { opacity: 1; }
-  /* Media Solutions has no artifact to show, so it opens the list as a
-     full-width panel above the project rows. */
+  /* The two ongoing pieces open the list as a pair; the shipped work
+     follows as a project row with its artifact. */
+  .sheet[data-page="godaddy"] .cs-gd-now {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+  }
   .sheet[data-page="godaddy"] .cs-gd-now + .cs-gd-project { margin-top: var(--gd-step-row); }
   .sheet[data-page="godaddy"] .cs-gd-now-item {
     padding: 26px 26px 28px; border-radius: 14px; background: var(--gd-panel);
@@ -5069,7 +5072,9 @@
       grid-template-columns: 1fr; gap: 24px;
     }
     .sheet[data-page="godaddy"] .cs-gd-project:nth-of-type(even) > :first-child { order: 0; }
-    .sheet[data-page="godaddy"] .cs-gd-contact { grid-template-columns: 1fr; gap: 14px; }
+    .sheet[data-page="godaddy"] .cs-gd-now,
+    .sheet[data-page="godaddy"] .cs-gd-contact { grid-template-columns: 1fr; }
+    .sheet[data-page="godaddy"] .cs-gd-contact { gap: 14px; }
   }
   @media (max-width: 640px) {
     .sheet[data-page="godaddy"] .cs-section { padding-top: 72px; }
@@ -8072,25 +8077,8 @@
               <h3>Sole analyst for Media Solutions</h3>
               <p>I own KPI reporting for the domain marketing team end to end: the databases, queries, scheduled runs, dashboard improvements, and which stakeholder requests go first.</p>
             </div>
-          </div>
-
-          <div class="cs-gd-project">
-            <div class="cs-gd-locked" role="img" aria-label="Reconstruction of the evaluation system's structure: rows of production conversations, each flagged as passing or as a routing, retrieval, or generation error. All conversation content is redacted.">
-                <span class="cs-gd-seal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.6"/><path d="M8.2 10.5V7.2a3.8 3.8 0 0 1 7.6 0v3.3"/></svg></span>
-              <div class="cs-gd-bar" aria-hidden="true">
-                <span class="cs-gd-dot"></span><span class="cs-gd-dot"></span><span class="cs-gd-dot"></span>
-              </div>
-              <div class="cs-gd-rows" aria-hidden="true">
-                <div class="cs-gd-row"><span class="cs-gd-rd" style="--w:74%"></span><span class="cs-gd-chip cs-gd-chip--pass">Pass</span></div>
-                <div class="cs-gd-row"><span class="cs-gd-rd" style="--w:58%"></span><span class="cs-gd-chip cs-gd-chip--routing">Routing</span></div>
-                <div class="cs-gd-row"><span class="cs-gd-rd" style="--w:86%"></span><span class="cs-gd-chip cs-gd-chip--pass">Pass</span></div>
-                <div class="cs-gd-row"><span class="cs-gd-rd" style="--w:63%"></span><span class="cs-gd-chip cs-gd-chip--retrieval">Retrieval</span></div>
-                <div class="cs-gd-row"><span class="cs-gd-rd" style="--w:49%"></span><span class="cs-gd-chip cs-gd-chip--generation">Generation</span></div>
-                  <div class="cs-gd-row"><span class="cs-gd-rd" style="--w:71%"></span><span class="cs-gd-chip cs-gd-chip--pass">Pass</span></div>
-              </div>
-            </div>
-            <div>
-              <div class="cs-gd-tags"><span class="cs-gd-tag">Commerce</span><span class="cs-gd-tag cs-gd-tag--status">In progress</span></div>
+            <div class="cs-gd-now-item">
+              <div class="cs-gd-tags"><span class="cs-gd-tag">Commerce</span><span class="cs-gd-tag cs-gd-tag--status">Ongoing</span></div>
               <h3>Catching where a production LLM agent fails</h3>
               <p>I designed an evaluation framework that flags routing, retrieval, and generation errors in live traffic, and I&rsquo;m now building it on Langfuse with engineering. A paired taxonomy breaks conversation quality down by topic, business vertical, and customer segment.</p>
             </div>
