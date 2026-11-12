@@ -4801,8 +4801,8 @@
      is none. What stays visible is what the work produced; what is gone is
      what belongs to GoDaddy.
 
-     Deliberately the plainest study on the site: hero, overview, three
-     projects, contact. No question section, no decision blocks, no impact
+     Deliberately the plainest study on the site: hero, overview with a
+     stat strip, one list of work, contact. No question section, no decision blocks, no impact
      panel. When the artifacts can't carry the story, more scaffolding
      around them reads as padding, not depth.
 
@@ -4979,7 +4979,6 @@
   }
   .sheet[data-page="godaddy"] .cs-gd-rd--sm { height: 6px; }
   .sheet[data-page="godaddy"] .cs-gd-rd--lg { height: 14px; border-radius: 4px; }
-  .sheet[data-page="godaddy"] .cs-gd-rd--soft { background: var(--gd-redact-soft); }
 
   .sheet[data-page="godaddy"] .cs-gd-row {
     display: grid; grid-template-columns: 1fr 84px; gap: 14px;
@@ -5010,7 +5009,6 @@
     display: grid; grid-template-rows: auto 1fr; gap: 18px; padding: 20px;
   }
   .sheet[data-page="godaddy"] .cs-gd-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .sheet[data-page="godaddy"] .cs-gd-kpis--3 { grid-template-columns: repeat(3, 1fr); }
   .sheet[data-page="godaddy"] .cs-gd-kpi {
     display: grid; gap: 11px; padding: 15px 14px 17px;
     border-radius: 9px; background: var(--gd-redact-soft);
@@ -5023,27 +5021,14 @@
     background: var(--gd-bar); opacity: .68;
   }
   .sheet[data-page="godaddy"] .cs-gd-chart i.is-hi { opacity: 1; }
-  .sheet[data-page="godaddy"] .cs-gd-lines { display: grid; gap: 14px; align-content: center; }
-  /* Standing work reads first as a pair across the top; the piece being
-     built follows as a normal project row, so every artifact on the page
-     sits in the same kind of row. */
+  /* The two pieces with nothing to show sit as a pair under the project
+     rows, closing the one list of work rather than heading a second one. */
   .sheet[data-page="godaddy"] .cs-gd-now {
     display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
   }
-  .sheet[data-page="godaddy"] .cs-gd-now + .cs-gd-project { margin-top: var(--gd-step-row); }
+  .sheet[data-page="godaddy"] .cs-gd-project + .cs-gd-now { margin-top: var(--gd-step-row); }
   .sheet[data-page="godaddy"] .cs-gd-now-item {
     padding: 26px 26px 28px; border-radius: 14px; background: var(--gd-panel);
-  }
-  /* Currently holds three pieces of work in two different containers — two
-     notes and a full row. The index is what says they are one list read in
-     order rather than a pair plus an unrelated project. Same mono numbering
-     the product-principle blocks use elsewhere on the site, in the accent
-     rather than low ink — it ties the index to the section labels, and at
-     9px a muted grey was doing too little to be worth having. */
-  .sheet[data-page="godaddy"] .cs-gd-num {
-    display: block; margin-bottom: 13px;
-    font-family: var(--mono); font-size: 9px; font-weight: 700;
-    letter-spacing: .07em; color: var(--gd-accent);
   }
   .sheet[data-page="godaddy"] .cs-gd-now-item h3 {
     margin-bottom: 9px; font-family: var(--sans); font-size: 16px;
@@ -5053,13 +5038,47 @@
     margin: 0; font-size: 13px; line-height: 1.58; color: var(--ink-mid); text-wrap: pretty;
   }
 
-  /* Full width to match the project rows, and two columns so the panel is
-     filled rather than holding one paragraph against a third of empty box.
-     One column at this width would run to a ~130ch measure. */
+  /* The page's only numbers, pulled out of the prose so a skim catches
+     them. Three peers on one hairline, the headline figure set at the
+     project-title weight so the strip reads as part of the overview. */
+  .sheet[data-page="godaddy"] .cs-gd-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    margin: 36px 0 0; padding-top: 22px; border-top: 1px solid var(--line);
+  }
+  .sheet[data-page="godaddy"] .cs-gd-stats dt {
+    margin-bottom: 6px; font-family: var(--sans); font-size: 22px;
+    font-weight: 700; line-height: 1.15; letter-spacing: -.02em; color: var(--ink);
+  }
+  .sheet[data-page="godaddy"] .cs-gd-stats dd {
+    margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink-mid);
+  }
+  /* Said before the redacted figures appear, so they read as withheld
+     rather than unfinished. */
+  .sheet[data-page="godaddy"] .cs-gd-note {
+    margin: 22px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-low);
+  }
+  /* Team and status on every piece of work, since that is most of what a
+     skim takes away. Outlined so they don't read as buttons, and the status
+     chip in the accent so it stands apart from the team. */
+  .sheet[data-page="godaddy"] .cs-gd-tags {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 13px;
+  }
+  .sheet[data-page="godaddy"] .cs-gd-tag {
+    padding: 4px 8px 5px; border: 1px solid var(--line); border-radius: 999px;
+    font-family: var(--mono); font-size: 9px; font-weight: 700; line-height: 1;
+    letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--ink-mid);
+  }
+  .sheet[data-page="godaddy"] .cs-gd-tag--status {
+    border-color: color-mix(in oklab, var(--gd-accent) 55%, transparent);
+    color: color-mix(in oklab, var(--gd-accent) 60%, var(--ink));
+  }
+
+  /* One line now that the NDA note moved up under the stats; the measure
+     cap keeps it from running the full width of the panel. */
   .sheet[data-page="godaddy"] .cs-gd-contact {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 34px;
     padding: 30px 30px 32px; border-radius: 14px; background: var(--gd-panel);
   }
+  .sheet[data-page="godaddy"] .cs-gd-contact p { max-width: 62ch; }
   .sheet[data-page="godaddy"] .cs-gd-contact p {
     margin: 0; font-size: 14px; line-height: 1.62; color: var(--ink-mid);
   }
@@ -5072,9 +5091,7 @@
     }
     .sheet[data-page="godaddy"] .cs-gd-project:nth-of-type(even) > :first-child { order: 0; }
     .sheet[data-page="godaddy"] .cs-gd-now { grid-template-columns: 1fr; }
-    .sheet[data-page="godaddy"] .cs-gd-now,
-    .sheet[data-page="godaddy"] .cs-gd-contact { grid-template-columns: 1fr; }
-    .sheet[data-page="godaddy"] .cs-gd-contact { gap: 14px; }
+    .sheet[data-page="godaddy"] .cs-gd-stats { grid-template-columns: 1fr; }
   }
   @media (max-width: 640px) {
     .sheet[data-page="godaddy"] .cs-section { padding-top: 72px; }
@@ -5107,7 +5124,6 @@
     .sheet[data-page="godaddy"] .cs-gd-rd--sm { height: 5px; }
     .sheet[data-page="godaddy"] .cs-gd-rd--lg { height: 11px; border-radius: 3px; }
     .sheet[data-page="godaddy"] .cs-gd-chart { gap: 6px; }
-    .sheet[data-page="godaddy"] .cs-gd-lines { gap: 12px; }
   }
 
   /* Third pass on this hero. Dropped: the dark card (felt cold), the bubble
@@ -8055,7 +8071,7 @@
             <img class="cs-hero-mark" src="assets/images/godaddy-icon-black.svg" alt="" aria-hidden="true">
           </div>
           <dl class="cs-hero-meta">
-            <div><dt>Timeline</dt><dd>July 2026 – Present, extended through fall</dd></div>
+            <div><dt>Timeline</dt><dd>July 2026 – Present</dd></div>
             <div><dt>Role</dt><dd>Data Analytics Intern, Product</dd></div>
             <div><dt>Teams</dt><dd>Commerce, Media Solutions</dd></div>
             <div><dt>Tools</dt><dd>SQL, Python, Langfuse, Redshift, QuickSight, Claude Code</dd></div>
@@ -8065,24 +8081,18 @@
         <div class="cs-section">
           <span class="cs-label">Overview</span>
           <div class="cs-copy cs-overview">
-            <p>Data analytics intern on product at GoDaddy, building evaluation, pipelines, and reporting for a production LLM agent and a running program of product experiments.</p>
+            <p>I work across two product teams. On Commerce, I built the experiment analysis pipeline and designed the evaluation framework for a production LLM agent. On Media Solutions, I&rsquo;m the only analyst.</p>
           </div>
+          <dl class="cs-gd-stats">
+            <div><dt>Weeks &rarr; minutes</dt><dd>experiment readout turnaround</dd></div>
+            <div><dt>3 stages</dt><dd>checked in live LLM agent traffic</dd></div>
+            <div><dt>Sole analyst</dt><dd>Media Solutions KPI reporting</dd></div>
+          </dl>
+          <p class="cs-gd-note">All work here is under NDA. Visuals keep the structure and leave out the data.</p>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">Currently</span>
-          <div class="cs-gd-now">
-            <div class="cs-gd-now-item">
-              <span class="cs-gd-num">01</span>
-              <h3>Media Solutions KPI reporting</h3>
-              <p>Ownership of Media Solutions KPI reporting and dashboard improvements, extended into the fall.</p>
-            </div>
-            <div class="cs-gd-now-item">
-              <span class="cs-gd-num">02</span>
-              <h3>Machine learning for repeat purchase</h3>
-              <p>A machine learning project aimed at increasing additional product purchases among existing customers.</p>
-            </div>
-          </div>
+          <span class="cs-label">Work</span>
 
           <div class="cs-gd-project">
             <div class="cs-gd-locked" role="img" aria-label="Reconstruction of the evaluation system's structure: rows of production conversations, each flagged as passing or as a routing, retrieval, or generation error. All conversation content is redacted.">
@@ -8100,15 +8110,11 @@
               </div>
             </div>
             <div>
-              <span class="cs-gd-num">03</span>
-              <h3>Closed-loop evaluation for a production LLM agent</h3>
-              <p>A closed-loop evaluation framework I designed and am implementing on Langfuse, flagging routing, retrieval, and generation errors in production traffic. A paired taxonomy tracks conversation quality by topic, business vertical, and customer segment.</p>
+              <div class="cs-gd-tags"><span class="cs-gd-tag">Commerce</span><span class="cs-gd-tag cs-gd-tag--status">In progress</span></div>
+              <h3>Catching where a production LLM agent fails</h3>
+              <p>I designed an evaluation framework that flags routing, retrieval, and generation errors in live traffic, and I&rsquo;m now building it on Langfuse with engineering. A paired taxonomy breaks conversation quality down by topic, business vertical, and customer segment.</p>
             </div>
           </div>
-        </div>
-
-        <div class="cs-section">
-          <span class="cs-label">Projects</span>
 
           <div class="cs-gd-project">
             <div class="cs-gd-locked" role="img" aria-label="Reconstruction of the experiment dashboard's structure: four KPI tiles above a trend chart. All metric names and values are redacted.">
@@ -8131,42 +8137,29 @@
               </div>
             </div>
             <div>
-              <h3>Experiment analysis for the Commerce team</h3>
-              <p>SQL and Python pipelines in Amazon Redshift analyzing engagement, conversion, and KPI performance across live product experiments, with automated readouts and stakeholder reporting that cut analysis turnaround from weeks to a few minutes.</p>
+              <div class="cs-gd-tags"><span class="cs-gd-tag">Commerce</span><span class="cs-gd-tag cs-gd-tag--status">Shipped</span></div>
+              <h3>Experiment readouts: weeks &rarr; minutes</h3>
+              <p>The experimentation platform couldn&rsquo;t conclude tests on our conversion metric because it has several parts. I built SQL and Python pipelines in Redshift that calculate it along with engagement and KPI performance, then automated the readouts. Results go into QuickSight dashboards and executive presentations.</p>
             </div>
           </div>
 
-          <div class="cs-gd-project">
-            <div class="cs-gd-locked" role="img" aria-label="Reconstruction of an executive readout's structure: three KPI tiles above lines of body text. All figures and text are redacted.">
-                <span class="cs-gd-seal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.6"/><path d="M8.2 10.5V7.2a3.8 3.8 0 0 1 7.6 0v3.3"/></svg></span>
-              <div class="cs-gd-bar" aria-hidden="true">
-                <span class="cs-gd-dot"></span><span class="cs-gd-dot"></span><span class="cs-gd-dot"></span>
-              </div>
-              <div class="cs-gd-dash" aria-hidden="true">
-                <div class="cs-gd-kpis cs-gd-kpis--3">
-                  <div class="cs-gd-kpi"><span class="cs-gd-rd cs-gd-rd--sm" style="--w:66%"></span><span class="cs-gd-rd cs-gd-rd--lg" style="--w:72%"></span></div>
-                  <div class="cs-gd-kpi"><span class="cs-gd-rd cs-gd-rd--sm" style="--w:52%"></span><span class="cs-gd-rd cs-gd-rd--lg" style="--w:60%"></span></div>
-                  <div class="cs-gd-kpi"><span class="cs-gd-rd cs-gd-rd--sm" style="--w:74%"></span><span class="cs-gd-rd cs-gd-rd--lg" style="--w:45%"></span></div>
-                </div>
-                <div class="cs-gd-lines">
-                  <span class="cs-gd-rd cs-gd-rd--sm cs-gd-rd--soft" style="--w:96%"></span>
-                  <span class="cs-gd-rd cs-gd-rd--sm cs-gd-rd--soft" style="--w:88%"></span>
-                  <span class="cs-gd-rd cs-gd-rd--sm cs-gd-rd--soft" style="--w:93%"></span>
-                  <span class="cs-gd-rd cs-gd-rd--sm cs-gd-rd--soft" style="--w:61%"></span>
-                </div>
-              </div>
+          <div class="cs-gd-now">
+            <div class="cs-gd-now-item">
+              <div class="cs-gd-tags"><span class="cs-gd-tag">Media Solutions</span><span class="cs-gd-tag cs-gd-tag--status">Ongoing</span></div>
+              <h3>Sole analyst for Media Solutions</h3>
+              <p>I own KPI reporting for the domain marketing team end to end: the databases, queries, scheduled runs, dashboard improvements, and which stakeholder requests go first.</p>
             </div>
-            <div>
-              <h3>Dashboards and executive readouts</h3>
-              <p>Amazon QuickSight dashboards and executive presentations that turned experiment and agent-performance findings into recommendations informing product decisions.</p>
+            <div class="cs-gd-now-item">
+              <div class="cs-gd-tags"><span class="cs-gd-tag cs-gd-tag--status">In progress</span></div>
+              <h3>Predicting repeat purchases</h3>
+              <p>A machine learning model that predicts which existing customers are likely to buy another product.</p>
             </div>
           </div>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">More info</span>
+          <span class="cs-label">Contact</span>
           <div class="cs-gd-contact">
-            <p>The products, data, and dashboards I worked on are private, so the artifacts above keep their structure and drop their contents.</p>
             <p>Happy to talk through the evaluation design, the taxonomy, or how the reporting was put together. Reach me at <b>zahsan9@uw.edu</b>.</p>
           </div>
         </div>
