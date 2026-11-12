@@ -5021,10 +5021,13 @@
     margin: 0; font-size: 13px; line-height: 1.58; color: var(--ink-mid); text-wrap: pretty;
   }
 
-  /* Team and when, as a quiet line over the headline. Time rather than
-     status: the body copy already says what is still being built. */
+  /* Team and when, over the headline, in the profile banner's meta style
+     (mono, uppercase, tracked). Time rather than status: the body copy
+     already says what is still being built. */
   .sheet[data-page="godaddy"] p.cs-gd-meta {
-    margin: 0 0 6px; font-size: 13px; line-height: 1.4; color: var(--ink-low);
+    margin: 0 0 8px; color: var(--ink-mid);
+    font-family: var(--mono); font-size: 11px; line-height: 1.4;
+    letter-spacing: var(--tracking-label); text-transform: uppercase;
   }
 
   /* Full width to match the project rows, and two columns so the panel is
