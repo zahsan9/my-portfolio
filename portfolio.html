@@ -5052,11 +5052,6 @@
   .sheet[data-page="godaddy"] .cs-gd-stats dd {
     margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink-mid);
   }
-  /* Said before the redacted figures appear, so they read as withheld
-     rather than unfinished. */
-  .sheet[data-page="godaddy"] .cs-gd-note {
-    margin: 22px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-low);
-  }
   /* Team and status on every piece of work, since that is most of what a
      skim takes away. Outlined so they don't read as buttons, and the status
      chip in the accent so it stands apart from the team. */
@@ -5073,12 +5068,13 @@
     color: color-mix(in oklab, var(--gd-accent) 60%, var(--ink));
   }
 
-  /* One line now that the NDA note moved up under the stats; the measure
-     cap keeps it from running the full width of the panel. */
+  /* Full width to match the project rows, and two columns so the panel is
+     filled rather than holding one paragraph against a third of empty box.
+     One column at this width would run to a ~130ch measure. */
   .sheet[data-page="godaddy"] .cs-gd-contact {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 34px;
     padding: 30px 30px 32px; border-radius: 14px; background: var(--gd-panel);
   }
-  .sheet[data-page="godaddy"] .cs-gd-contact p { max-width: 62ch; }
   .sheet[data-page="godaddy"] .cs-gd-contact p {
     margin: 0; font-size: 14px; line-height: 1.62; color: var(--ink-mid);
   }
@@ -5092,6 +5088,7 @@
     .sheet[data-page="godaddy"] .cs-gd-project:nth-of-type(even) > :first-child { order: 0; }
     .sheet[data-page="godaddy"] .cs-gd-now { grid-template-columns: 1fr; }
     .sheet[data-page="godaddy"] .cs-gd-stats { grid-template-columns: 1fr; }
+    .sheet[data-page="godaddy"] .cs-gd-contact { grid-template-columns: 1fr; gap: 14px; }
   }
   @media (max-width: 640px) {
     .sheet[data-page="godaddy"] .cs-section { padding-top: 72px; }
@@ -8088,7 +8085,6 @@
             <div><dt>3 stages</dt><dd>checked in live LLM agent traffic</dd></div>
             <div><dt>Sole analyst</dt><dd>Media Solutions KPI reporting</dd></div>
           </dl>
-          <p class="cs-gd-note">All work here is under NDA. Visuals keep the structure and leave out the data.</p>
         </div>
 
         <div class="cs-section">
@@ -8158,8 +8154,9 @@
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">Contact</span>
+          <span class="cs-label">More info</span>
           <div class="cs-gd-contact">
+            <p>The products, data, and dashboards I worked on are private, so the artifacts above keep their structure and drop their contents.</p>
             <p>Happy to talk through the evaluation design, the taxonomy, or how the reporting was put together. Reach me at <b>zahsan9@uw.edu</b>.</p>
           </div>
         </div>
