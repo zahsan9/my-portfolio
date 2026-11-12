@@ -5021,12 +5021,9 @@
     background: var(--gd-bar); opacity: .68;
   }
   .sheet[data-page="godaddy"] .cs-gd-chart i.is-hi { opacity: 1; }
-  /* The two pieces with nothing to show sit as a pair under the project
-     rows, closing the one list of work rather than heading a second one. */
-  .sheet[data-page="godaddy"] .cs-gd-now {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
-  }
-  .sheet[data-page="godaddy"] .cs-gd-project + .cs-gd-now { margin-top: var(--gd-step-row); }
+  /* Media Solutions has no artifact to show, so it opens the list as a
+     full-width panel above the project rows. */
+  .sheet[data-page="godaddy"] .cs-gd-now + .cs-gd-project { margin-top: var(--gd-step-row); }
   .sheet[data-page="godaddy"] .cs-gd-now-item {
     padding: 26px 26px 28px; border-radius: 14px; background: var(--gd-panel);
   }
@@ -5086,7 +5083,6 @@
       grid-template-columns: 1fr; gap: 24px;
     }
     .sheet[data-page="godaddy"] .cs-gd-project:nth-of-type(even) > :first-child { order: 0; }
-    .sheet[data-page="godaddy"] .cs-gd-now { grid-template-columns: 1fr; }
     .sheet[data-page="godaddy"] .cs-gd-stats { grid-template-columns: 1fr; }
     .sheet[data-page="godaddy"] .cs-gd-contact { grid-template-columns: 1fr; gap: 14px; }
   }
@@ -8090,6 +8086,14 @@
         <div class="cs-section">
           <span class="cs-label">Work</span>
 
+          <div class="cs-gd-now">
+            <div class="cs-gd-now-item">
+              <div class="cs-gd-tags"><span class="cs-gd-tag">Media Solutions</span><span class="cs-gd-tag cs-gd-tag--status">Ongoing</span></div>
+              <h3>Sole analyst for Media Solutions</h3>
+              <p>I own KPI reporting for the domain marketing team end to end: the databases, queries, scheduled runs, dashboard improvements, and which stakeholder requests go first.</p>
+            </div>
+          </div>
+
           <div class="cs-gd-project">
             <div class="cs-gd-locked" role="img" aria-label="Reconstruction of the evaluation system's structure: rows of production conversations, each flagged as passing or as a routing, retrieval, or generation error. All conversation content is redacted.">
                 <span class="cs-gd-seal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.6"/><path d="M8.2 10.5V7.2a3.8 3.8 0 0 1 7.6 0v3.3"/></svg></span>
@@ -8136,19 +8140,6 @@
               <div class="cs-gd-tags"><span class="cs-gd-tag">Commerce</span><span class="cs-gd-tag cs-gd-tag--status">Shipped</span></div>
               <h3>Experiment readouts: weeks &rarr; minutes</h3>
               <p>The experimentation platform couldn&rsquo;t conclude tests on our conversion metric because it has several parts. I built SQL and Python pipelines in Redshift that calculate it along with engagement and KPI performance, then automated the readouts. Results go into QuickSight dashboards and executive presentations.</p>
-            </div>
-          </div>
-
-          <div class="cs-gd-now">
-            <div class="cs-gd-now-item">
-              <div class="cs-gd-tags"><span class="cs-gd-tag">Media Solutions</span><span class="cs-gd-tag cs-gd-tag--status">Ongoing</span></div>
-              <h3>Sole analyst for Media Solutions</h3>
-              <p>I own KPI reporting for the domain marketing team end to end: the databases, queries, scheduled runs, dashboard improvements, and which stakeholder requests go first.</p>
-            </div>
-            <div class="cs-gd-now-item">
-              <div class="cs-gd-tags"><span class="cs-gd-tag cs-gd-tag--status">In progress</span></div>
-              <h3>Predicting repeat purchases</h3>
-              <p>A machine learning model that predicts which existing customers are likely to buy another product.</p>
             </div>
           </div>
         </div>
