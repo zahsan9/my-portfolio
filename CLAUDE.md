@@ -224,7 +224,7 @@ Do not make every sheet visually identical. Consistency comes from the canvas, s
 
 - Start with product premise, current status, role/team framing, and build context.
 - Keep Stack + Ownership near the top when implementation is materially part of the work, but do not let the stack dominate the rest of the story.
-- Preferred narrative order (format modelled on Emmi Wu's case studies): hero, The Brief (the "How might" question plus one paragraph that states scope and ownership), The Problem (statement headline, one line, then the 2×2 research findings in `.cs-brew-context`), The Approach (headline, one line, then `cs-product-principles`), Product Flows (headline, then click-to-open boxes, see below), Tradeoffs (`.cs-brew-decisions`, a grid of `cs-decision-block` panels, each one short sentence naming what was given up and why), Measuring Success (`cs-learnings`), Current Outcome, Next Iteration, Contact, References (`.cs-refs`). Every section follows the same rhythm: label, one statement headline (`cs-question`, bold sans on brew) that makes the point, a line or two of support capped at 68ch, then the evidence. Every research claim carries an inline citation that appears in References. Keep it skimmable: one stat per finding, one sentence per decision, short metric lines. Brew has no separate Overview or Stack + Ownership section; ownership lives in The Brief and the stack in the hero.
+- Preferred narrative order: hero, Stack + Ownership, Product Context, Product Principles, product flows, Current Outcome, Next Iteration.
 - Product flow section names should be direct and title case. Use “Comment Section,” “Onboarding,” “Splash + Loading,” and “Directions,” not vague headings such as “Design Work.”
 - State collaboration precisely. Brew is a partner project and broader product direction is shared. The case study separately identifies the flows the author independently owns. Never claim sole ownership of shared work or completed ownership of work that is still WIP.
 - WIP flows use honest placeholders and statuses such as “Not yet designed” or “Work in progress.” Preserve final layout space without presenting unfinished work as complete.
@@ -245,10 +245,6 @@ Use an annotated click-through player when several screenshots show the same sur
 - The final version contains only positive annotations. Move remaining problems to Next Iteration.
 - Order Brew’s interaction stories as: Reviews + ratings, Reply threads, then Comment card. DOM order, visual order, and keyboard order must match.
 - Use the author’s actual critique notes. Do not infer or fabricate a rationale when the real iteration notes are available.
-
-### Brew flow boxes
-
-Brew's three flows (Comments + reviews, Directions, Save) live in one "Product Flows" section as `.cs-flow-box` accordions instead of three scroll-pinned walkthroughs, so a reader opens only the flow they care about. Each box header (`.cs-flow-box-head`, a real `<button>` with `aria-expanded` / `aria-controls`) shows a title, one-line framing, and the flow's first screen as a thumbnail. Only one box is open at a time; a closed body is `inert`, so its step buttons leave the tab order. The open/close animates `grid-template-rows` on `--motion-slow`. Players inside a box are skipped by `initializeScrollFlow()` (no sticky pinning) and step by click: `initializeIterationPlayers()` injects `.cs-flow-nav` previous/next arrows with a `data-flow-count` counter beside the dots. A `.cs-scroll-flow` outside a box still gets the scroll-driven storyboard.
 
 ### Motion and accessibility
 
