@@ -4951,7 +4951,7 @@
      was one too many, and a centred mark states the condition of the whole
      artifact rather than annotating its corner.
 
-     The disc is the one piece of accent inside an artifact, and it works
+     The teal lock is the one piece of accent inside an artifact, and it works
      because everything around it is genuinely neutral: the redaction tokens
      are chroma 0, not a low-chroma blue. They used to carry hue 220 at
      0.01–0.02, which tinted every bar, tile and border faintly teal and
@@ -4959,11 +4959,13 @@
   .sheet[data-page="godaddy"] .cs-gd-seal {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     z-index: 2; display: grid; place-items: center;
-    width: 56px; height: 56px; border-radius: 50%;
-    background: var(--gd-accent); color: var(--gd-deep);
-    box-shadow: 0 0 0 7px var(--gd-surface);
+    width: 34px; height: 34px; border-radius: 8px;
+    /* No disc: the lock itself carries the accent. The backing is the
+       artifact's own surface colour, invisible except where it keeps the
+       redaction bars from running through the icon. */
+    background: var(--gd-surface); color: var(--gd-accent);
   }
-  .sheet[data-page="godaddy"] .cs-gd-seal svg { width: 23px; height: 23px; }
+  .sheet[data-page="godaddy"] .cs-gd-seal svg { width: 28px; height: 28px; }
 
   /* Widths vary per instance through --w so a column of bars reads as text
      of different lengths rather than a loading skeleton. */
@@ -5011,7 +5013,7 @@
   }
   .sheet[data-page="godaddy"] .cs-gd-now + .cs-gd-project { margin-top: var(--gd-step-row); }
   .sheet[data-page="godaddy"] .cs-gd-now-item {
-    padding: 26px 26px 28px; border-radius: 14px; background: var(--gd-panel);
+    padding: 34px 26px 36px; border-radius: 14px; background: var(--gd-panel);
   }
   .sheet[data-page="godaddy"] .cs-gd-now-item h3 {
     margin-bottom: 9px; font-family: var(--sans); font-size: 16px;
@@ -5057,9 +5059,9 @@
     .sheet[data-page="godaddy"] .cs-gd-bar { gap: 6px; padding: 10px 14px; }
     .sheet[data-page="godaddy"] .cs-gd-dot { width: 5px; height: 5px; }
     .sheet[data-page="godaddy"] .cs-gd-seal {
-      width: 44px; height: 44px; box-shadow: 0 0 0 5px var(--gd-surface);
+      width: 30px; height: 30px;
     }
-    .sheet[data-page="godaddy"] .cs-gd-seal svg { width: 20px; height: 20px; }
+    .sheet[data-page="godaddy"] .cs-gd-seal svg { width: 24px; height: 24px; }
     .sheet[data-page="godaddy"] .cs-gd-row {
       grid-template-columns: minmax(0, 1fr) 28px; gap: 12px; padding: 8px 14px;
     }
