@@ -3795,15 +3795,6 @@
     border-radius: 12px;
     background: var(--brew-panel);
   }
-  .sheet[data-page="brew"] .cs-product-principle span {
-    display: block;
-    margin-bottom: 24px;
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    color: var(--ink-low);
-  }
   .sheet[data-page="brew"] .cs-product-principle h3 {
     margin-bottom: 9px;
     font-family: var(--sans);
@@ -4265,10 +4256,6 @@
     outline: 2px solid var(--brew-cream); outline-offset: -2px; border-radius: 14px;
   }
   .sheet[data-page="brew"] .cs-flow-box-text { display: grid; gap: 4px; min-width: 0; }
-  .sheet[data-page="brew"] .cs-flow-box-meta {
-    font-family: var(--mono); font-size: 10px; letter-spacing: var(--tracking-label);
-    text-transform: uppercase; color: var(--ink-low);
-  }
   .sheet[data-page="brew"] .cs-flow-box-title {
     font-family: var(--sans); font-size: 19px; font-weight: 700;
     letter-spacing: -0.015em; line-height: 1.2; color: var(--ink);
@@ -7173,17 +7160,14 @@
           <span class="cs-label">Product Principles</span>
           <div class="cs-product-principles">
             <div class="cs-product-principle">
-              <span>01</span>
               <h3>Intent before ranking</h3>
               <p>Lead with what someone needs from a cafe instead of asking them to decode an average star rating.</p>
             </div>
             <div class="cs-product-principle">
-              <span>02</span>
               <h3>States with meaning</h3>
               <p>Use Want to go, Been here, and Favorite to reflect distinct moments in a person's relationship with a place.</p>
             </div>
             <div class="cs-product-principle">
-              <span>03</span>
               <h3>Shared surfaces, clear rules</h3>
               <p>Keep related actions together while making differences, such as reviews versus comments, clear in the interaction.</p>
             </div>
@@ -7196,7 +7180,6 @@
           <div class="cs-flow-box" data-flow-box>
             <button class="cs-flow-box-head" type="button" aria-expanded="false" aria-controls="brew-flow-reviews">
               <span class="cs-flow-box-text">
-                <span class="cs-flow-box-meta">8 steps</span>
                 <span class="cs-flow-box-title">Comments + reviews</span>
                 <span class="cs-flow-box-sub">Review tags (WiFi, outlets, noise, price) are the data intent discovery runs on.</span>
               </span>
@@ -7295,7 +7278,6 @@
           <div class="cs-flow-box" data-flow-box>
             <button class="cs-flow-box-head" type="button" aria-expanded="false" aria-controls="brew-flow-directions">
               <span class="cs-flow-box-text">
-                <span class="cs-flow-box-meta">3 steps</span>
                 <span class="cs-flow-box-title">Directions</span>
                 <span class="cs-flow-box-sub"><strong>Scope call:</strong> Brew shows travel times, then hands off to Google Maps for navigation.</span>
               </span>
@@ -7349,7 +7331,6 @@
           <div class="cs-flow-box" data-flow-box>
             <button class="cs-flow-box-head" type="button" aria-expanded="false" aria-controls="brew-flow-save">
               <span class="cs-flow-box-text">
-                <span class="cs-flow-box-meta">6 steps</span>
                 <span class="cs-flow-box-title">Save</span>
                 <span class="cs-flow-box-sub">One state per cafe that moves forward: Want to go, Been here, Favorite.</span>
               </span>
