@@ -4221,7 +4221,12 @@
   /* Context findings sit in a 2×2 of panels between the audience line and
      the approach, so the research reads as evidence rather than one long
      run of prose. */
-  .sheet[data-page="brew"] .cs-brew-context { margin-top: 20px; gap: 12px; }
+  .sheet[data-page="brew"] .cs-brew-context { margin-top: 24px; gap: 12px; }
+  /* Each section: label, one statement headline, a line or two of support,
+     then the evidence. */
+  .sheet[data-page="brew"] .cs-section > .cs-copy { max-width: 68ch; }
+  .sheet[data-page="brew"] .cs-section > .cs-copy + :is(.cs-product-principles, .cs-flow-boxes, .cs-two-col, .cs-learnings) { margin-top: 24px; }
+  .sheet[data-page="brew"] .cs-question + :is(.cs-product-principles, .cs-flow-boxes, .cs-two-col, .cs-learnings) { margin-top: 24px; }
   /* Bold sans like every other heading on this study, across the full
      column, rather than the light display serif other studies use. */
   .sheet[data-page="brew"] .cs-question {
@@ -7110,36 +7115,23 @@
             <div><dt>Timeline</dt><dd>2026</dd></div>
             <div><dt>Role</dt><dd>Product design + front-end</dd></div>
             <div><dt>Team</dt><dd>Partner project</dd></div>
-            <div><dt>Stack</dt><dd>React Native + Expo</dd></div>
+            <div><dt>Stack</dt><dd>React + Vite prototype, React Native planned</dd></div>
           </dl>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">Overview</span>
-          <div class="cs-copy cs-overview">
-            <p>A cafe-discovery app organized around what someone needs from a space, with save states that mean something and one shared system for comments and reviews.</p>
-          </div>
-        </div>
-
-        <div class="cs-section">
-          <span class="cs-label">Stack + Ownership</span>
-          <div class="cs-two-col">
-            <div class="cs-feature">
-              <h3>Stack</h3>
-              <p>Prototype in React 18 + Vite. The iOS app is planned in React Native, Expo, and TypeScript on Google Maps Platform.</p>
-            </div>
-            <div class="cs-feature">
-              <h3>Ownership</h3>
-              <p>A partner project with shared product direction. I own comments and reviews, onboarding, splash and loading, and directions, designed and built in the working prototype.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="cs-section">
-          <span class="cs-label">Product Context</span>
-          <h3 class="cs-question">How might Brew help someone find the right cafe for what they need, then remember it the way they naturally think about it?</h3>
+          <span class="cs-label">The Brief</span>
+          <h3 class="cs-question">How might Brew help someone find the right cafe for what they need, then remember it the way they think about it?</h3>
           <div class="cs-copy">
-            <p><strong>For</strong> students and remote workers picking a cafe for a reason: to work, meet friends, or take a quiet break.</p>
+            <p>Brew is a cafe-discovery app built around why you&rsquo;re going. It&rsquo;s a partner project with shared product direction; I own comments and reviews, onboarding, splash and loading, and directions, designed and built in a working prototype.</p>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">The Problem</span>
+          <h3 class="cs-question">A 4.6 can&rsquo;t tell you if a cafe is quiet enough to work.</h3>
+          <div class="cs-copy">
+            <p>Students and remote workers pick a cafe for a reason: to work, meet friends, or take a quiet break. Ratings and saved lists don&rsquo;t capture that.</p>
           </div>
           <div class="cs-two-col cs-brew-context">
             <div class="cs-feature">
@@ -7159,14 +7151,15 @@
               <p>Google Maps lists are separate folders. A cafe can sit in several, and a visit is just a checkmark.</p>
             </div>
           </div>
-          <div class="cs-copy cs-copy--after-fig">
-            <p><strong>Brew&rsquo;s approach:</strong> browse by intent (quiet, work-friendly, social), and give each cafe one state that moves forward: Want to go, Been here, Favorite.</p>
-          </div>
         </div>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">Product Principles</span>
+          <span class="cs-label">The Approach</span>
+          <h3 class="cs-question">Browse by why you&rsquo;re going. Save by where you are with a cafe.</h3>
+          <div class="cs-copy">
+            <p>Discovery starts from intent (quiet, work-friendly, social), and each cafe has one state that moves forward: Want to go, Been here, Favorite.</p>
+          </div>
           <div class="cs-product-principles">
             <div class="cs-product-principle">
               <h3>Intent before ranking</h3>
@@ -7185,12 +7178,13 @@
 
         <div class="cs-section cs-iterations-section">
           <span class="cs-label">Product Flows</span>
+          <h3 class="cs-question">The flows I own, built in a working prototype.</h3>
           <div class="cs-flow-boxes">
           <div class="cs-flow-box" data-flow-box>
             <button class="cs-flow-box-head" type="button" aria-expanded="false" aria-controls="brew-flow-reviews">
               <span class="cs-flow-box-text">
-                <span class="cs-flow-box-title">Comments + reviews</span>
-                <span class="cs-flow-box-sub">Review tags (WiFi, outlets, noise, price) are the data intent discovery runs on.</span>
+                <span class="cs-flow-box-title">Review without starting over</span>
+                <span class="cs-flow-box-sub">Comments and reviews share one sheet. Tags (WiFi, outlets, noise, price) feed intent discovery.</span>
               </span>
               <img class="cs-flow-box-thumb" src="assets/images/brew-review-v1.jpg" alt="" aria-hidden="true" loading="lazy">
               <span class="cs-flow-box-icon" aria-hidden="true"></span>
@@ -7287,8 +7281,8 @@
           <div class="cs-flow-box" data-flow-box>
             <button class="cs-flow-box-head" type="button" aria-expanded="false" aria-controls="brew-flow-directions">
               <span class="cs-flow-box-text">
-                <span class="cs-flow-box-title">Directions</span>
-                <span class="cs-flow-box-sub"><strong>Scope call:</strong> Brew shows travel times, then hands off to Google Maps for navigation.</span>
+                <span class="cs-flow-box-title">See the trip, then hand off</span>
+                <span class="cs-flow-box-sub">Brew compares travel times, then Google Maps takes over navigation.</span>
               </span>
               <img class="cs-flow-box-thumb" src="assets/images/brew-directions-1.jpg" alt="" aria-hidden="true" loading="lazy">
               <span class="cs-flow-box-icon" aria-hidden="true"></span>
@@ -7340,7 +7334,7 @@
           <div class="cs-flow-box" data-flow-box>
             <button class="cs-flow-box-head" type="button" aria-expanded="false" aria-controls="brew-flow-save">
               <span class="cs-flow-box-text">
-                <span class="cs-flow-box-title">Save</span>
+                <span class="cs-flow-box-title">Save with a state that moves forward</span>
                 <span class="cs-flow-box-sub">One state per cafe that moves forward: Want to go, Been here, Favorite.</span>
               </span>
               <img class="cs-flow-box-thumb" src="assets/images/brew-save-1.jpg" alt="" aria-hidden="true" loading="lazy">
@@ -7471,7 +7465,8 @@
         -->
 
         <div class="cs-section">
-          <span class="cs-label">Decisions + Tradeoffs</span>
+          <span class="cs-label">Tradeoffs</span>
+          <h3 class="cs-question">Every call gave something up.</h3>
           <div class="cs-two-col cs-brew-decisions">
             <div class="cs-decision-block">
               <h3>Two-step review</h3>
@@ -7502,6 +7497,7 @@
 
         <div class="cs-section">
           <span class="cs-label">Measuring Success</span>
+          <h3 class="cs-question">What would tell us it&rsquo;s working.</h3>
           <div class="cs-learnings">
             <div class="cs-learning"><strong>Save to visit:</strong> Want to go &rarr; Been here within 30 days</div>
             <div class="cs-learning"><strong>Review completion:</strong> rating flows posted, and drop-off at tags</div>
@@ -7525,6 +7521,13 @@
             <div class="cs-learning">Usability test the find &rarr; save &rarr; visit &rarr; review loop.</div>
             <div class="cs-learning">Prompt for tags when a cafe moves to Been here.</div>
             <div class="cs-learning">Match the rating summary visual to its score.</div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Contact</span>
+          <div class="cs-copy">
+            <p>Happy to walk through the prototype and the calls behind it. Reach me at <strong>zahsan9@uw.edu</strong>.</p>
           </div>
         </div>
 
