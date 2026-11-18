@@ -3681,8 +3681,9 @@
     --line: oklch(1 0.01 80 / 0.12);
     --brew-cream: oklch(0.91 0.045 84);
     --brew-cream-ink: oklch(0.2 0.018 69);
-    /* Solid and clearly lighter than the canvas, so panels read as boxes. */
-    --brew-panel: oklch(0.355 0.012 76);
+    /* Solid neutral light gray, clearly lighter than the canvas, so panels
+       read as boxes. No warm tint: tinted, it read as brown. */
+    --brew-panel: oklch(0.385 0 0);
     --brew-positive: oklch(0.76 0.09 151);
     --brew-negative: oklch(0.74 0.1 28);
   }
