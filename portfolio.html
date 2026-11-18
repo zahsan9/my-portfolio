@@ -1155,7 +1155,7 @@
     margin-bottom: 16px;
   }
   .banner h1 em { margin-left: 0.16em; font-style: normal; }
-  .banner .bio { font-size: 16px; line-height: 1.65; max-width: 600px; margin: 0 auto; }
+  .banner .bio { font-size: 16px; line-height: 1.65; max-width: 520px; margin: 0 auto; }
   .banner .bio em { font-style: italic; color: var(--accent); }
   /* Desktop line 1 is the roles (.bio-role); phones swap in the school
      line instead (.bio-school), since the roles don't fit. */
@@ -3681,9 +3681,7 @@
     --line: oklch(1 0.01 80 / 0.12);
     --brew-cream: oklch(0.91 0.045 84);
     --brew-cream-ink: oklch(0.2 0.018 69);
-    /* Solid neutral light gray, clearly lighter than the canvas, so panels
-       read as boxes. No warm tint: tinted, it read as brown. */
-    --brew-panel: oklch(0.385 0 0);
+    --brew-panel: oklch(1 0.012 82 / 0.055);
     --brew-positive: oklch(0.76 0.09 151);
     --brew-negative: oklch(0.74 0.1 28);
   }
@@ -3695,7 +3693,7 @@
     --line: oklch(0.2 0.012 70 / 0.12);
     --brew-cream: oklch(0.965 0.018 85);
     --brew-cream-ink: oklch(0.18 0.018 68);
-    --brew-panel: oklch(0.995 0.006 82);
+    --brew-panel: oklch(0.985 0.009 82);
     --brew-positive: oklch(0.48 0.11 151);
     --brew-negative: oklch(0.55 0.13 28);
   }
@@ -3796,6 +3794,15 @@
     border: 0;
     border-radius: 12px;
     background: var(--brew-panel);
+  }
+  .sheet[data-page="brew"] .cs-product-principle span {
+    display: block;
+    margin-bottom: 24px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: var(--ink-low);
   }
   .sheet[data-page="brew"] .cs-product-principle h3 {
     margin-bottom: 9px;
@@ -4205,135 +4212,10 @@
     border-radius: 14px;
     background: var(--brew-panel);
   }
-  .sheet[data-page="brew"] .cs-learning { padding: 11px 0 11px 20px; }
-  .sheet[data-page="brew"] .cs-learning:first-child { padding-top: 0; }
-  .sheet[data-page="brew"] .cs-learning:last-child { padding-bottom: 0; }
+  .sheet[data-page="brew"] .cs-learning { padding: 0 0 0 20px; }
   .sheet[data-page="brew"] .cs-learning::before {
-    top: calc(11px + 0.65em);
+    top: 0.65em;
     background: var(--brew-cream);
-  }
-  .sheet[data-page="brew"] .cs-learning:first-child::before { top: 0.65em; }
-  .sheet[data-page="brew"] .cs-learning strong { color: var(--ink); font-weight: 700; }
-  .sheet[data-page="brew"] .cs-impact-callout p {
-    margin-top: 14px; max-width: 62ch;
-    font-size: 15px; line-height: 1.55; color: var(--brew-cream-ink);
-  }
-  /* Context findings sit in a 2×2 of panels between the audience line and
-     the approach, so the research reads as evidence rather than one long
-     run of prose. */
-  .sheet[data-page="brew"] .cs-brew-context { margin-top: 24px; gap: 12px; }
-  /* Each section: label, one statement headline, a line or two of support,
-     then the evidence. */
-  .sheet[data-page="brew"] .cs-section > .cs-copy { max-width: 68ch; }
-  .sheet[data-page="brew"] .cs-section > .cs-copy + :is(.cs-product-principles, .cs-flow-boxes, .cs-two-col, .cs-learnings) { margin-top: 24px; }
-  .sheet[data-page="brew"] .cs-question + :is(.cs-product-principles, .cs-flow-boxes, .cs-two-col, .cs-learnings) { margin-top: 24px; }
-  /* Bold sans like every other heading on this study, across the full
-     column, rather than the light display serif other studies use. */
-  .sheet[data-page="brew"] .cs-question {
-    max-width: none; margin-bottom: 16px;
-    font-family: var(--sans); font-size: clamp(22px, 2.5vw, 28px); font-weight: 700;
-    font-variation-settings: normal; line-height: 1.2; letter-spacing: -0.02em;
-    text-wrap: pretty;
-  }
-  .sheet[data-page="brew"] .cs-brew-context .cs-feature h3 { margin-bottom: 10px; }
-  .sheet[data-page="brew"] .cs-brew-context .cs-feature p { font-size: 13px; line-height: 1.6; }
-  /* Decisions as a grid of panels; each line leads with its role
-     (Gave up / Why / Guardrail) so the tradeoff can be skimmed. */
-  .sheet[data-page="brew"] .cs-brew-decisions { gap: 12px; }
-  .sheet[data-page="brew"] .cs-brew-decisions .cs-decision-block { padding: 22px 22px 24px; }
-  .sheet[data-page="brew"] .cs-brew-decisions .cs-decision-block h3 {
-    margin-bottom: 8px; font-family: var(--sans); font-size: 16px;
-    letter-spacing: -0.012em; line-height: 1.2;
-  }
-  .sheet[data-page="brew"] .cs-brew-decisions .cs-decision-block p {
-    font-size: 13px; line-height: 1.55; color: var(--ink-mid);
-  }
-  .sheet[data-page="brew"] .cs-brew-decisions .cs-decision-block p + p { margin-top: 6px; }
-  .sheet[data-page="brew"] .cs-brew-decisions .cs-decision-block strong { color: var(--ink); }
-  .sheet[data-page="brew"] .cs-refs li { font-size: 13px; line-height: 1.5; color: var(--ink-mid); }
-  .sheet[data-page="brew"] .cs-refs li::before { background: var(--ink-low); }
-  /* Product flows: three boxes that open on click instead of three
-     scroll-pinned walkthroughs, so a reader picks the flow they care about
-     rather than scrolling through all sixteen steps. The header carries the
-     flow's first screen as a thumbnail; opening it swaps the thumbnail for
-     the full player. */
-  .sheet[data-page="brew"] .cs-flow-boxes { display: grid; gap: 12px; }
-  .sheet[data-page="brew"] .cs-flow-box {
-    border-radius: 14px; background: var(--brew-panel); overflow: hidden;
-  }
-  .sheet[data-page="brew"] .cs-flow-box-head {
-    display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 20px;
-    width: 100%; padding: 20px 22px; border: 0; background: none;
-    color: inherit; font: inherit; text-align: left; cursor: pointer;
-  }
-  .sheet[data-page="brew"] .cs-flow-box-head:focus-visible {
-    outline: 2px solid var(--brew-cream); outline-offset: -2px; border-radius: 14px;
-  }
-  .sheet[data-page="brew"] .cs-flow-box-text { display: grid; gap: 4px; min-width: 0; }
-  .sheet[data-page="brew"] .cs-flow-box-title {
-    font-family: var(--sans); font-size: 19px; font-weight: 700;
-    letter-spacing: -0.015em; line-height: 1.2; color: var(--ink);
-  }
-  .sheet[data-page="brew"] .cs-flow-box-sub {
-    max-width: 58ch; font-size: 13px; line-height: 1.5; color: var(--ink-mid);
-  }
-  .sheet[data-page="brew"] .cs-flow-box-sub strong { color: var(--ink); }
-  .sheet[data-page="brew"] .cs-flow-box-thumb {
-    width: 44px; height: 82px; object-fit: cover; object-position: top;
-    border-radius: 8px;
-    transition: opacity var(--motion-med) var(--ease-out), transform var(--motion-med) var(--ease-out);
-  }
-  /* Plus that turns into a minus. */
-  .sheet[data-page="brew"] .cs-flow-box-icon {
-    position: relative; width: 30px; height: 30px; border-radius: 50%;
-    background: var(--brew-cream);
-    transition: transform var(--motion-med) var(--ease-out);
-  }
-  .sheet[data-page="brew"] .cs-flow-box-icon::before,
-  .sheet[data-page="brew"] .cs-flow-box-icon::after {
-    content: ''; position: absolute; top: 50%; left: 50%;
-    width: 12px; height: 2px; margin: -1px 0 0 -6px; border-radius: 1px;
-    background: var(--brew-cream-ink);
-    transition: transform var(--motion-med) var(--ease-out);
-  }
-  .sheet[data-page="brew"] .cs-flow-box-icon::after { transform: rotate(90deg); }
-  .sheet[data-page="brew"] .cs-flow-box.is-open .cs-flow-box-icon::after { transform: rotate(0deg); }
-  .sheet[data-page="brew"] .cs-flow-box-head:hover .cs-flow-box-thumb { transform: translateY(-2px); }
-  .sheet[data-page="brew"] .cs-flow-box.is-open .cs-flow-box-thumb { opacity: 0; transform: none; }
-  .sheet[data-page="brew"] .cs-flow-box-body {
-    display: grid; grid-template-rows: 0fr;
-    transition: grid-template-rows var(--motion-slow) var(--ease-out);
-  }
-  .sheet[data-page="brew"] .cs-flow-box.is-open .cs-flow-box-body { grid-template-rows: 1fr; }
-  .sheet[data-page="brew"] .cs-flow-box-inner { min-height: 0; overflow: hidden; }
-  /* The box is the panel now, so the player inside drops its own fill and
-     the eyebrow that repeated the box title. */
-  .sheet[data-page="brew"] .cs-flow-box .cs-iteration-player {
-    margin: 0; padding: 4px 22px 26px; background: none; border-radius: 0;
-  }
-  .sheet[data-page="brew"] .cs-flow-box .cs-iteration-eyebrow { display: none; }
-  .sheet[data-page="brew"] .cs-flow-box .cs-iteration-visual { width: min(100%, 300px); }
-  .sheet[data-page="brew"] .cs-flow-nav {
-    display: flex; align-items: center; gap: 12px; margin: -6px 0 22px;
-  }
-  .sheet[data-page="brew"] .cs-flow-nav button {
-    display: grid; place-items: center; width: 32px; height: 32px;
-    border: 1px solid var(--line); border-radius: 50%; background: none;
-    color: var(--ink); font: 14px/1 var(--sans); cursor: pointer;
-    transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
-  }
-  .sheet[data-page="brew"] .cs-flow-nav button:hover {
-    background: var(--brew-cream); border-color: var(--brew-cream); color: var(--brew-cream-ink);
-  }
-  .sheet[data-page="brew"] .cs-flow-nav button:focus-visible { outline: 2px solid var(--brew-cream); outline-offset: 2px; }
-  .sheet[data-page="brew"] .cs-flow-nav span {
-    min-width: 3.5ch; text-align: center;
-    font-family: var(--mono); font-size: 11px; color: var(--ink-mid);
-  }
-  @media (max-width: 640px) {
-    .sheet[data-page="brew"] .cs-flow-box-head { gap: 14px; padding: 18px; }
-    .sheet[data-page="brew"] .cs-flow-box-thumb { display: none; }
-    .sheet[data-page="brew"] .cs-flow-box .cs-iteration-player { padding: 0 18px 22px; }
   }
   /* CROW borrows brew's product-design grammar (measured section rhythm,
      framed figures, three-up principles). Its portfolio accent follows the
@@ -6531,7 +6413,7 @@
           <img class="avatar-photo" src="assets/images/profile.jpg" alt="Portrait of Zainab Ahsan" />
         </div>
         <h1 id="nameTitle">Zainab <em>Ahsan</em></h1>
-        <p class="bio"><span class="bio-role">Incoming Product Engineer Intern @ Tesla<span class="bio-divider" aria-hidden="true">|</span>CS + Data Science @ UW</span><span class="bio-school">CS + Data Science @ UW</span><br>I design, build, and overthink the <span class="bio-details">details in between :)</span></p>
+        <p class="bio"><span class="bio-role">Incoming @ Tesla<span class="bio-divider" aria-hidden="true">|</span>CS + Data Science @ UW</span><span class="bio-school">CS + Data Science @ UW</span><br>I design, build, and overthink the <span class="bio-details">details in between :)</span></p>
         <div class="meta">Seattle, WA<span class="meta-sep" aria-hidden="true">|</span>5 Boards, 7 Pins</div>
       </div>
 
@@ -7115,302 +6997,262 @@
             <div><dt>Timeline</dt><dd>2026</dd></div>
             <div><dt>Role</dt><dd>Product design + front-end</dd></div>
             <div><dt>Team</dt><dd>Partner project</dd></div>
-            <div><dt>Stack</dt><dd>React + Vite prototype, React Native planned</dd></div>
+            <div><dt>Stack</dt><dd>React Native + Expo</dd></div>
           </dl>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">The Brief</span>
-          <h3 class="cs-question">How might Brew help someone find the right cafe for what they need, then remember it the way they think about it?</h3>
-          <div class="cs-copy">
-            <p>Brew is a cafe-discovery app built around why you&rsquo;re going. It&rsquo;s a partner project with shared product direction; I own comments and reviews, onboarding, splash and loading, and directions, designed and built in a working prototype.</p>
+          <span class="cs-label">Overview</span>
+          <div class="cs-copy cs-overview">
+            <p>A cafe-discovery app organized around what someone needs from a space, with meaningful save states and one shared system for comments and reviews.</p>
           </div>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">The Problem</span>
-          <h3 class="cs-question">A 4.6 can&rsquo;t tell you if a cafe is quiet enough to work.</h3>
-          <div class="cs-copy">
-            <p>Students and remote workers pick a cafe for a reason: to work, meet friends, or take a quiet break. Ratings and saved lists don&rsquo;t capture that.</p>
-          </div>
-          <div class="cs-two-col cs-brew-context">
+          <span class="cs-label">Stack + Ownership</span>
+          <div class="cs-two-col">
             <div class="cs-feature">
-              <h3>Discovery is scattered</h3>
-              <p>40% of 18 to 24-year-olds look for lunch spots on TikTok or Instagram, not Maps (Raghavan, 2022). Cafe finds end up split across apps.</p>
+              <h3>Stack</h3>
+              <p>The current interaction prototype is built in React 18 + Vite. The iOS app is planned in React Native with Expo and TypeScript, using Google Maps Platform for cafe search, place details, maps, and directions. This keeps the working prototype close to the mobile implementation while giving the shipped app a native framework and navigation model.</p>
             </div>
             <div class="cs-feature">
-              <h3>A star rating hides what matters</h3>
-              <p>Ratings pile up at 5 and 1 stars, so the average says little (Hu et al., 2009). A 4.6 can&rsquo;t tell you if it&rsquo;s quiet enough to work.</p>
-            </div>
-            <div class="cs-feature">
-              <h3>Practical needs drive the choice</h3>
-              <p>37% of mobile workers pick a coffee shop for its WiFi over its coffee (Samsung).</p>
-            </div>
-            <div class="cs-feature">
-              <h3>Where existing tools stop</h3>
-              <p>Google Maps lists are separate folders. A cafe can sit in several, and a visit is just a checkmark.</p>
+              <h3>Ownership</h3>
+              <p>Brew is a partner project, and we shape the broader product together. I independently own the flows covered here: comments and review-comments, onboarding, splash and loading states, and directions. I design and build each flow in the working prototype, test it at real phone proportions, and refine the states that static mockups do not expose.</p>
             </div>
           </div>
-        </div>
         </div>
 
         <div class="cs-section">
-          <span class="cs-label">The Approach</span>
-          <h3 class="cs-question">Browse by why you&rsquo;re going. Save by where you are with a cafe.</h3>
+          <span class="cs-label">Product Context</span>
+          <h3 class="cs-question">How might Brew help someone find the right cafe for what they need, then remember it the way they naturally think about it?</h3>
           <div class="cs-copy">
-            <p>Discovery starts from intent (quiet, work-friendly, social), and each cafe has one state that moves forward: Want to go, Been here, Favorite.</p>
+            <p>People already find cafes across Google Maps, Instagram, TikTok, and their own Notes app. The information is fragmented, star ratings flatten very different needs into one score, and a single bookmark does not distinguish curiosity from experience or genuine preference.</p>
+            <p>Brew reframes discovery around intent, with categories like quiet, work-friendly, and social. It also separates Want to Go, Been, and Favorite so saving a cafe communicates a meaningful relationship instead of adding it to one undifferentiated list.</p>
           </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Product Principles</span>
           <div class="cs-product-principles">
             <div class="cs-product-principle">
+              <span>01</span>
               <h3>Intent before ranking</h3>
               <p>Lead with what someone needs from a cafe instead of asking them to decode an average star rating.</p>
             </div>
             <div class="cs-product-principle">
+              <span>02</span>
               <h3>States with meaning</h3>
-              <p>Use Want to go, Been here, and Favorite to reflect distinct moments in a person's relationship with a place.</p>
+              <p>Use Want to Go, Been, and Favorite to reflect distinct moments in a person's relationship with a place.</p>
             </div>
             <div class="cs-product-principle">
+              <span>03</span>
               <h3>Shared surfaces, clear rules</h3>
-              <p>Keep related actions together while making differences, such as reviews versus comments, clear in the interaction.</p>
+              <p>Keep related actions together while making differences, such as reviews versus comments, legible in the interaction.</p>
             </div>
           </div>
         </div>
 
         <div class="cs-section cs-iterations-section">
-          <span class="cs-label">Product Flows</span>
-          <h3 class="cs-question">The flows I own, built in a working prototype.</h3>
-          <div class="cs-flow-boxes">
-          <div class="cs-flow-box" data-flow-box>
-            <button class="cs-flow-box-head" type="button" aria-expanded="false" aria-controls="brew-flow-reviews">
-              <span class="cs-flow-box-text">
-                <span class="cs-flow-box-title">Review without starting over</span>
-                <span class="cs-flow-box-sub">Comments and reviews share one sheet. Tags (WiFi, outlets, noise, price) feed intent discovery.</span>
-              </span>
-              <img class="cs-flow-box-thumb" src="assets/images/brew-review-v1.jpg" alt="" aria-hidden="true" loading="lazy">
-              <span class="cs-flow-box-icon" aria-hidden="true"></span>
-            </button>
-            <div class="cs-flow-box-body" id="brew-flow-reviews" inert>
-              <div class="cs-flow-box-inner">
-              <div class="cs-iteration-player cs-scroll-flow cs-rating-flow" data-iteration-player data-iteration-rank="1">
-                <div class="cs-iteration-visual" aria-live="polite">
-                  <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-review-v1.jpg" alt="Comment sheet at rest, before a review has started, showing no comments yet" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-review-v2.jpg" alt="Comment composer with Had a great time typed, before a rating is attached" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-review-v3.jpg" alt="Rating step one of two with unselected cups and the written comment preserved" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="3" src="assets/images/brew-review-v4.jpg" alt="Rating step one with three and a half cups selected and the numeric score 3.5" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="4" src="assets/images/brew-review-v5.jpg" alt="Rating step two with cafe-experience tags before any are selected" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="5" src="assets/images/brew-review-v6.jpg" alt="Has outlets, Good WiFi, and Great for groups selected above the written review" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="6" src="assets/images/brew-review-v7.jpg" alt="Zainab A.'s posted review with a 3.5 cup rating, one comment, and the cafe rating count increased to 140" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="7" src="assets/images/brew-review-v8.jpg" alt="Attempt to review the same cafe again with a toast that says You have already reviewed this cafe" loading="lazy">
-                </div>
-                <div class="cs-iteration-copy">
-                  <div class="cs-iteration-eyebrow">Reviews + ratings</div>
-                  <h3 data-iteration-title>Keep feedback close to the cafe</h3>
-                  <div class="cs-iteration-controls" role="group" aria-label="Choose a step in the review flow">
-                    <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show step 1 of the review flow">1</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show step 2 of the review flow">2</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show step 3 of the review flow">3</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="3" aria-pressed="false" aria-label="Show step 4 of the review flow">4</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="4" aria-pressed="false" aria-label="Show step 5 of the review flow">5</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="5" aria-pressed="false" aria-label="Show step 6 of the review flow">6</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="6" aria-pressed="false" aria-label="Show step 7 of the review flow">7</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="7" aria-pressed="false" aria-label="Show step 8 of the review flow">8</button>
-                  </div>
-                  <div class="cs-iteration-notes">
-                    <div class="cs-iteration-note is-active" data-iteration-note="0">
-                      <h4>Keep feedback close to the cafe</h4>
-                      <ul>
-                        <li><strong>Shared entry point:</strong> comments and reviews start in the same sheet, beside the cafe being discussed.</li>
-                        <li><strong>Optional rating:</strong> anyone can join the conversation without scoring the cafe.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="1">
-                      <h4>Preserve the work already done</h4>
-                      <ul>
-                        <li><strong>Keep the draft:</strong> attaching a rating carries the existing comment into the review flow.</li>
-                        <li><strong>No restart:</strong> people add detail as they go, without switching forms or retyping.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="2">
-                      <h4>Separate selection from submission</h4>
-                      <ul>
-                        <li><strong>No default score:</strong> cups start empty, so opening the rating flow doesn&rsquo;t assign a zero.</li>
-                        <li><strong>Two stages:</strong> the first arrow moves to cafe details, giving the reviewer one more step before publishing.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="3">
-                      <h4>Make the selected score explicit</h4>
-                      <ul>
-                        <li><strong>Half-cup increments:</strong> scores can land between whole numbers, such as 3.5 out of 5.</li>
-                        <li><strong>Numeric confirmation:</strong> the exact value sits beside the cups, so the score is clear beyond the icon fill.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="4">
-                      <h4>Capture what a rating leaves out</h4>
-                      <ul>
-                        <li><strong>Practical context:</strong> tags describe WiFi, outlets, noise, and price alongside the overall score.</li>
-                        <li><strong>Intent matters:</strong> these details speak to why someone visits, like working or meeting friends.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="5">
-                      <h4>Keep choices visible before posting</h4>
-                      <ul>
-                        <li><strong>Visible selections:</strong> highlighted tags show which details will post with the review.</li>
-                        <li><strong>Room for context:</strong> the original note stays editable, keeping tags and personal feedback in one place.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="6">
-                      <h4>Confirm the contribution and its limits</h4>
-                      <ul>
-                        <li><strong>Visible result:</strong> the note and the 3.5-cup rating post together, and the rating count rises from 139 to 140.</li>
-                        <li><strong>One rating per person:</strong> the cup dims after posting, while the comment field stays open for conversation.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="7">
-                      <h4>Make the one-rating rule visible</h4>
-                      <ul>
-                        <li><strong>Clear feedback:</strong> a toast explains when someone tries to review the same cafe again.</li>
-                        <li><strong>Conversation stays open:</strong> the existing review stays visible and the comment field is still available.</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+          <span class="cs-label">Comment Section</span>
+
+          <div class="cs-iteration-player cs-scroll-flow cs-rating-flow" data-iteration-player data-iteration-rank="1">
+            <div class="cs-iteration-visual" aria-live="polite">
+              <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-review-v1.jpg" alt="Comment sheet at rest, before a review has started, showing no comments yet" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-review-v2.jpg" alt="Comment composer with Had a great time typed, before a rating is attached" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-review-v3.jpg" alt="Rating step one of two with unselected cups and the written comment preserved" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="3" src="assets/images/brew-review-v4.jpg" alt="Rating step one with three and a half cups selected and the numeric score 3.5" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="4" src="assets/images/brew-review-v5.jpg" alt="Rating step two with cafe-experience tags before any are selected" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="5" src="assets/images/brew-review-v6.jpg" alt="Has outlets, Good WiFi, and Great for groups selected above the written review" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="6" src="assets/images/brew-review-v7.jpg" alt="Zainab A.'s posted review with a 3.5 cup rating, one comment, and the cafe rating count increased to 140" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="7" src="assets/images/brew-review-v8.jpg" alt="Attempt to review the same cafe again with a toast that says You have already reviewed this cafe" loading="lazy">
+            </div>
+            <div class="cs-iteration-copy">
+              <div class="cs-iteration-eyebrow">Reviews + ratings</div>
+              <h3 data-iteration-title>Keep feedback close to the cafe</h3>
+              <div class="cs-iteration-controls" role="group" aria-label="Choose a step in the review flow">
+                <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show step 1 of the review flow">1</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show step 2 of the review flow">2</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show step 3 of the review flow">3</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="3" aria-pressed="false" aria-label="Show step 4 of the review flow">4</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="4" aria-pressed="false" aria-label="Show step 5 of the review flow">5</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="5" aria-pressed="false" aria-label="Show step 6 of the review flow">6</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="6" aria-pressed="false" aria-label="Show step 7 of the review flow">7</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="7" aria-pressed="false" aria-label="Show step 8 of the review flow">8</button>
               </div>
+              <div class="cs-iteration-notes">
+                <div class="cs-iteration-note is-active" data-iteration-note="0">
+                  <h4>Keep feedback close to the cafe</h4>
+                  <ul>
+                    <li><strong>Shared entry point:</strong> comments and reviews start in the same sheet, beside the cafe being discussed.</li>
+                    <li><strong>Optional rating:</strong> someone can join the conversation without scoring the cafe.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="1">
+                  <h4>Preserve the work already done</h4>
+                  <ul>
+                    <li><strong>Keep the draft:</strong> attaching a rating carries the existing comment into the review flow.</li>
+                    <li><strong>No restart:</strong> someone can add detail as they go, without choosing a different form or retyping.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="2">
+                  <h4>Separate selection from submission</h4>
+                  <ul>
+                    <li><strong>No default score:</strong> cups start empty; opening the rating flow does not assign a zero.</li>
+                    <li><strong>Two stages:</strong> the first arrow advances to cafe details, giving the reviewer another step before publishing.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="3">
+                  <h4>Make the selected score explicit</h4>
+                  <ul>
+                    <li><strong>Half-cup increments:</strong> allow a score between whole numbers, such as 3.5 out of 5.</li>
+                    <li><strong>Numeric confirmation:</strong> show the exact value beside the cups so the score is readable beyond the icon fill.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="4">
+                  <h4>Capture what a rating leaves out</h4>
+                  <ul>
+                    <li><strong>Practical context:</strong> tags describe WiFi, outlets, noise, and price alongside the overall score.</li>
+                    <li><strong>Intent matters:</strong> these details speak to what someone needs from a cafe, such as working or meeting friends.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="5">
+                  <h4>Keep choices visible before posting</h4>
+                  <ul>
+                    <li><strong>Visible selections:</strong> highlighted tags show which details will accompany the review.</li>
+                    <li><strong>Room for context:</strong> the original note stays editable, keeping structured tags and personal feedback in one place.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="6">
+                  <h4>Confirm the contribution and its limits</h4>
+                  <ul>
+                    <li><strong>Visible result:</strong> the posted note and 3.5-cup rating appear together; the rating count rises from 139 to 140.</li>
+                    <li><strong>One rating per person:</strong> the cup dims after posting, while the comment field remains available for conversation.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="7">
+                  <h4>Make the one-rating rule visible</h4>
+                  <ul>
+                    <li><strong>Clear feedback:</strong> a toast explains when someone tries to review the same cafe again.</li>
+                    <li><strong>Conversation stays open:</strong> the existing review remains visible and the comment field is still available.</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
-          <div class="cs-flow-box" data-flow-box>
-            <button class="cs-flow-box-head" type="button" aria-expanded="false" aria-controls="brew-flow-directions">
-              <span class="cs-flow-box-text">
-                <span class="cs-flow-box-title">See the trip, then hand off</span>
-                <span class="cs-flow-box-sub">Brew compares travel times, then Google Maps takes over navigation.</span>
-              </span>
-              <img class="cs-flow-box-thumb" src="assets/images/brew-directions-1.jpg" alt="" aria-hidden="true" loading="lazy">
-              <span class="cs-flow-box-icon" aria-hidden="true"></span>
-            </button>
-            <div class="cs-flow-box-body" id="brew-flow-directions" inert>
-              <div class="cs-flow-box-inner">
-              <div class="cs-iteration-player cs-scroll-flow cs-directions-flow" data-iteration-player data-iteration-rank="2">
-                <div class="cs-iteration-visual" aria-live="polite">
-                  <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-directions-1.jpg" alt="Directions sheet for Howdy Y'all Coffee with Use current location and Choose starting point options" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-directions-2.jpg" alt="Driving selected at 28 minutes alongside bus at 2 hours 24 minutes and walking at 6 hours 57 minutes" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-directions-3.jpg" alt="Bus selected at 2 hours 24 minutes with a visible focus ring, while Drive retains its Fastest badge and Get Directions remains available" loading="lazy">
-                </div>
-                <div class="cs-iteration-copy">
-                  <div class="cs-iteration-eyebrow">Directions</div>
-                  <h3 data-iteration-title>Choose how to get there</h3>
-                  <div class="cs-iteration-controls" role="group" aria-label="Choose a step in the directions flow">
-                    <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show step 1 of the directions flow">1</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show step 2 of the directions flow">2</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show step 3 of the directions flow">3</button>
-                  </div>
-                  <div class="cs-iteration-notes">
-                    <div class="cs-iteration-note is-active" data-iteration-note="0">
-                      <h4>Choose the starting point</h4>
-                      <ul>
-                        <li><strong>Two ways to begin:</strong> use current location or enter another starting point, for leaving now or planning ahead.</li>
-                        <li><strong>Destination carried forward:</strong> the selected cafe is already filled in, so there&rsquo;s no second search.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="1">
-                      <h4>Compare the trip before committing</h4>
-                      <ul>
-                        <li><strong>Side-by-side estimates:</strong> driving, bus, and walking times show the travel time before anyone leaves Brew.</li>
-                        <li><strong>Fastest stays explicit:</strong> a badge marks the quickest option while keeping the alternatives available.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="2">
-                      <h4>Let preference guide the final choice</h4>
-                      <ul>
-                        <li><strong>Selection is separate from speed:</strong> Bus is highlighted while Drive keeps its Fastest badge, leaving the choice with the traveler.</li>
-                        <li><strong>One clear handoff:</strong> Get Directions opens Google Maps with the chosen starting point, cafe, and travel mode.</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+        </div>
+
+        <div class="cs-section cs-iterations-section">
+          <span class="cs-label">Directions</span>
+
+          <div class="cs-iteration-player cs-scroll-flow cs-directions-flow" data-iteration-player data-iteration-rank="2">
+            <div class="cs-iteration-visual" aria-live="polite">
+              <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-directions-1.jpg" alt="Directions sheet for Howdy Y'all Coffee with Use current location and Choose starting point options" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-directions-2.jpg" alt="Driving selected at 28 minutes alongside bus at 2 hours 24 minutes and walking at 6 hours 57 minutes" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-directions-3.jpg" alt="Bus selected at 2 hours 24 minutes with a visible focus ring, while Drive retains its Fastest badge and Get Directions remains available" loading="lazy">
+            </div>
+            <div class="cs-iteration-copy">
+              <div class="cs-iteration-eyebrow">Directions</div>
+              <h3 data-iteration-title>Choose how to get there</h3>
+              <div class="cs-iteration-controls" role="group" aria-label="Choose a step in the directions flow">
+                <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show step 1 of the directions flow">1</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show step 2 of the directions flow">2</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show step 3 of the directions flow">3</button>
               </div>
+              <div class="cs-iteration-notes">
+                <div class="cs-iteration-note is-active" data-iteration-note="0">
+                  <h4>Choose the starting point</h4>
+                  <ul>
+                    <li><strong>Two ways to begin:</strong> use current location or enter another starting point, supporting both immediate trips and planning ahead.</li>
+                    <li><strong>Carry the destination forward:</strong> the selected cafe is already filled in, so there is no need to search for it again.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="1">
+                  <h4>Compare the trip before committing</h4>
+                  <ul>
+                    <li><strong>Side-by-side estimates:</strong> driving, bus, and walking times make the travel commitment visible before leaving Brew.</li>
+                    <li><strong>Fastest stays explicit:</strong> the badge identifies the quickest option while keeping the alternatives available.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="2">
+                  <h4>Let preference guide the final choice</h4>
+                  <ul>
+                    <li><strong>Selection is separate from speed:</strong> Bus is highlighted while Drive retains its Fastest badge, leaving the choice with the traveler.</li>
+                    <li><strong>One clear handoff:</strong> Get Directions opens Google Maps with the chosen starting point, cafe, and travel mode.</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
-          <div class="cs-flow-box" data-flow-box>
-            <button class="cs-flow-box-head" type="button" aria-expanded="false" aria-controls="brew-flow-save">
-              <span class="cs-flow-box-text">
-                <span class="cs-flow-box-title">Save with a state that moves forward</span>
-                <span class="cs-flow-box-sub">One state per cafe that moves forward: Want to go, Been here, Favorite.</span>
-              </span>
-              <img class="cs-flow-box-thumb" src="assets/images/brew-save-1.jpg" alt="" aria-hidden="true" loading="lazy">
-              <span class="cs-flow-box-icon" aria-hidden="true"></span>
-            </button>
-            <div class="cs-flow-box-body" id="brew-flow-save" inert>
-              <div class="cs-flow-box-inner">
-              <div class="cs-iteration-player cs-scroll-flow cs-save-flow" data-iteration-player data-iteration-rank="3">
-                <div class="cs-iteration-visual" aria-live="polite">
-                  <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-save-1.jpg" alt="Save sheet for The Shop by Porter with Want to go, Been here, and Favorites unselected" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-save-2.jpg" alt="Want to go highlighted with an Add to Want to go confirmation button" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-save-3.jpg" alt="Cafe feed with Added to Want to go confirmation and an updated bookmark" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="3" src="assets/images/brew-save-4.jpg" alt="Been here chosen as the next shelf while Want to go remains outlined, with Move to Been here action" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="4" src="assets/images/brew-save-5.jpg" alt="Moved to Been here confirmation with Been here selected and Remove from shelf available" loading="lazy">
-                  <img class="cs-iteration-slide" data-iteration-slide="5" src="assets/images/brew-save-6.jpg" alt="Removed from shelves confirmation with all shelf choices cleared and the feed action reset to Save" loading="lazy">
-                </div>
-                <div class="cs-iteration-copy">
-                  <div class="cs-iteration-eyebrow">Save</div>
-                  <h3 data-iteration-title>Save for now, update after a visit</h3>
-                  <div class="cs-iteration-controls" role="group" aria-label="Choose a step in the save flow">
-                    <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show step 1 of the save flow">1</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show step 2 of the save flow">2</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show step 3 of the save flow">3</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="3" aria-pressed="false" aria-label="Show step 4 of the save flow">4</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="4" aria-pressed="false" aria-label="Show step 5 of the save flow">5</button>
-                    <button class="cs-iteration-control" type="button" data-iteration-control="5" aria-pressed="false" aria-label="Show step 6 of the save flow">6</button>
-                  </div>
-                  <div class="cs-iteration-notes">
-                    <div class="cs-iteration-note is-active" data-iteration-note="0">
-                      <h4>Give each save a meaning</h4>
-                      <ul>
-                        <li><strong>Three distinct states:</strong> Want to go, Been here, and Favorites separate interest, experience, and preference.</li>
-                        <li><strong>Cafe stays in view:</strong> the sheet names the place being saved while its photo remains visible.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="1">
-                      <h4>Make the destination explicit</h4>
-                      <ul>
-                        <li><strong>Preview the choice:</strong> Want to go highlights before the save is applied.</li>
-                        <li><strong>Name the action:</strong> Add to Want to go confirms what will happen and where the cafe will be saved.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="2">
-                      <h4>Confirm, then return to discovery</h4>
-                      <ul>
-                        <li><strong>Immediate feedback:</strong> a confirmation names the shelf, and the feed bookmark switches to its saved state.</li>
-                        <li><strong>Keep browsing:</strong> the first save closes the sheet and returns to the cafe, with no extra confirmation screen.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="3">
-                      <h4>Move the cafe as plans change</h4>
-                      <ul>
-                        <li><strong>Show current and next:</strong> Want to go stays outlined while Been here becomes the pending choice.</li>
-                        <li><strong>Move, don&rsquo;t duplicate:</strong> the button names the new shelf, so marking a visit moves the cafe instead of leaving it in its old state.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="4">
-                      <h4>Make the updated state readable</h4>
-                      <ul>
-                        <li><strong>Confirm the move:</strong> Been here stays selected, the feed icon becomes a check, and the message names the change.</li>
-                        <li><strong>Control stays close:</strong> Remove from shelf appears in the same sheet, so managing a save needs no separate flow.</li>
-                      </ul>
-                    </div>
-                    <div class="cs-iteration-note" data-iteration-note="5">
-                      <h4>Let the decision be undone</h4>
-                      <ul>
-                        <li><strong>Clear the saved state:</strong> removal resets the shelf choices and returns the feed action to Save.</li>
-                        <li><strong>Confirm the result:</strong> a removal message makes the change explicit, and the sheet stays open to pick a shelf again.</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+        </div>
+
+        <div class="cs-section cs-iterations-section">
+          <span class="cs-label">Save</span>
+
+          <div class="cs-iteration-player cs-scroll-flow cs-save-flow" data-iteration-player data-iteration-rank="3">
+            <div class="cs-iteration-visual" aria-live="polite">
+              <img class="cs-iteration-slide is-active" data-iteration-slide="0" src="assets/images/brew-save-1.jpg" alt="Save sheet for The Shop by Porter with Want to go, Been here, and Favorites unselected" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="1" src="assets/images/brew-save-2.jpg" alt="Want to go highlighted with an Add to Want to go confirmation button" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="2" src="assets/images/brew-save-3.jpg" alt="Cafe feed with Added to Want to go confirmation and an updated bookmark" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="3" src="assets/images/brew-save-4.jpg" alt="Been here chosen as the next shelf while Want to go remains outlined, with Move to Been here action" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="4" src="assets/images/brew-save-5.jpg" alt="Moved to Been here confirmation with Been here selected and Remove from shelf available" loading="lazy">
+              <img class="cs-iteration-slide" data-iteration-slide="5" src="assets/images/brew-save-6.jpg" alt="Removed from shelves confirmation with all shelf choices cleared and the feed action reset to Save" loading="lazy">
+            </div>
+            <div class="cs-iteration-copy">
+              <div class="cs-iteration-eyebrow">Save</div>
+              <h3 data-iteration-title>Save for now, update after a visit</h3>
+              <div class="cs-iteration-controls" role="group" aria-label="Choose a step in the save flow">
+                <button class="cs-iteration-control" type="button" data-iteration-control="0" aria-pressed="true" aria-label="Show step 1 of the save flow">1</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="1" aria-pressed="false" aria-label="Show step 2 of the save flow">2</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="2" aria-pressed="false" aria-label="Show step 3 of the save flow">3</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="3" aria-pressed="false" aria-label="Show step 4 of the save flow">4</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="4" aria-pressed="false" aria-label="Show step 5 of the save flow">5</button>
+                <button class="cs-iteration-control" type="button" data-iteration-control="5" aria-pressed="false" aria-label="Show step 6 of the save flow">6</button>
               </div>
+              <div class="cs-iteration-notes">
+                <div class="cs-iteration-note is-active" data-iteration-note="0">
+                  <h4>Give each save a meaning</h4>
+                  <ul>
+                    <li><strong>Three distinct states:</strong> Want to go, Been here, and Favorites separate interest, experience, and preference.</li>
+                    <li><strong>Keep the cafe in view:</strong> the sheet names the place being saved while its photo remains visible.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="1">
+                  <h4>Make the destination explicit</h4>
+                  <ul>
+                    <li><strong>Preview the choice:</strong> Want to go highlights before the save is applied.</li>
+                    <li><strong>Name the action:</strong> Add to Want to go confirms both what will happen and where the cafe will be saved.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="2">
+                  <h4>Confirm, then return to discovery</h4>
+                  <ul>
+                    <li><strong>Immediate feedback:</strong> a confirmation names the shelf, and the feed bookmark changes to the saved state.</li>
+                    <li><strong>Keep browsing:</strong> the first save closes the sheet, returning to the cafe without a separate confirmation screen.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="3">
+                  <h4>Move the cafe as plans change</h4>
+                  <ul>
+                    <li><strong>Show current and next:</strong> Want to go stays outlined while Been here becomes the pending choice.</li>
+                    <li><strong>Move, rather than duplicate:</strong> the button names the new shelf, reflecting a visit without leaving the cafe in the old state.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="4">
+                  <h4>Make the updated state readable</h4>
+                  <ul>
+                    <li><strong>Confirm the move:</strong> Been here stays selected, the feed icon becomes a check, and the message names the change.</li>
+                    <li><strong>Keep control available:</strong> Remove from shelf appears in the same sheet, so managing a save does not require another flow.</li>
+                  </ul>
+                </div>
+                <div class="cs-iteration-note" data-iteration-note="5">
+                  <h4>Let the decision be undone</h4>
+                  <ul>
+                    <li><strong>Clear the saved state:</strong> removal resets the shelf choices and returns the feed action to Save.</li>
+                    <li><strong>Confirm the result:</strong> a removal message makes the change explicit, while the sheet stays available to choose a shelf again.</li>
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
           </div>
         </div>
 
@@ -7465,81 +7307,16 @@
         -->
 
         <div class="cs-section">
-          <span class="cs-label">Tradeoffs</span>
-          <h3 class="cs-question">Every call gave something up.</h3>
-          <div class="cs-two-col cs-brew-decisions">
-            <div class="cs-decision-block">
-              <h3>Two-step review</h3>
-              <p><strong>Gave up</strong> speed, <strong>for</strong> tags, the data intent filters need. Watching drop-off at the tags step.</p>
-            </div>
-            <div class="cs-decision-block">
-              <h3>One sheet for comments and reviews</h3>
-              <p><strong>Gave up</strong> every post being a review, <strong>so</strong> people can talk without scoring. One rating per person keeps the two distinct.</p>
-            </div>
-            <div class="cs-decision-block">
-              <h3>Half cups</h3>
-              <p><strong>Gave up</strong> whole numbers, <strong>because</strong> great-to-work-from with average coffee isn&rsquo;t a 3 or a 4.</p>
-            </div>
-            <div class="cs-decision-block">
-              <h3>Hand off directions</h3>
-              <p><strong>Gave up</strong> keeping people in Brew, <strong>because</strong> Google Maps already does navigation well.</p>
-            </div>
-            <div class="cs-decision-block">
-              <h3>Rejected: separate forms</h3>
-              <p>People would pick a form before knowing what to say, and switching would mean retyping.</p>
-            </div>
-            <div class="cs-decision-block">
-              <h3>Risk: cold start</h3>
-              <p>Filters stay thin until cafes have tags. Plan: prompt for tags when a cafe moves to Been here.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="cs-section">
-          <span class="cs-label">Measuring Success</span>
-          <h3 class="cs-question">What would tell us it&rsquo;s working.</h3>
-          <div class="cs-learnings">
-            <div class="cs-learning"><strong>Save to visit:</strong> Want to go &rarr; Been here within 30 days</div>
-            <div class="cs-learning"><strong>Review completion:</strong> rating flows posted, and drop-off at tags</div>
-            <div class="cs-learning"><strong>Tag coverage:</strong> reviews with at least one tag</div>
-            <div class="cs-learning"><strong>Directions handoff:</strong> cafe views ending in Get Directions</div>
-            <div class="cs-learning"><strong>Guardrail:</strong> comment volume holds as more people rate</div>
-          </div>
-        </div>
-
-        <div class="cs-section">
           <span class="cs-label">Current Outcome</span>
           <div class="cs-impact-callout">
             <span class="cs-impact-line">A working prototype connects cafe discovery to saving, directions, comments, and ratings in one place.</span>
-            <p>Built and tested at phone size, including the states mockups miss.</p>
           </div>
         </div>
 
         <div class="cs-section">
           <span class="cs-label">Next Iteration</span>
           <div class="cs-learnings">
-            <div class="cs-learning">Usability test the find &rarr; save &rarr; visit &rarr; review loop.</div>
-            <div class="cs-learning">Prompt for tags when a cafe moves to Been here.</div>
-            <div class="cs-learning">Match the rating summary visual to its score.</div>
-          </div>
-        </div>
-
-        <div class="cs-section">
-          <span class="cs-label">Contact</span>
-          <div class="cs-copy">
-            <p>Happy to walk through the prototype and the calls behind it. Reach me at <strong>zahsan9@uw.edu</strong>.</p>
-          </div>
-        </div>
-
-        <div class="cs-section">
-          <span class="cs-label">References</span>
-          <div class="cs-copy cs-refs">
-            <ul>
-              <li>Raghavan, P. Remarks at Fortune Brainstorm Tech, 2022.</li>
-              <li>Hu, N., Pavlou, P. A., &amp; Zhang, J. Overcoming the J-shaped Distribution of Product Reviews. <em>Communications of the ACM</em>, 2009.</li>
-              <li>Samsung mobile worker report, via TechRadar.</li>
-              <li>Google Maps Help. Create a list of places. Google Business Profile Help. Business attributes.</li>
-            </ul>
+            <div class="cs-learning">Validate the find → save → visit → review loop with usage data, align the rating summary visual with its score, and make moderation actions easier to discover.</div>
           </div>
         </div>
       `,
@@ -8664,8 +8441,6 @@
       }
     }
     player.dataset.activeIteration = String(boundedIndex);
-    const counter = player.querySelector('[data-flow-count]');
-    if (counter) counter.textContent = `${boundedIndex + 1} / ${controls.length}`;
     if (moveFocus) controls[boundedIndex]?.focus({ preventScroll: true });
   }
 
@@ -8772,49 +8547,9 @@
         .sort((a, b) => Number(a.dataset.iterationRank) - Number(b.dataset.iterationRank));
       orderedPlayers.forEach(player => section.append(player));
     });
-    // Boxed flows step by click, so they get previous / next arrows and a
-    // counter beside the dots.
-    root.querySelectorAll('[data-flow-box] [data-iteration-player]').forEach(player => {
-      const nav = document.createElement('div');
-      nav.className = 'cs-flow-nav';
-      nav.innerHTML = '<button type="button" data-flow-step="-1" aria-label="Previous step">←</button>'
-        + '<span data-flow-count aria-live="polite"></span>'
-        + '<button type="button" data-flow-step="1" aria-label="Next step">→</button>';
-      player.querySelector('.cs-iteration-controls').after(nav);
-    });
     root.querySelectorAll('[data-iteration-player]').forEach(player => setIterationPlayerStep(player, 0));
-    // Flows tucked into a click-to-open box step by click, not by scroll.
-    root.querySelectorAll('.cs-scroll-flow').forEach(player => {
-      if (!player.closest('[data-flow-box]')) initializeScrollFlow(player);
-    });
+    root.querySelectorAll('.cs-scroll-flow').forEach(initializeScrollFlow);
   }
-
-  // Flow boxes: one open at a time, so the study never turns into three
-  // stacked walkthroughs. Closed bodies are inert so their step buttons
-  // drop out of the tab order.
-  function setFlowBoxOpen(box, open) {
-    box.classList.toggle('is-open', open);
-    box.querySelector('.cs-flow-box-head').setAttribute('aria-expanded', String(open));
-    box.querySelector('.cs-flow-box-body').inert = !open;
-  }
-  sheetBody.addEventListener('click', event => {
-    const step = event.target.closest('[data-flow-step]');
-    if (!step) return;
-    const player = step.closest('[data-iteration-player]');
-    const count = player.querySelectorAll('[data-iteration-control]').length;
-    const next = (Number(player.dataset.activeIteration) + Number(step.dataset.flowStep) + count) % count;
-    setIterationPlayerStep(player, next);
-  });
-  sheetBody.addEventListener('click', event => {
-    const head = event.target.closest('.cs-flow-box-head');
-    if (!head) return;
-    const box = head.closest('[data-flow-box]');
-    const open = !box.classList.contains('is-open');
-    box.parentElement.querySelectorAll(':scope > [data-flow-box].is-open').forEach(other => {
-      if (other !== box) setFlowBoxOpen(other, false);
-    });
-    setFlowBoxOpen(box, open);
-  });
 
   sheetBody.addEventListener('click', event => {
     const control = event.target.closest('[data-iteration-control]');
