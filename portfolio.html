@@ -4212,11 +4212,41 @@
     border-radius: 14px;
     background: var(--brew-panel);
   }
-  .sheet[data-page="brew"] .cs-learning { padding: 0 0 0 20px; }
+  .sheet[data-page="brew"] .cs-learning { padding: 11px 0 11px 20px; }
+  .sheet[data-page="brew"] .cs-learning:first-child { padding-top: 0; }
+  .sheet[data-page="brew"] .cs-learning:last-child { padding-bottom: 0; }
   .sheet[data-page="brew"] .cs-learning::before {
-    top: 0.65em;
+    top: calc(11px + 0.65em);
     background: var(--brew-cream);
   }
+  .sheet[data-page="brew"] .cs-learning:first-child::before { top: 0.65em; }
+  .sheet[data-page="brew"] .cs-learning strong { color: var(--ink); font-weight: 700; }
+  .sheet[data-page="brew"] .cs-impact-callout p {
+    margin-top: 14px; max-width: 62ch;
+    font-size: 15px; line-height: 1.55; color: var(--brew-cream-ink);
+  }
+  /* Context findings sit in a 2×2 of panels between the audience line and
+     the approach, so the research reads as evidence rather than one long
+     run of prose. */
+  .sheet[data-page="brew"] .cs-brew-context { margin-top: 20px; gap: 12px; }
+  .sheet[data-page="brew"] .cs-brew-context .cs-feature h3 { margin-bottom: 10px; }
+  .sheet[data-page="brew"] .cs-brew-context .cs-feature p { font-size: 13px; line-height: 1.6; }
+  /* A sentence of framing between a flow's label and its player. */
+  .sheet[data-page="brew"] .cs-flow-intro { max-width: 68ch; margin-bottom: 20px; }
+  /* Decisions as a grid of panels; each line leads with its role
+     (Gave up / Why / Guardrail) so the tradeoff can be skimmed. */
+  .sheet[data-page="brew"] .cs-brew-decisions { gap: 12px; }
+  .sheet[data-page="brew"] .cs-brew-decisions .cs-decision-block { padding: 22px 22px 24px; }
+  .sheet[data-page="brew"] .cs-brew-decisions .cs-decision-block h3 {
+    margin-bottom: 12px; font-size: 20px;
+  }
+  .sheet[data-page="brew"] .cs-brew-decisions .cs-decision-block p {
+    font-size: 13px; line-height: 1.55; color: var(--ink-mid);
+  }
+  .sheet[data-page="brew"] .cs-brew-decisions .cs-decision-block p + p { margin-top: 6px; }
+  .sheet[data-page="brew"] .cs-brew-decisions .cs-decision-block strong { color: var(--ink); }
+  .sheet[data-page="brew"] .cs-refs li { font-size: 13px; line-height: 1.5; color: var(--ink-mid); }
+  .sheet[data-page="brew"] .cs-refs li::before { background: var(--ink-low); }
   /* CROW borrows brew's product-design grammar (measured section rhythm,
      framed figures, three-up principles). Its portfolio accent follows the
      shared plum card token so the feed identity carries into the study. */
@@ -7004,7 +7034,7 @@
         <div class="cs-section">
           <span class="cs-label">Overview</span>
           <div class="cs-copy cs-overview">
-            <p>A cafe-discovery app organized around what someone needs from a space, with meaningful save states and one shared system for comments and reviews.</p>
+            <p>A cafe-discovery app organized around what someone needs from a space, with save states that mean something and one shared system for comments and reviews.</p>
           </div>
         </div>
 
@@ -7013,11 +7043,11 @@
           <div class="cs-two-col">
             <div class="cs-feature">
               <h3>Stack</h3>
-              <p>The current interaction prototype is built in React 18 + Vite. The iOS app is planned in React Native with Expo and TypeScript, using Google Maps Platform for cafe search, place details, maps, and directions. This keeps the working prototype close to the mobile implementation while giving the shipped app a native framework and navigation model.</p>
+              <p>The current interaction prototype is built in React 18 + Vite. The iOS app is planned in React Native with Expo and TypeScript, using Google Maps Platform for cafe search, place details, maps, and directions. This keeps the prototype close to the mobile build while giving the shipped app a native framework and navigation model.</p>
             </div>
             <div class="cs-feature">
               <h3>Ownership</h3>
-              <p>Brew is a partner project, and we shape the broader product together. I independently own the flows covered here: comments and review-comments, onboarding, splash and loading states, and directions. I design and build each flow in the working prototype, test it at real phone proportions, and refine the states that static mockups do not expose.</p>
+              <p>Brew is a partner project, and we shape the broader product together. I own the flows covered here: comments and reviews, onboarding, splash and loading states, and directions. I design and build each flow in the working prototype, test it at real phone proportions, and refine the states that static mockups don&rsquo;t show.</p>
             </div>
           </div>
         </div>
@@ -7026,9 +7056,30 @@
           <span class="cs-label">Product Context</span>
           <h3 class="cs-question">How might Brew help someone find the right cafe for what they need, then remember it the way they naturally think about it?</h3>
           <div class="cs-copy">
-            <p>People already find cafes across Google Maps, Instagram, TikTok, and their own Notes app. The information is fragmented, star ratings flatten very different needs into one score, and a single bookmark does not distinguish curiosity from experience or genuine preference.</p>
-            <p>Brew reframes discovery around intent, with categories like quiet, work-friendly, and social. It also separates Want to Go, Been, and Favorite so saving a cafe communicates a meaningful relationship instead of adding it to one undifferentiated list.</p>
+            <p><strong>Who it&rsquo;s for:</strong> students and remote workers choosing a cafe for a specific reason: getting work done, meeting friends, or taking a quiet break.</p>
           </div>
+          <div class="cs-two-col cs-brew-context">
+            <div class="cs-feature">
+              <h3>Discovery is scattered</h3>
+              <p>Google&rsquo;s own research found that 40 percent of 18 to 24-year-old users go to TikTok or Instagram when they are looking for a place for lunch, rather than Google Maps or Search (Raghavan, 2022). Gen Z is still the most likely to prefer Google over all other platforms (89%) (Adobe Express, 2026), so people move between apps rather than replacing one with another. Cafe finds end up split across all of them.</p>
+            </div>
+            <div class="cs-feature">
+              <h3>A star rating hides what matters</h3>
+              <p>Online ratings follow a J-shaped distribution, with mostly 5-star ratings, some 1-star ratings, and hardly any in between, which makes the average a weak measure of quality (Hu, Pavlou &amp; Zhang, 2009). The right environment also depends on the task: moderate background noise (70 dB) improved creative performance compared with low noise (50 dB), while high noise (85 dB) hurt it (Mehta, Zhu &amp; Cheema, 2012). A 4.6 can&rsquo;t tell you whether a cafe fits what you&rsquo;re there to do.</p>
+            </div>
+            <div class="cs-feature">
+              <h3>Practical needs drive the choice</h3>
+              <p>After home, the second most common place remote workers work from is a coffee shop or cafe (Buffer, 2019). In one survey, more than a third of mobile workers (37%) chose a coffee shop for its WiFi over the quality of its coffee (Samsung). The most common reason people give for working in a coffee shop is to be around other people (Broadband.co.uk, 2024).</p>
+            </div>
+            <div class="cs-feature">
+              <h3>Where existing tools stop</h3>
+              <p>Google Maps already has Favorites, Want to go, and Starred places lists by default, and business attributes like whether a place has Wi-Fi or outdoor seating. Those lists work as separate folders. A place can sit in several at once, and a visit is a checkmark inside Want to go. Brew gives each cafe one state that moves forward, from Want to go to Been here to Favorite. It also builds discovery around intent, so amenity data isn&rsquo;t the main way to browse.</p>
+            </div>
+          </div>
+          <div class="cs-copy cs-copy--after-fig">
+            <p><strong>Brew&rsquo;s approach:</strong> Brew starts with intent, using categories like quiet, work-friendly, and social. Review tags for WiFi, outlets, noise, and price fill in those categories.</p>
+          </div>
+        </div>
         </div>
 
         <div class="cs-section">
@@ -7042,18 +7093,21 @@
             <div class="cs-product-principle">
               <span>02</span>
               <h3>States with meaning</h3>
-              <p>Use Want to Go, Been, and Favorite to reflect distinct moments in a person's relationship with a place.</p>
+              <p>Use Want to go, Been here, and Favorite to reflect distinct moments in a person's relationship with a place.</p>
             </div>
             <div class="cs-product-principle">
               <span>03</span>
               <h3>Shared surfaces, clear rules</h3>
-              <p>Keep related actions together while making differences, such as reviews versus comments, legible in the interaction.</p>
+              <p>Keep related actions together while making differences, such as reviews versus comments, clear in the interaction.</p>
             </div>
           </div>
         </div>
 
         <div class="cs-section cs-iterations-section">
           <span class="cs-label">Comment Section</span>
+          <div class="cs-copy cs-flow-intro">
+            <p>Review tags like WiFi, outlets, noise, and price are what intent discovery runs on. Every tagged review makes the quiet and work-friendly filters more accurate.</p>
+          </div>
 
           <div class="cs-iteration-player cs-scroll-flow cs-rating-flow" data-iteration-player data-iteration-rank="1">
             <div class="cs-iteration-visual" aria-live="polite">
@@ -7084,56 +7138,56 @@
                   <h4>Keep feedback close to the cafe</h4>
                   <ul>
                     <li><strong>Shared entry point:</strong> comments and reviews start in the same sheet, beside the cafe being discussed.</li>
-                    <li><strong>Optional rating:</strong> someone can join the conversation without scoring the cafe.</li>
+                    <li><strong>Optional rating:</strong> anyone can join the conversation without scoring the cafe.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="1">
                   <h4>Preserve the work already done</h4>
                   <ul>
                     <li><strong>Keep the draft:</strong> attaching a rating carries the existing comment into the review flow.</li>
-                    <li><strong>No restart:</strong> someone can add detail as they go, without choosing a different form or retyping.</li>
+                    <li><strong>No restart:</strong> people add detail as they go, without switching forms or retyping.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="2">
                   <h4>Separate selection from submission</h4>
                   <ul>
-                    <li><strong>No default score:</strong> cups start empty; opening the rating flow does not assign a zero.</li>
-                    <li><strong>Two stages:</strong> the first arrow advances to cafe details, giving the reviewer another step before publishing.</li>
+                    <li><strong>No default score:</strong> cups start empty, so opening the rating flow doesn&rsquo;t assign a zero.</li>
+                    <li><strong>Two stages:</strong> the first arrow moves to cafe details, giving the reviewer one more step before publishing.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="3">
                   <h4>Make the selected score explicit</h4>
                   <ul>
-                    <li><strong>Half-cup increments:</strong> allow a score between whole numbers, such as 3.5 out of 5.</li>
-                    <li><strong>Numeric confirmation:</strong> show the exact value beside the cups so the score is readable beyond the icon fill.</li>
+                    <li><strong>Half-cup increments:</strong> scores can land between whole numbers, such as 3.5 out of 5.</li>
+                    <li><strong>Numeric confirmation:</strong> the exact value sits beside the cups, so the score is clear beyond the icon fill.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="4">
                   <h4>Capture what a rating leaves out</h4>
                   <ul>
                     <li><strong>Practical context:</strong> tags describe WiFi, outlets, noise, and price alongside the overall score.</li>
-                    <li><strong>Intent matters:</strong> these details speak to what someone needs from a cafe, such as working or meeting friends.</li>
+                    <li><strong>Intent matters:</strong> these details speak to why someone visits, like working or meeting friends.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="5">
                   <h4>Keep choices visible before posting</h4>
                   <ul>
-                    <li><strong>Visible selections:</strong> highlighted tags show which details will accompany the review.</li>
-                    <li><strong>Room for context:</strong> the original note stays editable, keeping structured tags and personal feedback in one place.</li>
+                    <li><strong>Visible selections:</strong> highlighted tags show which details will post with the review.</li>
+                    <li><strong>Room for context:</strong> the original note stays editable, keeping tags and personal feedback in one place.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="6">
                   <h4>Confirm the contribution and its limits</h4>
                   <ul>
-                    <li><strong>Visible result:</strong> the posted note and 3.5-cup rating appear together; the rating count rises from 139 to 140.</li>
-                    <li><strong>One rating per person:</strong> the cup dims after posting, while the comment field remains available for conversation.</li>
+                    <li><strong>Visible result:</strong> the note and the 3.5-cup rating post together, and the rating count rises from 139 to 140.</li>
+                    <li><strong>One rating per person:</strong> the cup dims after posting, while the comment field stays open for conversation.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="7">
                   <h4>Make the one-rating rule visible</h4>
                   <ul>
                     <li><strong>Clear feedback:</strong> a toast explains when someone tries to review the same cafe again.</li>
-                    <li><strong>Conversation stays open:</strong> the existing review remains visible and the comment field is still available.</li>
+                    <li><strong>Conversation stays open:</strong> the existing review stays visible and the comment field is still available.</li>
                   </ul>
                 </div>
               </div>
@@ -7143,6 +7197,9 @@
 
         <div class="cs-section cs-iterations-section">
           <span class="cs-label">Directions</span>
+          <div class="cs-copy cs-flow-intro">
+            <p><strong>Scope call:</strong> Brew doesn&rsquo;t build navigation. Google Maps already handles turn-by-turn, so Brew shows the travel time up front, then hands off with everything filled in.</p>
+          </div>
 
           <div class="cs-iteration-player cs-scroll-flow cs-directions-flow" data-iteration-player data-iteration-rank="2">
             <div class="cs-iteration-visual" aria-live="polite">
@@ -7162,21 +7219,21 @@
                 <div class="cs-iteration-note is-active" data-iteration-note="0">
                   <h4>Choose the starting point</h4>
                   <ul>
-                    <li><strong>Two ways to begin:</strong> use current location or enter another starting point, supporting both immediate trips and planning ahead.</li>
-                    <li><strong>Carry the destination forward:</strong> the selected cafe is already filled in, so there is no need to search for it again.</li>
+                    <li><strong>Two ways to begin:</strong> use current location or enter another starting point, for leaving now or planning ahead.</li>
+                    <li><strong>Destination carried forward:</strong> the selected cafe is already filled in, so there&rsquo;s no second search.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="1">
                   <h4>Compare the trip before committing</h4>
                   <ul>
-                    <li><strong>Side-by-side estimates:</strong> driving, bus, and walking times make the travel commitment visible before leaving Brew.</li>
-                    <li><strong>Fastest stays explicit:</strong> the badge identifies the quickest option while keeping the alternatives available.</li>
+                    <li><strong>Side-by-side estimates:</strong> driving, bus, and walking times show the travel time before anyone leaves Brew.</li>
+                    <li><strong>Fastest stays explicit:</strong> a badge marks the quickest option while keeping the alternatives available.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="2">
                   <h4>Let preference guide the final choice</h4>
                   <ul>
-                    <li><strong>Selection is separate from speed:</strong> Bus is highlighted while Drive retains its Fastest badge, leaving the choice with the traveler.</li>
+                    <li><strong>Selection is separate from speed:</strong> Bus is highlighted while Drive keeps its Fastest badge, leaving the choice with the traveler.</li>
                     <li><strong>One clear handoff:</strong> Get Directions opens Google Maps with the chosen starting point, cafe, and travel mode.</li>
                   </ul>
                 </div>
@@ -7213,42 +7270,42 @@
                   <h4>Give each save a meaning</h4>
                   <ul>
                     <li><strong>Three distinct states:</strong> Want to go, Been here, and Favorites separate interest, experience, and preference.</li>
-                    <li><strong>Keep the cafe in view:</strong> the sheet names the place being saved while its photo remains visible.</li>
+                    <li><strong>Cafe stays in view:</strong> the sheet names the place being saved while its photo remains visible.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="1">
                   <h4>Make the destination explicit</h4>
                   <ul>
                     <li><strong>Preview the choice:</strong> Want to go highlights before the save is applied.</li>
-                    <li><strong>Name the action:</strong> Add to Want to go confirms both what will happen and where the cafe will be saved.</li>
+                    <li><strong>Name the action:</strong> Add to Want to go confirms what will happen and where the cafe will be saved.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="2">
                   <h4>Confirm, then return to discovery</h4>
                   <ul>
-                    <li><strong>Immediate feedback:</strong> a confirmation names the shelf, and the feed bookmark changes to the saved state.</li>
-                    <li><strong>Keep browsing:</strong> the first save closes the sheet, returning to the cafe without a separate confirmation screen.</li>
+                    <li><strong>Immediate feedback:</strong> a confirmation names the shelf, and the feed bookmark switches to its saved state.</li>
+                    <li><strong>Keep browsing:</strong> the first save closes the sheet and returns to the cafe, with no extra confirmation screen.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="3">
                   <h4>Move the cafe as plans change</h4>
                   <ul>
                     <li><strong>Show current and next:</strong> Want to go stays outlined while Been here becomes the pending choice.</li>
-                    <li><strong>Move, rather than duplicate:</strong> the button names the new shelf, reflecting a visit without leaving the cafe in the old state.</li>
+                    <li><strong>Move, don&rsquo;t duplicate:</strong> the button names the new shelf, so marking a visit moves the cafe instead of leaving it in its old state.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="4">
                   <h4>Make the updated state readable</h4>
                   <ul>
                     <li><strong>Confirm the move:</strong> Been here stays selected, the feed icon becomes a check, and the message names the change.</li>
-                    <li><strong>Keep control available:</strong> Remove from shelf appears in the same sheet, so managing a save does not require another flow.</li>
+                    <li><strong>Control stays close:</strong> Remove from shelf appears in the same sheet, so managing a save needs no separate flow.</li>
                   </ul>
                 </div>
                 <div class="cs-iteration-note" data-iteration-note="5">
                   <h4>Let the decision be undone</h4>
                   <ul>
                     <li><strong>Clear the saved state:</strong> removal resets the shelf choices and returns the feed action to Save.</li>
-                    <li><strong>Confirm the result:</strong> a removal message makes the change explicit, while the sheet stays available to choose a shelf again.</li>
+                    <li><strong>Confirm the result:</strong> a removal message makes the change explicit, and the sheet stays open to pick a shelf again.</li>
                   </ul>
                 </div>
               </div>
@@ -7307,16 +7364,83 @@
         -->
 
         <div class="cs-section">
+          <span class="cs-label">Decisions + Tradeoffs</span>
+          <div class="cs-two-col cs-brew-decisions">
+            <div class="cs-decision-block">
+              <h3>Two-step review</h3>
+              <p><strong>Gave up:</strong> speed. A second screen is one more place to drop off.</p>
+              <p><strong>Why:</strong> tags are the data intent discovery runs on, so they get their own step.</p>
+              <p><strong>Watching:</strong> drop-off at the tags step.</p>
+            </div>
+            <div class="cs-decision-block">
+              <h3>One sheet for comments and reviews</h3>
+              <p><strong>Gave up:</strong> the simpler model where every post is a review.</p>
+              <p><strong>Why:</strong> people can join the conversation without scoring a cafe.</p>
+              <p><strong>Guardrail:</strong> ratings are optional and limited to one per person, so comments and reviews stay distinct.</p>
+            </div>
+            <div class="cs-decision-block">
+              <h3>Half cups</h3>
+              <p><strong>Gave up:</strong> the simplicity of whole numbers.</p>
+              <p><strong>Why:</strong> a cafe that&rsquo;s great to work from but has average coffee doesn&rsquo;t fit neatly into a 3 or a 4.</p>
+              <p><strong>Guardrail:</strong> the number beside the cups keeps the score readable.</p>
+            </div>
+            <div class="cs-decision-block">
+              <h3>Directions handoff</h3>
+              <p><strong>Gave up:</strong> keeping people inside Brew for the whole trip.</p>
+              <p><strong>Why:</strong> Google Maps already does navigation well. Brew&rsquo;s job ends once the cafe and route are chosen.</p>
+            </div>
+            <div class="cs-decision-block">
+              <h3>Considered and rejected</h3>
+              <p>Separate forms for comments and reviews. People would have to pick a form before knowing what they wanted to say, and switching would mean retyping.</p>
+            </div>
+            <div class="cs-decision-block">
+              <h3>Known risk: cold start</h3>
+              <p>Intent filters stay thin until a cafe has tagged reviews. The plan is to prompt for tags when a cafe moves to Been here, right after someone has actually visited.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">Measuring Success</span>
+          <div class="cs-learnings">
+            <div class="cs-learning"><strong>Save to visit:</strong> % of Want to go saves that move to Been here within 30 days</div>
+            <div class="cs-learning"><strong>Review completion:</strong> % of rating flows started that get posted, and drop-off at the tags step</div>
+            <div class="cs-learning"><strong>Tag coverage:</strong> % of reviews with at least one tag</div>
+            <div class="cs-learning"><strong>Directions handoff:</strong> % of cafe views that end in Get Directions</div>
+            <div class="cs-learning"><strong>Guardrail:</strong> comment volume holds steady as more people rate</div>
+          </div>
+        </div>
+
+        <div class="cs-section">
           <span class="cs-label">Current Outcome</span>
           <div class="cs-impact-callout">
             <span class="cs-impact-line">A working prototype connects cafe discovery to saving, directions, comments, and ratings in one place.</span>
+            <p>Each flow is built and tested at real phone proportions, including states static mockups miss: empty ratings, duplicate reviews, and moving a cafe between shelves.</p>
           </div>
         </div>
 
         <div class="cs-section">
           <span class="cs-label">Next Iteration</span>
           <div class="cs-learnings">
-            <div class="cs-learning">Validate the find → save → visit → review loop with usage data, align the rating summary visual with its score, and make moderation actions easier to discover.</div>
+            <div class="cs-learning">Run usability sessions on the full find &rarr; save &rarr; visit &rarr; review loop, then track the metrics above once Brew reaches real users.</div>
+            <div class="cs-learning">Add a tag prompt when a cafe moves to Been here.</div>
+            <div class="cs-learning">Make the rating summary visual match its score, and make moderation actions easier to find.</div>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <span class="cs-label">References</span>
+          <div class="cs-copy cs-refs">
+            <ul>
+              <li>Raghavan, P. Remarks at Fortune Brainstorm Tech, 2022.</li>
+              <li>Adobe Express. Using TikTok as a Search Engine, 2026.</li>
+              <li>Hu, N., Pavlou, P. A., &amp; Zhang, J. Overcoming the J-shaped Distribution of Product Reviews. <em>Communications of the ACM</em>, 2009.</li>
+              <li>Mehta, R., Zhu, R., &amp; Cheema, A. Is Noise Always Bad? <em>Journal of Consumer Research</em>, 2012.</li>
+              <li>Buffer. State of Remote Work, 2019.</li>
+              <li>Samsung mobile worker report, via TechRadar.</li>
+              <li>Broadband.co.uk. Coffee shop remote working survey, 2024.</li>
+              <li>Google Maps Help. Create a list of places. Google Business Profile Help. Business attributes.</li>
+            </ul>
           </div>
         </div>
       `,
