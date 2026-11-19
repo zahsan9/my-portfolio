@@ -10912,13 +10912,25 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
         // Anything the observer saw while the intro held it back.
         pins.filter(p => !p.classList.contains('is-in')).forEach(p => { reveal.unobserve(p); reveal.observe(p); });
       };
-      // Wait for the web fonts (capped, so a slow network never stalls the
-      // page) so text doesn't reflow mid-entrance, then two frames in, so the
-      // held-back first frame paints before it plays.
+      // Hold the intro until the opening load's heavy lifting is done: web
+      // fonts (so text doesn't reflow mid-entrance), the page load, and the
+      // first screen's images decoded. Started any earlier, the browser's
+      // first render and image decodes land on the entrance's opening frames
+      // and stutter it. Everything is still hidden, so the wait is invisible;
+      // it's capped so a slow network never stalls the page. Then an idle
+      // moment, then two frames so the held-back first frame paints first.
       if (root.classList.contains('feed-intro')) {
-        const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
-        Promise.race([fontsReady, new Promise(r => setTimeout(r, 700))])
-          .then(() => requestAnimationFrame(() => requestAnimationFrame(playIntro)));
+        const vh = window.innerHeight;
+        const firstScreenImgs = [...document.querySelectorAll('.banner img, #feed .pin img')]
+          .filter(img => img.getBoundingClientRect().top < vh);
+        const ready = Promise.all([
+          document.fonts ? document.fonts.ready : null,
+          document.readyState === 'complete' ? null : new Promise(r => window.addEventListener('load', r, { once: true })),
+          ...firstScreenImgs.map(img => img.decode ? img.decode().catch(() => {}) : null),
+        ]);
+        const idle = cb => window.requestIdleCallback ? requestIdleCallback(cb, { timeout: 120 }) : setTimeout(cb, 0);
+        Promise.race([ready, new Promise(r => setTimeout(r, 1200))])
+          .then(() => idle(() => requestAnimationFrame(() => requestAnimationFrame(playIntro))));
       }
     } else {
       root.classList.remove('feed-intro');
