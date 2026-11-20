@@ -281,5 +281,5 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 - **2-3 finished case studies, not more** — everything else stays `wip: true` (renders the "Coming soon" state). A placeholder reads better than a rushed write-up.
 - **Reads as a talk** — the section order above is the talk order: hook, question, decisions with reasoning, impact, reflection. Amazon-style loops expect this to work presented out loud, not just skimmed.
 
-**Gray bio, no rule under the topbar.** Only the name and titles use full `--ink`. The feed bio uses `--ink-soft` (oklch 0.70 in dark mode, 0.40 in light) so it sits a step back. The topbar has no `border-bottom`, and its blur backdrop is what separates it from content on scroll. The rail's `border-right` and the sheet head's `border-bottom` stay.
+**Gray bio, no rule under the topbar.** Only the name and titles use full `--ink`. The feed bio uses `--ink-soft` (oklch 0.70 in dark mode, 0.40 in light) so it sits a step back. The topbar has no `border-bottom` and the rail has no `border-right`: the rail and the page share `--paper`, and the topbar's blur backdrop is what separates it from content on scroll. The sheet head's `border-bottom` stays.
 
