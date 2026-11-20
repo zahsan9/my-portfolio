@@ -1264,7 +1264,6 @@
     .feed .feed-col { display: contents; }
     .feed .pin:has(.skills-card, .contact-card) { display: none; }
     .feed .pin[data-page] > .art { aspect-ratio: 4 / 5; }
-    .tabs .tab[data-filter="studio"] { display: none; }
   }
 
   .pin {
@@ -6139,6 +6138,12 @@
     animation: feed-in 1000ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
     animation-delay: var(--feed-d, 0ms);
   }
+  /* Once a card has made its entrance it never replays it (the extra
+     .is-in keeps this above the phone rule that swaps in feed-pin-in). Without this,
+     a card a filter hid and then brought back restarted feed-in (display
+     none -> shown restarts CSS animations) with its stale intro delay, and
+     faded in late, out of step with the filter's own motion. */
+  .feed.has-reveal .pin.is-in.is-settled { animation: none; }
   .feed .pin { translate: 0 var(--feed-lag, 0px); }
   /* Phones: the same fade up, without the blur. Animating filter on every
      card while the page scrolls flickered on mobile Safari, and so did a
@@ -6316,10 +6321,9 @@
       <nav class="tabs" aria-label="Filter work">
         <div class="tabs-scroll">
           <button class="tab active" data-filter="all" data-text="All" aria-pressed="true">All</button>
-          <button class="tab" data-filter="ux" data-text="Product / UX" aria-pressed="false">Product / UX</button>
-          <button class="tab" data-filter="swe" data-text="SWE" aria-pressed="false">SWE</button>
+          <button class="tab" data-filter="ux" data-text="Product" aria-pressed="false">Product</button>
+          <button class="tab" data-filter="swe" data-text="Software" aria-pressed="false">Software</button>
           <button class="tab" data-filter="viz" data-text="Data" aria-pressed="false">Data</button>
-          <button class="tab" data-filter="studio" data-text="WIIRED Studio" aria-pressed="false">WIIRED Studio</button>
         </div>
       </nav>
 
@@ -9455,8 +9459,8 @@
   syncFeedLayout();
 
   const CAT_LABELS = {
-    ux: 'Product / UX',
-    swe: 'SWE',
+    ux: 'Product',
+    swe: 'Software',
     viz: 'Data',
     studio: 'WIIRED Studio',
     misc: 'Misc'
@@ -9722,11 +9726,28 @@
       return (p.dataset.cat || '').split(/\s+/).includes(f);
     }));
 
-    // FIRST: only snapshot pins that are visible now AND will stay visible
-    const first = new Map();
+    // A faster-than-settle click can leave last pass's leavers mid-fade,
+    // still absolutely placed: finish them off before measuring.
     pins.forEach(p => {
-      if (!p.classList.contains('is-hidden') && show.has(p))
-        first.set(p, p.getBoundingClientRect());
+      if (!p.classList.contains('is-leaving')) return;
+      p.classList.remove('is-leaving');
+      p.classList.add('is-hidden');
+      p.style.cssText = '';
+    });
+
+    // Cards a filter brings on screen use the filter's fade, not the page
+    // entrance: reveal anything not yet revealed, and mark it settled.
+    show.forEach(p => p.classList.add('is-in', 'is-settled'));
+
+    // FIRST: only snapshot pins that are visible now AND will stay visible.
+    // Leavers are measured too, so they can fade out where they stood.
+    const first = new Map();
+    const leaving = new Map();
+    const feedBox = feed.getBoundingClientRect();
+    pins.forEach(p => {
+      if (p.classList.contains('is-hidden')) return;
+      if (show.has(p)) first.set(p, p.getBoundingClientRect());
+      else leaving.set(p, p.getBoundingClientRect());
     });
 
     // Preserve scroll so feed height change doesn't cause a jump
@@ -9734,10 +9755,22 @@
 
     feed.classList.toggle('is-filtered', f !== 'all');
 
-    // Cancel in-progress transitions; pre-hide new pins at opacity 0
+    // Cancel in-progress transitions; pre-hide new pins at opacity 0.
+    // Leavers come out of the layout but stay on screen, pinned where they
+    // were, so they can fade instead of vanishing and leaving holes.
     pins.forEach(p => {
       p.style.transition = 'none';
       p.style.transform  = '';
+      if (leaving.has(p)) {
+        const r = leaving.get(p);
+        p.classList.add('is-leaving');
+        Object.assign(p.style, {
+          position: 'absolute', margin: '0', zIndex: '0', pointerEvents: 'none',
+          left: (r.left - feedBox.left) + 'px', top: (r.top - feedBox.top) + 'px',
+          width: r.width + 'px', height: r.height + 'px',
+        });
+        return;
+      }
       if (show.has(p) && !first.has(p)) p.style.opacity = '0';
       else p.style.opacity = '';
       p.classList.toggle('is-hidden', !show.has(p));
@@ -9763,6 +9796,11 @@
     void feed.offsetWidth;
 
     // PLAY
+    leaving.forEach((_, p) => {
+      p.style.transition = 'opacity 0.18s ease, scale 0.18s ease';
+      p.style.opacity = '0';
+      p.style.scale = '0.98';
+    });
     show.forEach(p => {
       if (first.has(p)) {
         p.style.transition = 'transform 0.46s cubic-bezier(0.22,1,0.36,1)';
@@ -9777,7 +9815,15 @@
 
     filterSettleTimer = setTimeout(() => {
       filterSettleTimer = null;
-      pins.forEach(p => { p.style.transition = ''; p.style.transform = ''; p.style.opacity = ''; });
+      pins.forEach(p => {
+        if (p.classList.contains('is-leaving')) {
+          p.classList.remove('is-leaving');
+          p.classList.add('is-hidden');
+          p.style.cssText = '';
+          return;
+        }
+        p.style.transition = ''; p.style.transform = ''; p.style.opacity = '';
+      });
       lockFeedHeight();
     }, motionDelay(520));
   }
@@ -9794,13 +9840,6 @@
     });
   });
 
-  function syncMobileFilter() {
-    if (mobileFeedQuery.matches && currentFilter === 'studio') {
-      document.querySelector('.tab[data-filter="all"]').click();
-    }
-  }
-  mobileFeedQuery.addEventListener('change', syncMobileFilter);
-  syncMobileFilter();
 
 
   // ── Routing ──
@@ -10739,6 +10778,9 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
         });
       }, { threshold: 0.12 });
       pins.forEach(pin => reveal.observe(pin));
+      pins.forEach(pin => pin.addEventListener('animationend', e => {
+        if (e.target === pin && e.animationName.startsWith('feed')) pin.classList.add('is-settled');
+      }));
 
       // Opening load: the banner builds in, then the cards already on screen
       // follow in reading order.
