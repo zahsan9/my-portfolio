@@ -1174,11 +1174,10 @@
     transition: opacity var(--motion-med) ease;
   }
   .tabs-scroll { display: contents; }
-  /* Same voice as the rail's nav labels (Inter, 500, --tracking-ui), at
-     the bio's size (16px desktop, 14px phone) so the header reads as one
-     type system. */
+  /* Same voice as the rail's nav labels (Inter, 500, --tracking-ui): the
+     filters are navigation too, so they shouldn't outweigh the page. */
   .tab {
-    font-family: var(--sans); font-size: 16px; font-weight: 500;
+    font-family: var(--sans); font-size: 14px; font-weight: 500;
     letter-spacing: var(--tracking-ui);
     padding: 6px 0 10px; background: transparent; color: var(--control-muted);
     position: relative; line-height: 1;
@@ -6065,7 +6064,7 @@
     .banner h1 { font-size: 30px; margin-bottom: 8px; }
     .banner .bio { max-width: 292px; font-size: 13px; line-height: 1.55; }
     .tabs { width: min(292px, 100% - 36px); padding: 14px 0 16px; }
-    .tab { font-size: 14px; padding: 12px 0; }
+    .tab { font-size: 12px; padding: 12px 0; }
 .cs-two-col,
     .cs-artifact-grid,
     .cs-viz-grid,
