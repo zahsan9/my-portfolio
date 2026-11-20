@@ -86,7 +86,7 @@ Experience cards carry no tech-logo stack. There was one (`.exp-tech-zone`, an a
 
 ### Theme
 
-`data-theme="dark"` on `<html>` drives all color tokens via CSS custom property overrides in `[data-theme="dark"]`. Toggling adds `.theme-transitioning` for a 520ms crossfade, then removes it.
+**The site is dark-only.** The light theme and its toggle were removed. The head script always sets `data-theme="dark"` on `<html>` and clears any old stored `theme` key, and `[data-theme="dark"]` overrides the `:root` page-chrome tokens. The `:root` values are now only the base those overrides sit on; nothing renders them. Don't add `html[data-theme="light"]` rules back.
 
 `:root` holds the values dark mode actually ships with (`--paper`, `--ink`, `--c-cream`, etc. — dark is treated as the source of truth, not light). The `[data-theme="dark"]` block only overrides page-chrome tokens (paper/ink/line/control); it deliberately does **not** redefine the feed-card palette (`--c-*`) — those must render identically in both themes. `--sub-color` (used by `.pin .sub`, the feed-card hover caption) is the one token that's genuinely different per theme: black in light, white in dark, since it sits on the page background rather than a card surface.
 
@@ -197,7 +197,7 @@ Do not make every sheet visually identical. Consistency comes from the canvas, s
 
 ### Shared visual foundation
 
-- **Case-study canvas**: all finished case studies use the same mode-aware sheet background. Dark mode uses the lighter neutral gray `oklch(0.29 0 0)`; light mode uses the darker neutral gray `oklch(0.91 0 0)`. Keep the shared selector centralized so case-study backgrounds cannot drift apart.
+- **Case-study canvas**: all finished case studies use the same mode-aware sheet background. It uses the lighter neutral gray `oklch(0.29 0 0)`. Keep the shared selector centralized so case-study backgrounds cannot drift apart.
 - **Section rhythm**: use `66px` of top spacing between major `.cs-section` blocks. The space belongs before the next text section, not as extra space after a figure. Every major section should use the same rhythm, including Impact/Current Outcome. The one exception is the Overview that opens every study: it takes GoDaddy's wider step, `112px` above and below (`72px` at 640px and under), with its label `20px` from the lead, so the summary stands apart from the sections it introduces.
 - **Section labels**: title case, bold sans, compact rounded rectangle, and visually smaller than the content heading. Labels are not all-caps mono pills. Current size is `15px` for Brew and `16px` for Neutral.
 - **Structural boxes**: use a subtle fill with no outline and no shadow. Neutral and Brew section containers should not look like bordered cards. Borders are reserved for true content boundaries, such as figures, tables, version controls, or input-like elements.
