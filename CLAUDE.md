@@ -282,6 +282,8 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 - **2-3 finished case studies, not more** — everything else stays `wip: true` (renders the "Coming soon" state). A placeholder reads better than a rushed write-up.
 - **Reads as a talk** — the section order above is the talk order: hook, question, decisions with reasoning, impact, reflection. Amazon-style loops expect this to work presented out loud, not just skimmed.
 
+**Debossed component cards.** The noir cards (In the overlap, Find me elsewhere) read as pressed into the page. `.pin .art-noir` uses a fill of 90% `--paper` mixed with black, plus four inset shadows: a 1px rim at 28%, a 3px top shadow at 42%, an 18px top falloff at 34%, and a 1px bottom highlight at 9% white. The selector needs `.pin`, because `.pin .art`'s own box-shadow outranks a plain `.art-noir` rule.
+
 **Gray bio, no rule under the topbar.** Only the name and titles use full `--ink`. The feed bio uses `--ink-soft` (oklch 0.70 in dark mode, 0.40 in light) so it sits a step back. The topbar has no `border-bottom` and the rail has no `border-right`: the rail and the page share `--paper`, and the topbar's blur backdrop is what separates it from content on scroll. The sheet head's `border-bottom` stays.
 
 **Feed filters** are All · Product · Software · Data (`data-filter` ux / swe / viz). WIIRED Studio is not a filter. Its card shows only under All. The rail index's section headings (`CAT_LABELS`) use the same names.
