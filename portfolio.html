@@ -1191,7 +1191,15 @@
     opacity: 0;
   }
   .tab:hover { color: var(--ink); }
-  .tab.active { color: var(--ink); }
+  .tab.active { color: var(--ink); font-weight: 600; }
+  /* The active tab goes bold. Every tab reserves its bold width with an
+     invisible zero-height copy (data-text), so switching filters never
+     nudges its neighbours sideways. */
+  .tab { display: inline-flex; flex-direction: column; align-items: center; }
+  .tab::before {
+    content: attr(data-text); font-weight: 600;
+    height: 0; overflow: hidden; visibility: hidden; pointer-events: none;
+  }
   .tab.active::after {
     transform: scaleX(1); opacity: 1;
   }
@@ -6315,11 +6323,11 @@
 
       <nav class="tabs" aria-label="Filter work">
         <div class="tabs-scroll">
-          <button class="tab active" data-filter="all" aria-pressed="true">All</button>
-          <button class="tab" data-filter="ux" aria-pressed="false">Product / UX</button>
-          <button class="tab" data-filter="swe" aria-pressed="false">SWE</button>
-          <button class="tab" data-filter="viz" aria-pressed="false">Data</button>
-          <button class="tab" data-filter="studio" aria-pressed="false">WIIRED Studio</button>
+          <button class="tab active" data-filter="all" data-text="All" aria-pressed="true">All</button>
+          <button class="tab" data-filter="ux" data-text="Product / UX" aria-pressed="false">Product / UX</button>
+          <button class="tab" data-filter="swe" data-text="SWE" aria-pressed="false">SWE</button>
+          <button class="tab" data-filter="viz" data-text="Data" aria-pressed="false">Data</button>
+          <button class="tab" data-filter="studio" data-text="WIIRED Studio" aria-pressed="false">WIIRED Studio</button>
         </div>
       </nav>
 
