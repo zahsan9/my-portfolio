@@ -140,7 +140,7 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 | Prefix | Used for |
 |---|---|
 | `cs-` | Case study sheet content components |
-| `ab-` | About page sheet content. The deck cards carry no pills: no tag row on About Me / How I work / How I use AI, and no feature chips on Currently. About Me's copy is bottom-anchored (`margin-top:auto`). The two list cards keep `is-compact` text and take the freed height as row padding (17px, desktop only). Check `.ab-stack-header` against the card's inner height after any copy edit: the cards are a fixed 4:5 with `overflow: hidden`. |
+| `ab-` | About page sheet content. About Me, How I work, and How I use AI carry no tag pills. Currently keeps its white feature chips. About Me's copy is bottom-anchored (`margin-top:auto`) under a 380px photo circle (offset -80px top/right) that clears the title and stops above the first paragraph. The two list cards keep `is-compact` text and take the freed height as row padding (17px, desktop only). Check `.ab-stack-header` against the card's inner height after any copy edit: the cards are a fixed 4:5 with `overflow: hidden`. |
 | `exp-` | Experience timeline components |
 | `art-*` | Feed card color variants (`art-clay`, `art-sage`, `art-charcoal`, etc.) |
 | `pin` | Feed card (`.pin`, `.pin-active`, `.pin-meta`, `.sub`) |
