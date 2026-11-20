@@ -9701,9 +9701,10 @@
   // ── Filter motion: "spring give" ──
   // A damped spring baked into a CSS linear() easing, so the FLIP runs as a
   // plain WAAPI animation (compositor-friendly, cancellable) but settles with
-  // real give. stiffness 200 / damping 21 / mass 1 is ζ ≈ 0.74: ~3% overshoot,
-  // which reads as weight settling rather than bounce (ζ 0.71's 4% put ~36px
-  // of wobble on a full-height move). The duration is where
+  // real give. stiffness 200 / damping 22.5 / mass 1 is ζ ≈ 0.80: ~1.6%
+  // overshoot, a soft settle rather than a bounce (ζ 0.74's 3% read as too
+  // springy, and ζ 0.71's 4% put ~36px of wobble on a full-height move).
+  // The duration is where
   // the spring's envelope drops under 0.1%, so the curve lands on 1 with no
   // visible snap at the end.
   function springEasing(stiffness, damping, mass = 1) {
@@ -9726,7 +9727,7 @@
   // linear() is Chrome 113 / Safari 17.2 / Firefox 112+; older engines get the
   // site's usual ease-out (no overshoot) at the same length.
   const FILTER_SPRING = CSS.supports('animation-timing-function', 'linear(0, 1)')
-    ? springEasing(200, 21)
+    ? springEasing(200, 22.5)
     : { easing: FILTER_EASE_OUT, duration: 640 };
   const FILTER_LEAVE_MS      = 220; // leavers are mostly gone before stayers land
   const FILTER_ARRIVE_BEAT   = 100; // arrivals wait for the leavers' space to clear
@@ -9914,7 +9915,7 @@
     const arriveStep = filterStep(arrivals.length, FILTER_ARRIVE_STAGGER, FILTER_ARRIVE_SPAN);
     arrivals.forEach((p, i) => {
       const delay = FILTER_ARRIVE_BEAT + i * arriveStep;
-      trackFilterAnim(p, p.animate([{ scale: '0.94' }, { scale: '1' }], {
+      trackFilterAnim(p, p.animate([{ scale: '0.96' }, { scale: '1' }], {
         duration: FILTER_SPRING.duration, easing: FILTER_SPRING.easing, delay, fill: 'backwards',
       }));
       const from = { opacity: 0, transform: 'translateY(10px)' };
