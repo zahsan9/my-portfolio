@@ -296,4 +296,5 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 - **Reduced motion.** Changes are instant.
 - **Settled cards.** Every card a filter shows is `.is-in.is-settled` and never replays `feed-in`.
 - **Settle.** The timer is `motionDelay(total + 20)`. It hides the leavers, cancels the filter's animations and runs `lockFeedHeight()`.
+- **Height and view glide (`glideFeed`).** When a filter changes the feed's height, `.feed` height and `main.scrollTop` move together on one rAF ease-in-out (720ms). Otherwise a shorter page snaps the view up to its new bottom in one frame. The target scroll is read with the leavers set to `display:none`, because they're out of flow but still add scrollable overflow. Height and scroll are driven from the same loop, so the scroll never gets clamped. Wheel, touch or key input stops the scroll steering. `.feed.is-filtered` has `align-content: start` so the grid rows don't stretch while the height glides.
 - Never use the `translate` property in the FLIP: it belongs to the `--feed-lag` scroll spring.

@@ -1230,6 +1230,10 @@
   .feed.is-filtered {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* Rows stay packed at the top while the feed's height glides between
+       filters. With the default stretch, the spare height would be spread
+       across the rows and push the second row down mid-glide. */
+    align-content: start;
   }
   .feed.is-filtered .feed-col { display: contents; }
   /* A column with nothing visible in it collapses instead of leaving a dead
@@ -9730,6 +9734,33 @@
     ? springEasing(200, 22.5)
     : { easing: FILTER_EASE_OUT, duration: 640 };
   const FILTER_LEAVE_MS      = 220; // leavers are mostly gone before stayers land
+  const FILTER_HEIGHT_MS     = 720; // the feed's height (and so the view) gliding to the new size
+
+  // When a filter shortens the feed, the page gets shorter, and the browser
+  // would snap the view up to the new bottom in one frame. Instead, the
+  // feed's height and the scroll move together on one ease-in-out, frame
+  // by frame. Driving both from the same loop keeps the scroll inside the
+  // shrinking page at every step, so the browser never has to clamp it.
+  // If the visitor scrolls during the glide (wheel, touch or keys), the
+  // glide stops steering the scroll and only finishes the height.
+  let feedGlide = 0, glideSteer = false;
+  const stopSteer = () => { glideSteer = false; };
+  ['wheel', 'touchstart', 'keydown'].forEach(type =>
+    main.addEventListener(type, stopSteer, { passive: true }));
+  function glideFeed(h0, h1, s0, s1) {
+    cancelAnimationFrame(feedGlide);
+    const t0 = performance.now();
+    glideSteer = s1 < s0 - 1;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / FILTER_HEIGHT_MS);
+      const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      feed.style.height = (h0 + (h1 - h0) * e) + 'px';
+      if (glideSteer) main.scrollTop = s0 + (s1 - s0) * e;
+      feedGlide = k < 1 ? requestAnimationFrame(step) : 0;
+      if (!feedGlide) lockFeedHeight();
+    };
+    feedGlide = requestAnimationFrame(step);
+  }
   const FILTER_ARRIVE_BEAT   = 100; // arrivals wait for the leavers' space to clear
   const FILTER_ARRIVE_FADE   = 460; // opacity / lift / blur of an arrival (no overshoot)
   // Per-card stagger in reading order, capped by a total span so "All" (many
@@ -9779,6 +9810,11 @@
     // otherwise fire mid-flight here and hide/clear this pass's cards —
     // cancel it before starting a new pass.
     if (filterSettleTimer !== null) clearTimeout(filterSettleTimer);
+
+    // The feed's height as it looks right now (mid-glide on a rapid click),
+    // so the next height glide starts from it instead of snapping.
+    const fromHeight = feed.getBoundingClientRect().height;
+    cancelAnimationFrame(feedGlide); feedGlide = 0;
 
     // .feed is locked to a fixed height at rest (see lockFeedHeight). Left
     // locked here, it stays pinned to the OUTGOING filter's height for the
@@ -9857,8 +9893,17 @@
       p.classList.toggle('is-hidden', !show.has(p));
     });
 
-    // Reflow then restore scroll (prevents page jump from height change)
+    // Reflow and read the new layout: the feed's natural height, and how far
+    // the page will scroll once the leavers are gone (they're out of flow
+    // but still add scrollable overflow, so they're dropped for the read).
+    // Then hold the old height so the scroll can be restored unclamped; the
+    // glide below takes both to their new values.
     void feed.offsetWidth;
+    const toHeight = feed.getBoundingClientRect().height;
+    leaving.forEach((_, p) => { p.style.display = 'none'; });
+    const toScroll = Math.min(savedScroll, main.scrollHeight - main.clientHeight);
+    leaving.forEach((_, p) => { p.style.display = ''; });
+    feed.style.height = fromHeight + 'px';
     main.scrollTop = savedScroll;
     revealed.forEach(p => { p.style.transition = ''; });
     feedEmpty.classList.toggle('visible', show.size === 0);
@@ -9873,6 +9918,14 @@
     const arrivals = [...show].filter(p => !first.has(p)).sort(order);
     const blur = filterBlurOK();
     let total = FILTER_LEAVE_MS;
+
+    // Height + view glide.
+    if (Math.abs(toHeight - fromHeight) > 1 || toScroll < savedScroll - 1) {
+      glideFeed(fromHeight, toHeight, savedScroll, toScroll);
+      total = Math.max(total, FILTER_HEIGHT_MS);
+    } else {
+      feed.style.height = toHeight + 'px';
+    }
 
     // PLAY — leavers: a quick, soft exit from wherever they currently are.
     // fill: forwards holds them at 0 until the settle timer hides them.
@@ -9935,7 +9988,7 @@
         if (p.classList.contains('is-leaving')) hideLeaver(p);
         else cancelFilterAnims(p);
       });
-      lockFeedHeight();
+      if (!feedGlide) lockFeedHeight();
     }, motionDelay(total + 20));
   }
 
