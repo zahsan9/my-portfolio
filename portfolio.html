@@ -153,8 +153,8 @@
     --sub-color: #000;
   }
   [data-theme="dark"] {
-    --paper:       oklch(0.17  0 0);
-    --paper-2:     oklch(0.215 0 0);
+    --paper:       oklch(0.20  0 0);
+    --paper-2:     oklch(0.245 0 0);
     --ink:         oklch(0.93  0 0);
     --ink-mid:     oklch(0.58  0 0);
     --ink-soft:    oklch(0.70  0 0);
@@ -296,6 +296,7 @@
     background: var(--paper);
     display: flex; flex-direction: column; align-items: center;
     padding: 18px 0;
+    border-right: 1px solid var(--line);
     width: var(--chrome-size);
     overflow: hidden;
     z-index: 40;
@@ -1697,13 +1698,6 @@
     padding: 36px;
   }
   .art-noir.contact-card { padding: 36px; }
-  /* Dark mode: noir sits a step below the page, so it needs an edge. This is
-     an outline, not the inset ring above, because .pin .art's own box-shadow
-     overrides that ring, and its hover state swaps box-shadow for a lift. */
-  [data-theme="dark"] .art-noir {
-    outline: 1px solid oklch(1 0 0 / 0.12);
-    outline-offset: -1px;
-  }
   .art-noir .pin-meta { opacity: 0.55; }
 
   .pin .social-intro,
@@ -2771,9 +2765,10 @@
     margin-left: calc(var(--sheet-inset-left, 0px) * -1);
     margin-right: calc(var(--toc-reserve, 0px) * -1);
     /* 16px against the 48px pill keeps the head exactly --chrome-size tall,
-       so it lines up with the rail's own chrome. */
+       so its rule lines up with the rail's own chrome. */
     padding: 16px calc(var(--toc-reserve, 0px) + max(24px, calc((100% - var(--cs-col)) / 2 + 104px)))
              16px calc(var(--sheet-inset-left, 0px) + max(24px, calc((100% - var(--cs-col)) / 2 + 104px)));
+    border-bottom: 1px solid var(--line);
     position: sticky; top: 0; background: var(--paper); z-index: 2;
     min-height: var(--chrome-size);
   }
