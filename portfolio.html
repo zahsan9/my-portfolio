@@ -1697,6 +1697,13 @@
     padding: 36px;
   }
   .art-noir.contact-card { padding: 36px; }
+  /* Dark mode: noir sits a step below the page, so it needs an edge. This is
+     an outline, not the inset ring above, because .pin .art's own box-shadow
+     overrides that ring, and its hover state swaps box-shadow for a lift. */
+  [data-theme="dark"] .art-noir {
+    outline: 1px solid oklch(1 0 0 / 0.12);
+    outline-offset: -1px;
+  }
   .art-noir .pin-meta { opacity: 0.55; }
 
   .pin .social-intro,
