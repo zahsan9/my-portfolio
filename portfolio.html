@@ -1077,7 +1077,10 @@
     background: color-mix(in oklch, var(--paper) 86%, transparent);
     backdrop-filter: blur(18px) saturate(1.08);
     -webkit-backdrop-filter: blur(18px) saturate(1.08);
-    opacity: 0.72;
+    /* Hidden at the top of the page: with no rule under the bar, the
+       frosted backing over an empty page read as a faintly darker band.
+       It fades in once content scrolls beneath (.scrolled). */
+    opacity: 0;
     transition: opacity 0.24s ease;
   }
   .topbar.scrolled::before {
@@ -1085,7 +1088,6 @@
   }
   html[data-theme="dark"] .topbar::before {
     background: color-mix(in oklch, var(--paper) 92%, transparent);
-    opacity: 0.86;
   }
   html[data-theme="dark"] .topbar.scrolled::before {
     opacity: 0.98;
@@ -1844,17 +1846,6 @@
   }
   #feedView {
     transition: opacity var(--motion-med) var(--ease-out), transform var(--motion-med) var(--ease-out);
-  }
-  /* With no divider on the rail, the eye measures the feed against the whole
-     window, not the area right of the rail. So the feed shifts left by up to
-     half the rail's width, landing on the window's centre. It never shifts
-     more than the free space allows, so the feed always keeps its 36px
-     gutter clear of the rail. */
-  @media (min-width: 801px) {
-    #feedView {
-      position: relative;
-      left: calc(-1 * clamp(0px, (100vw - var(--chrome-size) - 1152px) / 2, var(--chrome-size) / 2));
-    }
   }
   @starting-style {
     #feedView { opacity: 0; transform: translateY(var(--rt-slide-y)); }
