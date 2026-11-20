@@ -6216,9 +6216,12 @@
      cards. On desktop cards also trail the scroll a few px on a spring
      (--feed-lag), on the standalone translate property so the filter
      FLIP, which uses transform, composes with it. */
+  /* Both ends add --feed-lag, so scrolling during the entrance moves the
+     card with the scroll spring right away. Without it, the animation hides
+     the spring's offset until it ends, and the card then jumps by that amount. */
   @keyframes feed-in {
-    from { opacity: 0; translate: 0 16px; filter: blur(6px) var(--pin-drop,); }
-    to   { opacity: 1; translate: 0 0; filter: blur(0) var(--pin-drop,); }
+    from { opacity: 0; translate: 0 calc(16px + var(--feed-lag, 0px)); filter: blur(6px) var(--pin-drop,); }
+    to   { opacity: 1; translate: 0 var(--feed-lag, 0px); filter: blur(0) var(--pin-drop,); }
   }
   html.feed-intro .banner > *,
   html.feed-intro .tabs { opacity: 0; }
