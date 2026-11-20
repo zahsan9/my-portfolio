@@ -49,6 +49,9 @@
     --paper-2:     oklch(0.93  0.005 262);
     --ink:         oklch(0.18  0 0);
     --ink-mid:     oklch(0.45  0.008 262);
+    /* Secondary reading text (the bio): gray, so only the name and titles
+       sit at full --ink. */
+    --ink-soft:    oklch(0.40  0.006 262);
     --ink-low:     oklch(0.65  0.006 262);
     --line:        oklch(0.88  0.005 262);
     --control-soft:oklch(0.90  0.005 262);
@@ -150,10 +153,11 @@
     --sub-color: #000;
   }
   [data-theme="dark"] {
-    --paper:       oklch(0.20  0 0);
-    --paper-2:     oklch(0.245 0 0);
+    --paper:       oklch(0.17  0 0);
+    --paper-2:     oklch(0.215 0 0);
     --ink:         oklch(0.93  0 0);
     --ink-mid:     oklch(0.58  0 0);
+    --ink-soft:    oklch(0.70  0 0);
     --ink-low:     oklch(0.42  0 0);
     --line:        oklch(0.28  0 0);
     --control-soft:oklch(0.30  0 0);
@@ -292,7 +296,6 @@
     background: var(--paper);
     display: flex; flex-direction: column; align-items: center;
     padding: 18px 0;
-    border-right: 1px solid var(--line);
     width: var(--chrome-size);
     overflow: hidden;
     z-index: 40;
@@ -1063,7 +1066,6 @@
     height: var(--chrome-size);
     padding: 16px 36px;
     display: flex; align-items: center; justify-content: flex-end;
-    border-bottom: 1px solid var(--line);
     isolation: isolate;
     transform: translateZ(0);
     transition: opacity 0.22s ease;
@@ -1155,7 +1157,7 @@
     margin-bottom: 16px;
   }
   .banner h1 em { margin-left: 0.16em; font-style: normal; }
-  .banner .bio { font-size: 16px; line-height: 1.65; max-width: 520px; margin: 0 auto; }
+  .banner .bio { font-size: 16px; line-height: 1.65; max-width: 520px; margin: 0 auto; color: var(--ink-soft); }
   .banner .bio em { font-style: italic; color: var(--accent); }
   /* Desktop line 1 is the roles (.bio-role); phones swap in the school
      line instead (.bio-school), since the roles don't fit. */
@@ -2762,10 +2764,9 @@
     margin-left: calc(var(--sheet-inset-left, 0px) * -1);
     margin-right: calc(var(--toc-reserve, 0px) * -1);
     /* 16px against the 48px pill keeps the head exactly --chrome-size tall,
-       so its rule lines up with the rail's own chrome. */
+       so it lines up with the rail's own chrome. */
     padding: 16px calc(var(--toc-reserve, 0px) + max(24px, calc((100% - var(--cs-col)) / 2 + 104px)))
              16px calc(var(--sheet-inset-left, 0px) + max(24px, calc((100% - var(--cs-col)) / 2 + 104px)));
-    border-bottom: 1px solid var(--line);
     position: sticky; top: 0; background: var(--paper); z-index: 2;
     min-height: var(--chrome-size);
   }
