@@ -284,7 +284,16 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 
 **Gray bio, no rule under the topbar.** Only the name and titles use full `--ink`. The feed bio uses `--ink-soft` (oklch 0.70 in dark mode, 0.40 in light) so it sits a step back. The topbar has no `border-bottom` and the rail has no `border-right`: the rail and the page share `--paper`, and the topbar's blur backdrop is what separates it from content on scroll. The sheet head's `border-bottom` stays.
 
-**Feed filters** are All · Product · Software · Data (`data-filter` ux / swe / viz). WIIRED Studio is not a filter. Its card shows only under All. The rail index's section headings (`CAT_LABELS`) use the same names. `applyFilter()` is a FLIP pass with three rules:
-- Leavers aren't hidden at once. They get `.is-leaving`, are pinned `position: absolute` where they stood, and fade out (0.18s) before the settle timer hides them.
-- Every card a filter shows is marked `.is-in.is-settled`, and settled cards never replay `feed-in`. Display none -> shown restarts CSS animations, which used to replay the page entrance with stale intro delays and made returning cards fade in late.
-- Staying cards slide (0.46s) and arriving cards fade in (0.3s).
+**Feed filters** are All · Product · Software · Data (`data-filter` ux / swe / viz). WIIRED Studio is not a filter. Its card shows only under All. The rail index's section headings (`CAT_LABELS`) use the same names.
+
+`applyFilter()` is a FLIP pass on WAAPI ("spring give"). All its animations are tracked in `filterAnims` and cancelled only by the filter itself, so the `feed-in` entrance and hover transitions are never touched.
+- **Spring.** `springEasing(stiffness, damping)` samples a damped spring into a 49-point CSS `linear()` easing. It's stiffness 200 and damping 21, about 3% overshoot over ~700ms. Browsers without `linear()` fall back to `cubic-bezier(0.22,1,0.36,1)` at 640ms. For less bounce, use damping 22 (about 2%).
+- **Leavers.** They get `.is-leaving`, are pinned `position:absolute` where they stood, and fade out over 220ms: opacity 0, `scale` 0.94, blur 4px.
+- **Stayers.** Inline `transform` slides them from old to new position on the spring. They start 25ms apart in reading order (capped at 120ms), with `fill: backwards` holding each in place until its turn.
+- **Arrivals.** They start after a 100ms beat, 45ms apart (capped at 180ms). Scale 0.94→1 runs on the spring, and only scale overshoots. Opacity, a 10px rise and a 6px→0 blur run on `cubic-bezier(0.22,1,0.36,1)` over 460ms.
+- **Interrupted clicks.** Each card's on-screen position, opacity and scale are measured before the running animations are cancelled, so it continues from where it is.
+- **Blur.** It's written as `blur(Npx)` plus the card's `--pin-drop`, so shaped cards keep their shadow. Phones get no blur.
+- **Reduced motion.** Changes are instant.
+- **Settled cards.** Every card a filter shows is `.is-in.is-settled` and never replays `feed-in`.
+- **Settle.** The timer is `motionDelay(total + 20)`. It hides the leavers, cancels the filter's animations and runs `lockFeedHeight()`.
+- Never use the `translate` property in the FLIP: it belongs to the `--feed-lag` scroll spring.
