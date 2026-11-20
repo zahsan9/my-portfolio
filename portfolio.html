@@ -9698,23 +9698,94 @@
   let currentFilter = 'all';
   let filterSettleTimer = null;
 
+  // ── Filter motion: "spring give" ──
+  // A damped spring baked into a CSS linear() easing, so the FLIP runs as a
+  // plain WAAPI animation (compositor-friendly, cancellable) but settles with
+  // real give. stiffness 200 / damping 21 / mass 1 is ζ ≈ 0.74: ~3% overshoot,
+  // which reads as weight settling rather than bounce (ζ 0.71's 4% put ~36px
+  // of wobble on a full-height move). The duration is where
+  // the spring's envelope drops under 0.1%, so the curve lands on 1 with no
+  // visible snap at the end.
+  function springEasing(stiffness, damping, mass = 1) {
+    const w0 = Math.sqrt(stiffness / mass);
+    const zeta = damping / (2 * Math.sqrt(stiffness * mass)); // underdamped only (< 1)
+    const wd = w0 * Math.sqrt(1 - zeta * zeta);
+    const decay = zeta * w0;
+    const seconds = Math.log(Math.hypot(1, decay / wd) / 0.001) / decay;
+    const steps = 48;
+    const points = [];
+    for (let i = 0; i <= steps; i++) {
+      const t = (i / steps) * seconds;
+      const x = i === steps ? 1
+        : 1 - Math.exp(-decay * t) * (Math.cos(wd * t) + (decay / wd) * Math.sin(wd * t));
+      points.push(+x.toFixed(4));
+    }
+    return { easing: `linear(${points.join(', ')})`, duration: Math.round(seconds * 1000) };
+  }
+  const FILTER_EASE_OUT = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  // linear() is Chrome 113 / Safari 17.2 / Firefox 112+; older engines get the
+  // site's usual ease-out (no overshoot) at the same length.
+  const FILTER_SPRING = CSS.supports('animation-timing-function', 'linear(0, 1)')
+    ? springEasing(200, 21)
+    : { easing: FILTER_EASE_OUT, duration: 640 };
+  const FILTER_LEAVE_MS      = 220; // leavers are mostly gone before stayers land
+  const FILTER_ARRIVE_BEAT   = 100; // arrivals wait for the leavers' space to clear
+  const FILTER_ARRIVE_FADE   = 460; // opacity / lift / blur of an arrival (no overshoot)
+  // Per-card stagger in reading order, capped by a total span so "All" (many
+  // cards) ripples in the same time as a two-card filter instead of dragging.
+  const FILTER_ARRIVE_STAGGER = 45, FILTER_ARRIVE_SPAN = 180;
+  const FILTER_MOVE_STAGGER   = 25, FILTER_MOVE_SPAN   = 120;
+  const filterStep = (n, per, span) => n > 1 ? Math.min(per, span / (n - 1)) : 0;
+
+  // Only the animations applyFilter itself started, per pin, so a new pass can
+  // cancel them without touching hover transitions or the feed-in entrance.
+  const filterAnims = new Map();
+  function trackFilterAnim(p, anim) {
+    if (!filterAnims.has(p)) filterAnims.set(p, []);
+    filterAnims.get(p).push(anim);
+  }
+  function cancelFilterAnims(p) {
+    (filterAnims.get(p) || []).forEach(a => a.cancel());
+    filterAnims.delete(p);
+  }
+  // Blur is composed in front of a shaped card's drop shadow so the shadow
+  // stays on through the motion (same trick as the feed-in keyframes). Phones
+  // skip filter animation entirely, as the entrance does: it flickered on
+  // mobile Safari.
+  const filterBlurOK = () => !window.matchMedia('(max-width: 800px)').matches;
+  const pinBlur = (p, px) => {
+    const drop = getComputedStyle(p).getPropertyValue('--pin-drop').trim();
+    return `blur(${px}px)` + (drop ? ' ' + drop : '');
+  };
+  const byReadingOrder = rects => (a, b) => {
+    const ra = rects.get(a), rb = rects.get(b);
+    return Math.abs(ra.top - rb.top) > 24 ? ra.top - rb.top : ra.left - rb.left;
+  };
+
+  function hideLeaver(p) {
+    cancelFilterAnims(p);
+    p.classList.remove('is-leaving');
+    p.classList.add('is-hidden');
+    p.style.cssText = '';
+  }
+
   function applyFilter(f) {
     if (f === currentFilter) return;
     currentFilter = f;
+    const reduce = prefersReducedMotion();
 
-    // A still-pending settle callback from an earlier, faster-than-520ms
-    // filter click would otherwise fire mid-flight here and wipe this
-    // click's own transition/transform/opacity, snapping cards instead of
-    // letting them finish sliding — cancel it before starting a new pass.
+    // A still-pending settle callback from an earlier, faster click would
+    // otherwise fire mid-flight here and hide/clear this pass's cards —
+    // cancel it before starting a new pass.
     if (filterSettleTimer !== null) clearTimeout(filterSettleTimer);
 
     // .feed is locked to a fixed height at rest (see lockFeedHeight). Left
     // locked here, it stays pinned to the OUTGOING filter's height for the
-    // entire ~520ms transition — e.g. switching from a filter that fits one
-    // row to one needing two leaves the container short until the settle
-    // timeout finally re-measures it, which is what made a second-row card
-    // look like it briefly landed in the wrong place. Unlocking to the new
-    // filter's natural height up front avoids that stale window entirely.
+    // whole transition — e.g. switching from a filter that fits one row to
+    // one needing two leaves the container short until the settle timeout
+    // finally re-measures it, which is what made a second-row card look like
+    // it briefly landed in the wrong place. Unlocking to the new filter's
+    // natural height up front avoids that stale window entirely.
     feed.style.height = 'auto';
 
     const show = new Set(pins.filter(p => {
@@ -9725,26 +9796,42 @@
 
     // A faster-than-settle click can leave last pass's leavers mid-fade,
     // still absolutely placed: finish them off before measuring.
-    pins.forEach(p => {
-      if (!p.classList.contains('is-leaving')) return;
-      p.classList.remove('is-leaving');
-      p.classList.add('is-hidden');
-      p.style.cssText = '';
-    });
+    pins.forEach(p => { if (p.classList.contains('is-leaving')) hideLeaver(p); });
 
-    // Cards a filter brings on screen use the filter's fade, not the page
-    // entrance: reveal anything not yet revealed, and mark it settled.
-    show.forEach(p => p.classList.add('is-in', 'is-settled'));
-
-    // FIRST: only snapshot pins that are visible now AND will stay visible.
-    // Leavers are measured too, so they can fade out where they stood.
+    // FIRST: snapshot every visible card AS IT LOOKS RIGHT NOW — mid-spring,
+    // mid-arrival, whatever. Measuring before cancelling the in-flight
+    // animations is what makes a rapid re-click continue from the card's
+    // current spot instead of snapping it home first.
     const first = new Map();
     const leaving = new Map();
     const feedBox = feed.getBoundingClientRect();
     pins.forEach(p => {
       if (p.classList.contains('is-hidden')) return;
-      if (show.has(p)) first.set(p, p.getBoundingClientRect());
-      else leaving.set(p, p.getBoundingClientRect());
+      const r = p.getBoundingClientRect();
+      const cs = getComputedStyle(p);
+      // Back out a mid-flight scale (it shrinks the rect about its centre),
+      // then work in layout-box corners like a plain FLIP does: a card whose
+      // height changes between the masonry and the grid stays top-aligned.
+      const w = p.offsetWidth, h = p.offsetHeight;
+      const state = {
+        x: r.left + r.width / 2 - w / 2, y: r.top + r.height / 2 - h / 2, w, h,
+        opacity: parseFloat(cs.opacity),
+        scale: cs.scale === 'none' ? 1 : parseFloat(cs.scale),
+      };
+      (show.has(p) ? first : leaving).set(p, state);
+    });
+    filterAnims.forEach((_, p) => cancelFilterAnims(p));
+
+    // Cards a filter brings on screen use the filter's motion, not the page
+    // entrance: reveal anything not yet revealed, and mark it settled. This
+    // runs after FIRST so a card still waiting for its scroll reveal is
+    // measured at the opacity it actually shows (0) and springs up from it,
+    // and the reveal's own CSS opacity transition is held off so it can't
+    // run underneath the filter's motion (released after the reflow below).
+    const revealed = [];
+    show.forEach(p => {
+      if (!p.classList.contains('is-in')) { p.style.transition = 'none'; revealed.push(p); }
+      p.classList.add('is-in', 'is-settled');
     });
 
     // Preserve scroll so feed height change doesn't cause a jump
@@ -9752,77 +9839,103 @@
 
     feed.classList.toggle('is-filtered', f !== 'all');
 
-    // Cancel in-progress transitions; pre-hide new pins at opacity 0.
     // Leavers come out of the layout but stay on screen, pinned where they
     // were, so they can fade instead of vanishing and leaving holes.
     pins.forEach(p => {
-      p.style.transition = 'none';
-      p.style.transform  = '';
       if (leaving.has(p)) {
-        const r = leaving.get(p);
+        if (reduce) { hideLeaver(p); return; }
+        const s = leaving.get(p);
         p.classList.add('is-leaving');
         Object.assign(p.style, {
           position: 'absolute', margin: '0', zIndex: '0', pointerEvents: 'none',
-          left: (r.left - feedBox.left) + 'px', top: (r.top - feedBox.top) + 'px',
-          width: r.width + 'px', height: r.height + 'px',
+          left: (s.x - feedBox.left) + 'px', top: (s.y - feedBox.top) + 'px',
+          width: s.w + 'px', height: s.h + 'px',
         });
         return;
       }
-      if (show.has(p) && !first.has(p)) p.style.opacity = '0';
-      else p.style.opacity = '';
       p.classList.toggle('is-hidden', !show.has(p));
     });
 
     // Reflow then restore scroll (prevents page jump from height change)
     void feed.offsetWidth;
     main.scrollTop = savedScroll;
-
-    // LAST: snapshot staying pins in their new positions
-    const last = new Map();
-    first.forEach((_, p) => last.set(p, p.getBoundingClientRect()));
-
-    // INVERT both axes: filtered cards repack into a row-first grid, so staying
-    // cards may move horizontally as well as vertically.
-    first.forEach((r0, p) => {
-      const r1 = last.get(p);
-      const dx = r0.left - r1.left;
-      const dy = r0.top - r1.top;
-      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) p.style.transform = `translate(${dx}px, ${dy}px)`;
-    });
-
-    void feed.offsetWidth;
-
-    // PLAY
-    leaving.forEach((_, p) => {
-      p.style.transition = 'opacity 0.18s ease, scale 0.18s ease';
-      p.style.opacity = '0';
-      p.style.scale = '0.98';
-    });
-    show.forEach(p => {
-      if (first.has(p)) {
-        p.style.transition = 'transform 0.46s cubic-bezier(0.22,1,0.36,1)';
-        p.style.transform  = '';
-      } else {
-        p.style.transition = 'opacity 0.3s ease 0.08s';
-        p.style.opacity    = '';
-      }
-    });
-
+    revealed.forEach(p => { p.style.transition = ''; });
     feedEmpty.classList.toggle('visible', show.size === 0);
 
+    if (reduce) { lockFeedHeight(); return; }
+
+    // LAST: every shown card in its new place (arrivals too, for ordering).
+    const last = new Map();
+    show.forEach(p => last.set(p, p.getBoundingClientRect()));
+    const order = byReadingOrder(last);
+    const movers   = [...first.keys()].sort(order);
+    const arrivals = [...show].filter(p => !first.has(p)).sort(order);
+    const blur = filterBlurOK();
+    let total = FILTER_LEAVE_MS;
+
+    // PLAY — leavers: a quick, soft exit from wherever they currently are.
+    // fill: forwards holds them at 0 until the settle timer hides them.
+    leaving.forEach((s, p) => {
+      const from = { opacity: s.opacity, scale: String(s.scale) };
+      const to   = { opacity: 0, scale: '0.94' };
+      if (blur) { from.filter = pinBlur(p, 0); to.filter = pinBlur(p, 4); }
+      trackFilterAnim(p, p.animate([from, to], {
+        duration: FILTER_LEAVE_MS, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards',
+      }));
+    });
+
+    // Stayers: INVERT on both axes (filtered cards repack into a row-first
+    // grid), then spring home, rippling in reading order. fill: backwards
+    // holds each at its old spot through its stagger delay. A card caught
+    // mid-arrival by a rapid click also springs its opacity/scale up from
+    // where they were.
+    const moveStep = filterStep(movers.length, FILTER_MOVE_STAGGER, FILTER_MOVE_SPAN);
+    movers.forEach((p, i) => {
+      const s = first.get(p), r1 = last.get(p);
+      const dx = s.x - r1.left;
+      const dy = s.y - r1.top;
+      const from = {}, to = {};
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+        from.transform = `translate(${dx}px, ${dy}px)`; to.transform = 'none';
+      }
+      if (Math.abs(s.scale - 1) > 0.001) { from.scale = String(s.scale); to.scale = '1'; }
+      if (s.opacity < 0.999) { from.opacity = s.opacity; to.opacity = 1; }
+      if (!Object.keys(from).length) return;
+      const delay = i * moveStep;
+      trackFilterAnim(p, p.animate([from, to], {
+        duration: FILTER_SPRING.duration, easing: FILTER_SPRING.easing, delay, fill: 'backwards',
+      }));
+      total = Math.max(total, delay + FILTER_SPRING.duration);
+    });
+
+    // Arrivals: after a short beat, staggered in reading order. Scale rides
+    // the spring (the only property that overshoots); opacity, the 10px lift
+    // and the blur take a plain ease-out so nothing flashes past full.
+    const arriveStep = filterStep(arrivals.length, FILTER_ARRIVE_STAGGER, FILTER_ARRIVE_SPAN);
+    arrivals.forEach((p, i) => {
+      const delay = FILTER_ARRIVE_BEAT + i * arriveStep;
+      trackFilterAnim(p, p.animate([{ scale: '0.94' }, { scale: '1' }], {
+        duration: FILTER_SPRING.duration, easing: FILTER_SPRING.easing, delay, fill: 'backwards',
+      }));
+      const from = { opacity: 0, transform: 'translateY(10px)' };
+      const to   = { opacity: 1, transform: 'none' };
+      if (blur) { from.filter = pinBlur(p, 6); to.filter = pinBlur(p, 0); }
+      trackFilterAnim(p, p.animate([from, to], {
+        duration: FILTER_ARRIVE_FADE, easing: FILTER_EASE_OUT, delay, fill: 'backwards',
+      }));
+      total = Math.max(total, delay + Math.max(FILTER_SPRING.duration, FILTER_ARRIVE_FADE));
+    });
+
+    // Settle once the last spring has landed: hide the leavers, drop the
+    // finished animations, and re-lock the feed height.
     filterSettleTimer = setTimeout(() => {
       filterSettleTimer = null;
       pins.forEach(p => {
-        if (p.classList.contains('is-leaving')) {
-          p.classList.remove('is-leaving');
-          p.classList.add('is-hidden');
-          p.style.cssText = '';
-          return;
-        }
-        p.style.transition = ''; p.style.transform = ''; p.style.opacity = '';
+        if (p.classList.contains('is-leaving')) hideLeaver(p);
+        else cancelFilterAnims(p);
       });
       lockFeedHeight();
-    }, motionDelay(520));
+    }, motionDelay(total + 20));
   }
 
   document.querySelectorAll('.tab').forEach(b => {
