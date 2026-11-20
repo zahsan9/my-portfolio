@@ -117,7 +117,7 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 
 ## Design tokens (CSS custom properties)
 
-**Page chrome (theme-dependent — flips between `:root` and `[data-theme="dark"]`):** `--paper`, `--paper-2`, `--ink`, `--ink-mid`, `--ink-low`, `--line`, `--control-soft`, `--control-muted`, `--accent-soft`, `--sub-color`
+**Page chrome (theme-dependent — flips between `:root` and `[data-theme="dark"]`):** `--paper`, `--paper-2`, `--ink`, `--ink-mid`, `--ink-soft`, `--ink-low`, `--line`, `--control-soft`, `--control-muted`, `--accent-soft`, `--sub-color`
 
 **Feed card palette (theme-independent — defined once in `:root`, never overridden):** `--c-clay`, `--c-blue`, `--c-cream`, `--c-yellow`, `--c-sage`, `--c-plum`, `--c-sand`, `--c-charcoal`, `--c-noir`, `--c-noir-2`, `--accent`. `--c-plum` is a muted lavender (`oklch(0.71 0.06 305)`), lighter and softer than the old saturated plum but darkened back toward `--c-sage`/`--c-clay`'s lightness so it doesn't read as washed out next to them — don't push it lighter than ~0.72 or more saturated than ~0.07 chroma. `--c-clay` doubles as the "coral" tone (used by the Daily type & motion card and the About page's Design skill pill) — there is no separate `--c-coral` token, don't add one.
 
@@ -280,3 +280,6 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 - **Scale over safety** — lead with what made the problem hard; don't bury a real constraint (respondent count, edge cases, conflicting stakeholders) in a middle paragraph.
 - **2-3 finished case studies, not more** — everything else stays `wip: true` (renders the "Coming soon" state). A placeholder reads better than a rushed write-up.
 - **Reads as a talk** — the section order above is the talk order: hook, question, decisions with reasoning, impact, reflection. Amazon-style loops expect this to work presented out loud, not just skimmed.
+
+**Hierarchy through color, not lines.** Only the name and titles use full `--ink`. Secondary reading text, like the feed bio, uses `--ink-soft`: oklch 0.70 in dark mode, 0.40 in light. The rail (`border-right`), the topbar (`border-bottom`), and the sheet head (`border-bottom`) have no hairlines. The rail and the page share `--paper`, and the topbar's blur backdrop separates it from content once you scroll. Don't add those lines back. Dark `--paper` is oklch 0.17 and `--paper-2` is 0.215, a bit deeper than before for a sleeker black.
+
