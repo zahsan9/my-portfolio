@@ -1372,11 +1372,26 @@
     transition: opacity var(--motion-med) ease, filter var(--motion-med) ease;
   }
   .feed:not(.has-open) .pin[class*="frame-"][data-page]:focus-visible {
-    filter: drop-shadow(3px 20px 20px oklch(0 0 0 / 0.36)) drop-shadow(0 2px 2px oklch(0 0 0 / 0.25));
+    filter: var(--pin-drop-hover, drop-shadow(3px 20px 20px oklch(0 0 0 / 0.36)) drop-shadow(0 2px 2px oklch(0 0 0 / 0.25)));
   }
   @media (hover: hover) {
     .feed:not(.has-open) .pin[class*="frame-"][data-page]:hover {
-      filter: drop-shadow(3px 20px 20px oklch(0 0 0 / 0.36)) drop-shadow(0 2px 2px oklch(0 0 0 / 0.25));
+      filter: var(--pin-drop-hover, drop-shadow(3px 20px 20px oklch(0 0 0 / 0.36)) drop-shadow(0 2px 2px oklch(0 0 0 / 0.25)));
+    }
+  }
+  /* Light mode: on a pale page the dark-mode shadow weight reads heavy, so
+     the shadows drop to roughly half strength (rest, hover, and the plain
+     cards' hover lift). */
+  html[data-theme="light"] .pin[class*="frame-"] {
+    --pin-drop: drop-shadow(1px 6px 9px oklch(0 0 0 / 0.16)) drop-shadow(0 1px 1px oklch(0 0 0 / 0.12));
+    --pin-drop-hover: drop-shadow(2px 16px 18px oklch(0 0 0 / 0.2)) drop-shadow(0 2px 2px oklch(0 0 0 / 0.12));
+  }
+  html[data-theme="light"] .feed:not(.has-open) .pin[data-page]:focus-visible .art {
+    box-shadow: 0 12px 32px -8px oklch(0.1 0.005 60 / 0.11);
+  }
+  @media (hover: hover) {
+    html[data-theme="light"] .feed:not(.has-open) .pin[data-page]:hover .art {
+      box-shadow: 0 12px 32px -8px oklch(0.1 0.005 60 / 0.11);
     }
   }
   /* Frames are drawn inside the card's own box (inset rings), so every
