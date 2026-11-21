@@ -305,6 +305,5 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 
 **Hidden details** (keep them few, small, and never in the way of the main scan):
 - After a successful copy, the email copy controls show the cursor pill "Copied, talk soon :)" (`COPIED_PILL`) for the hold. The Experience outro email pill's check state uses the same words.
-- Hovering the sign-off ("© 2026 Zainab Ahsan") crossfades it in place to "designed & built by hand, no templates" (`.copyright-swap`: both lines in one grid cell, so nothing reflows; hover-capable pointers only; only the text takes the pointer).
 - The resume nudge on Experience (see Topbar).
 

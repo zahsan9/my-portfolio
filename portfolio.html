@@ -238,20 +238,6 @@
     pointer-events: none;
     user-select: none;
   }
-  /* Hidden detail: hovering the sign-off swaps it, in place, for a quiet
-     note that the site is hand-made. Both lines stack in one grid cell, so
-     nothing reflows. Only the text takes the pointer; the footer's padding
-     stays click-through. */
-  .copyright-swap { display: inline-grid; justify-items: center; pointer-events: auto; }
-  .copyright-swap > span {
-    grid-area: 1 / 1; white-space: nowrap;
-    transition: opacity 0.35s var(--ease-out), translate 0.45s var(--ease-out), filter 0.35s var(--ease-out);
-  }
-  .copyright-alt { opacity: 0; translate: 0 4px; filter: blur(2px); }
-  @media (hover: hover) {
-    .copyright-swap:hover .copyright-main { opacity: 0; translate: 0 -4px; filter: blur(2px); }
-    .copyright-swap:hover .copyright-alt  { opacity: 1; translate: 0 0; filter: none; }
-  }
   /* The same sign-off closes About and Experience. About is one centred
      screen on desktop, so the line pins to its foot there without moving
      the stack; on phones it simply follows the cards. */
@@ -6579,7 +6565,7 @@
 
       </div>
       <div class="feed-empty" id="feedEmpty" aria-live="polite">Nothing in this board yet.</div>
-      <footer class="copyright"><span class="copyright-swap"><span class="copyright-main">© 2026 Zainab Ahsan</span><span class="copyright-alt" aria-hidden="true">designed &amp; built by hand, no templates</span></span></footer>
+      <footer class="copyright">© 2026 Zainab Ahsan</footer>
     </section>
 
     <!-- ═══ ABOUT PAGE ═══ -->
@@ -6675,7 +6661,7 @@
       </div>
       </div>
 
-      <footer class="copyright"><span class="copyright-swap"><span class="copyright-main">© 2026 Zainab Ahsan</span><span class="copyright-alt" aria-hidden="true">designed &amp; built by hand, no templates</span></span></footer>
+      <footer class="copyright">© 2026 Zainab Ahsan</footer>
     </section>
 
 
@@ -6770,7 +6756,7 @@
               </span>
             </button>
           </div>
-          <footer class="copyright"><span class="copyright-swap"><span class="copyright-main">© 2026 Zainab Ahsan</span><span class="copyright-alt" aria-hidden="true">designed &amp; built by hand, no templates</span></span></footer>
+          <footer class="copyright">© 2026 Zainab Ahsan</footer>
         </div>
       </div>
     </section>
