@@ -2705,10 +2705,10 @@
     opacity: 0;
     transition:
       opacity 120ms var(--ease-out),
-      min-width 480ms var(--ease-soft),
-      max-width 480ms var(--ease-soft),
-      height 220ms var(--ease-out),
-      padding 480ms var(--ease-soft),
+      min-width 320ms var(--ease-soft),
+      max-width 320ms var(--ease-soft),
+      height 180ms var(--ease-out),
+      padding 320ms var(--ease-soft),
       background 180ms var(--ease-out),
       color 320ms var(--ease-soft);
     will-change: left, top;
@@ -10574,8 +10574,10 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
        transitions so the two don't fight. Instant under reduced motion. */
     const PILL_EASE = 'cubic-bezier(0.19, 1, 0.22, 1)';
     const springOK = CSS.supports('animation-timing-function', 'linear(0, 1)');
-    const PILL_OPEN  = springOK ? springEasing(230, 21) : { easing: PILL_EASE, duration: 560 };
-    const PILL_CLOSE = springOK ? springEasing(260, 27) : { easing: PILL_EASE, duration: 420 };
+    // Same give (damping ratio ~0.7 open, ~0.8 close), tuned stiffer so it
+    // lands quicker: settle time is set by damping, so both went up together.
+    const PILL_OPEN  = springOK ? springEasing(400, 28) : { easing: PILL_EASE, duration: 440 };
+    const PILL_CLOSE = springOK ? springEasing(420, 32) : { easing: PILL_EASE, duration: 340 };
     let pillSettle = 0;
     const sizeOf = () => { const r = cursor.getBoundingClientRect(); return { w: r.width, h: r.height }; };
     const wrapWords = () => {
@@ -10608,11 +10610,11 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       if (still) return;
       const words = wrapWords();
       const to = sizeOf();
-      resize(from, to, wasPill ? { duration: 480, easing: PILL_EASE } : PILL_OPEN);
+      resize(from, to, wasPill ? { duration: 360, easing: PILL_EASE } : PILL_OPEN);
       words.animate([
         { opacity: 0, filter: 'blur(3px)', transform: 'translateY(3px)' },
         { opacity: 1, filter: 'blur(0)', transform: 'none' },
-      ], { duration: 380, delay: wasPill ? 60 : 110, easing: PILL_EASE, fill: 'backwards' });
+      ], { duration: 300, delay: wasPill ? 40 : 70, easing: PILL_EASE, fill: 'backwards' });
     }
     function hidePill({ dropHover = false } = {}) {
       if (!cursor.classList.contains('is-pill')) {
