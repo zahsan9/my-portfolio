@@ -2451,6 +2451,12 @@
       box-sizing: border-box;
       padding: 0 24px;
       scroll-snap-align: end;
+      /* The screen is a full window tall, but the snapport is the window
+         minus the top bar (scroll-padding-top). Too big to fit, it was
+         snapped by its top to the bar's edge: 80px short of the bottom, text
+         80px low. Trimming its snap area by the bar's height makes it fit
+         exactly, so it lands flush at the very bottom. */
+      scroll-margin-top: calc(-1 * var(--chrome-size));
     }
   }
   /* Closing note under the timeline — the last scroll stop on desktop. */
