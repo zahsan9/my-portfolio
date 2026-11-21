@@ -1958,23 +1958,13 @@
      place out of flow while it fades. */
   .topbar-swap { position: relative; display: flex; align-items: center; }
   /* Resume nudge (Experience page only): every few seconds the resume icon
-     gives a small double hop with a tilt while a hand-drawn loop circles it,
+     gives a small double hop with a tilt,
      so the eye finds it without a banner or a pop-up. Most of each 6s cycle
      is rest. It pauses on hover and stops for the session once the resume
      has been opened (.is-seen). */
   #topbarResumeBtn { position: relative; }
   .topbar.is-exp #topbarResumeBtn:not(.is-seen) .resume-glyph {
     animation: resume-nudge 6s cubic-bezier(0.3, 0, 0.3, 1) 2.5s infinite;
-  }
-  #topbarResumeBtn .resume-circle {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    overflow: visible; pointer-events: none;
-    fill: none; stroke: currentColor; stroke-width: 1.6;
-    stroke-linecap: round; stroke-linejoin: round;
-    stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0;
-  }
-  .topbar.is-exp #topbarResumeBtn:not(.is-seen) .resume-circle {
-    animation: resume-circle 6s cubic-bezier(0.45, 0, 0.25, 1) 2.5s infinite;
   }
   #topbarResumeBtn:hover svg { animation-play-state: paused; }
   @keyframes resume-nudge {
@@ -1983,13 +1973,6 @@
     6%   { transform: none; }
     8.5% { transform: translateY(-2px) rotate(4deg); }
     11%  { transform: none; }
-  }
-  /* The loop draws on with the hop, holds a beat, then fades. */
-  @keyframes resume-circle {
-    0%        { stroke-dashoffset: 1; opacity: 0.9; }
-    13%       { stroke-dashoffset: 0; opacity: 0.9; }
-    24%       { stroke-dashoffset: 0; opacity: 0.9; }
-    32%, 100% { stroke-dashoffset: 0; opacity: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
     .topbar.is-exp #topbarResumeBtn svg { animation: none; }
@@ -6344,12 +6327,6 @@
           <span class="social-glyph" aria-hidden="true">in</span>
         </a>
         <a class="topbar-social-btn" id="topbarResumeBtn" aria-label="View resume (PDF)" data-cursor-link="↗ resume" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer">
-          <!-- Hand-drawn loop for the Experience nudge: one pen stroke around
-               the icon that runs a little past its start, like circling
-               something on paper. -->
-          <svg class="resume-circle" viewBox="0 0 48 48" aria-hidden="true">
-            <path pathLength="1" d="M33 9.5C22.5 4.5 7.5 11.5 7.5 25c0 11.5 11 18 21.5 15.5C39 38 43 28 40.5 18.5 38.5 11.5 31.5 7.5 23.5 8.5"/>
-          </svg>
           <svg class="resume-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M14 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/>
             <path d="M14 3.5V8h4.5M9 12.5h6M9 16h4"/>
