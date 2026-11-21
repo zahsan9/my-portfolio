@@ -246,20 +246,39 @@
     .about-page.active { position: relative; }
     .about-page .copyright { position: absolute; left: 0; bottom: 0; padding: 0 24px 44px; }
   }
-  /* Experience: inside the closing note. On desktop the note is a full
-     snapped screen, so the line pins to its foot; on phones it follows the
-     email pill, which hangs out of flow 30px below the text and is 48px
-     tall, so the margin clears both with room to spare. */
+  /* Experience has no sign-off: its closing screen ends on the Back to top
+     cue instead (.exp-top-cue), positioned against this. */
   .exp-outro { position: relative; }
-  .exp-outro .copyright { margin-top: 84px; padding: 0 24px; }
-  /* Back to top: the same quiet pill as Back to Work, on the last screen.
-     Phones: in flow under the email pill. Desktop: pinned above the
-     sign-off at the foot of the snapped closing screen. */
-  .exp-back-top { margin-top: 84px; }
-  .exp-back-top + .copyright { margin-top: 20px; }
+  /* Back to top: the timeline's opening "Scroll" cue, mirrored. Same mono
+     label and hairline, with the pulse running up instead of down. It
+     closes the page in place of the sign-off. Phones: in flow under the
+     email pill. Desktop: pinned to the foot of the snapped closing screen. */
+  .exp-top-cue {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    margin-top: 84px; padding: 6px 12px;
+    border: 0; background: none; cursor: pointer;
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: var(--tracking-label); color: var(--ink-mid);
+    transition: color 0.2s var(--ease-out);
+  }
+  @media (hover: hover) { .exp-top-cue:hover { color: var(--ink); } }
+  .exp-top-cue:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 6px; }
+  .exp-top-cue-line {
+    position: relative; width: 1px; height: 56px; overflow: hidden;
+    background: color-mix(in oklch, var(--ink) 22%, transparent);
+  }
+  .exp-top-cue-line::after {
+    content: ''; position: absolute; inset: auto 0 0; height: 40%;
+    background: currentColor;
+    animation: exp-cue-rise 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+  @keyframes exp-cue-rise {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(-250%); }
+  }
+  @media (prefers-reduced-motion: reduce) { .exp-top-cue-line::after { animation: none; } }
   @media (min-width: 801px) {
-    .exp-outro .copyright { position: absolute; left: 0; bottom: 44px; margin: 0; }
-    .exp-back-top { position: absolute; left: 50%; bottom: 76px; translate: -50% 0; margin: 0; }
+    .exp-top-cue { position: absolute; left: 50%; bottom: 36px; translate: -50% 0; margin: 0; }
   }
   /* Custom feed scrollbar */
   .feed-scroll-track {
@@ -6773,11 +6792,10 @@
               </span>
             </button>
           </div>
-          <button class="page-back exp-back-top" type="button" id="expBackTop">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M3 7l5-4 5 4"/></svg>
-            Back to top
+          <button class="exp-top-cue" type="button" id="expBackTop">
+            <span class="exp-top-cue-line" aria-hidden="true"></span>
+            <span>Back to top</span>
           </button>
-          <footer class="copyright">© 2026 Zainab Ahsan</footer>
         </div>
       </div>
     </section>
