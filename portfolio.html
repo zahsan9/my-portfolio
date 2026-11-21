@@ -2995,7 +2995,9 @@
      --climate-accent-text carries the numbers/highlights that need to be
      yellow on dark but dark-on-light instead, since pale yellow text has no
      contrast on a light page. */
-  html[data-theme="dark"] :is(.sheet[data-page="brew"], .sheet[data-page="climate"], .sheet[data-page="crow"], .sheet[data-page="habitat"], .sheet[data-page="dreamcatcher"]) {
+  /* Every case study shares this canvas (brew's gray), whatever its
+     slug, so a new study can't silently miss it the way GoDaddy did. */
+  html[data-theme="dark"] .sheet[data-page] {
     --paper: oklch(0.29 0 0);
   }
   html[data-theme="dark"] .sheet[data-page="climate"] {
