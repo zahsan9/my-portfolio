@@ -6285,7 +6285,7 @@
     <!-- Top bar -->
     <header class="topbar">
       <div class="page-actions topbar-page-actions" id="topbarPageActions" hidden>
-        <a class="page-resume-btn" id="topbarResume" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer" hidden>Resume ↗</a>
+        <a class="page-resume-btn" id="topbarResume" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer" data-cursor-link="↗ resume" hidden>View resume ↗</a>
         <button class="page-back" type="button" data-back-to-feed>
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>
           Back to Work
@@ -10233,7 +10233,8 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     });
     if (topbarPageActions) topbarPageActions.hidden = name === 'feed';
     if (topbarSocial) topbarSocial.hidden = name !== 'feed';
-    if (topbarResume) topbarResume.hidden = true; // Resume pill hidden for now — flip back to `name !== 'experience'` to re-enable
+    // The resume pill lives on the Experience page, next to Back to Work.
+    if (topbarResume) topbarResume.hidden = name !== 'experience';
 
     const viewMap = { feed: feedView, about: aboutView, experience: expView };
     const leaving  = viewMap[currentRouteName];
