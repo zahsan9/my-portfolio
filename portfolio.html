@@ -252,8 +252,14 @@
      tall, so the margin clears both with room to spare. */
   .exp-outro { position: relative; }
   .exp-outro .copyright { margin-top: 84px; padding: 0 24px; }
+  /* Back to top: the same quiet pill as Back to Work, on the last screen.
+     Phones: in flow under the email pill. Desktop: pinned above the
+     sign-off at the foot of the snapped closing screen. */
+  .exp-back-top { margin-top: 84px; }
+  .exp-back-top + .copyright { margin-top: 20px; }
   @media (min-width: 801px) {
     .exp-outro .copyright { position: absolute; left: 0; bottom: 44px; margin: 0; }
+    .exp-back-top { position: absolute; left: 50%; bottom: 76px; translate: -50% 0; margin: 0; }
   }
   /* Custom feed scrollbar */
   .feed-scroll-track {
@@ -6765,6 +6771,10 @@
               </span>
             </button>
           </div>
+          <button class="page-back exp-back-top" type="button" id="expBackTop">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M3 7l5-4 5 4"/></svg>
+            Back to top
+          </button>
           <footer class="copyright">© 2026 Zainab Ahsan</footer>
         </div>
       </div>
@@ -10402,6 +10412,12 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     // Keyboard activation (e.detail === 0) keeps focus for the next Tab stop.
     if (e.detail !== 0) b.blur();
   }));
+  // Experience's "Back to top": glide the page back to the timeline heading
+  // (instant under reduced motion). The scroll snap lands it on the intro.
+  document.getElementById('expBackTop')?.addEventListener('click', () => {
+    document.querySelector('.main').scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  });
+
   document.querySelectorAll('[data-back-to-feed]').forEach(button => {
     button.addEventListener('click', () => setRoute('feed'));
   });
