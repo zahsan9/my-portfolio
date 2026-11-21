@@ -304,6 +304,6 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 - Never use the `translate` property in the FLIP: it belongs to the `--feed-lag` scroll spring.
 
 **Hidden details** (keep them few, small, and never in the way of the main scan):
-- After a successful copy, the email copy controls show the cursor pill "Copied, talk soon :)" (`COPIED_PILL`) for the hold. The Experience outro email pill's check state uses the same words.
+- After a successful copy, the email copy controls show the cursor pill "Copied, talk soon :)" (`COPIED_PILL`) for the hold. A `cursor:label` retitle on a pill that's already showing morphs: the pill's width animates from the old label to the new (480ms, `cubic-bezier(0.19,1,0.22,1)`, the cursor's own ease-soft), and the new words (`.cursor-words`) fade up through a 3px blur. The revert at the end of the hold morphs back the same way. The Experience outro email pill's check state uses the same words.
 - The resume nudge on Experience (see Topbar).
 
