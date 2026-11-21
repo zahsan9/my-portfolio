@@ -10607,10 +10607,11 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
        transitions so the two don't fight. Instant under reduced motion. */
     const PILL_EASE = 'cubic-bezier(0.19, 1, 0.22, 1)';
     const springOK = CSS.supports('animation-timing-function', 'linear(0, 1)');
-    // Same give (damping ratio ~0.7 open, ~0.8 close), tuned stiffer so it
-    // lands quicker: settle time is set by damping, so both went up together.
-    const PILL_OPEN  = springOK ? springEasing(400, 28) : { easing: PILL_EASE, duration: 440 };
-    const PILL_CLOSE = springOK ? springEasing(420, 32) : { easing: PILL_EASE, duration: 340 };
+    // Springy but quick: damping ratio ~0.6 open (~9% overshoot), ~0.68 close
+    // (a small dip below the dot before it settles). Settle time is set by
+    // damping, so lowering it for more spring also lengthens the tail a touch.
+    const PILL_OPEN  = springOK ? springEasing(400, 24) : { easing: PILL_EASE, duration: 440 };
+    const PILL_CLOSE = springOK ? springEasing(420, 28) : { easing: PILL_EASE, duration: 340 };
     let pillSettle = 0;
     const sizeOf = () => { const r = cursor.getBoundingClientRect(); return { w: r.width, h: r.height }; };
     const wrapWords = () => {
