@@ -1871,8 +1871,7 @@
   /* Header pills now match the rail nav's own box model exactly: 48px
      tall, no border ever, transparent at rest, --control-soft fill on
      hover/focus — the same three states .rail-btn uses. */
-  .page-back,
-  .page-resume-btn {
+  .page-back {
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -1886,12 +1885,6 @@
     color: var(--ink);
     transition: background 0.15s, color 0.15s;
   }
-  .page-resume-btn {
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
   /* Same type as .cs-cta-btn (the Figma/Repo pills) and the mode toggle's
      options — mono, sentence case, light tracking. These are actionable
      controls, not quiet metadata, so they get the CTA pill's lighter touch
@@ -1903,12 +1896,7 @@
     font-weight: 400;
     letter-spacing: var(--tracking-ui);
   }
-  /* Resume stays permanently filled, the same treatment .rail-btn.active
-     uses for the current route — it's the one header pill meant to read
-     as a persistent call to action, not a plain nav-style link. */
-  .page-resume-btn { background: var(--ink); color: var(--paper); }
-  .page-back svg,
-  .page-resume-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .page-back svg { width: 14px; height: 14px; flex-shrink: 0; }
   .page-back:hover,
   .page-back:focus-visible {
     background: var(--control-soft);
@@ -1917,26 +1905,18 @@
   /* The sheet focuses its Back to Work as soon as a case study opens, so the
      UA's blue ring would land on top of the study's own palette. Ink, at the
      pill's own scale, for every header pill. */
-  .page-back:focus-visible,
-  .page-resume-btn:focus-visible {
+  .page-back:focus-visible {
     outline: 2px solid var(--ink);
     outline-offset: 2px;
-  }
-  /* A control-soft fill would fight the permanent-CTA fill above (it can
-     read as the pill going flat/duller instead of more prominent) — a
-     simple dim keeps it feeling responsive without losing that identity. */
-  .page-resume-btn:hover,
-  .page-resume-btn:focus-visible {
-    opacity: 0.82;
   }
   .page-actions {
     display: flex;
     align-items: center;
     gap: 10px;
   }
-  .topbar-page-actions[hidden],
+  .topbar-updated[hidden],
+  .page-back[hidden],
   .topbar-social[hidden],
-  .page-resume-btn[hidden],
   .sheet-mode-toggle[hidden] { display: none; }
   .topbar-social-btn {
     display: inline-flex;
@@ -6284,13 +6264,6 @@
 
     <!-- Top bar -->
     <header class="topbar">
-      <div class="page-actions topbar-page-actions" id="topbarPageActions" hidden>
-        <a class="page-resume-btn" id="topbarResume" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer" data-cursor-link="↗ resume" hidden>View resume ↗</a>
-        <button class="page-back" type="button" data-back-to-feed>
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>
-          Back to Work
-        </button>
-      </div>
       <div class="page-actions topbar-social" id="topbarSocial">
         <button class="topbar-social-btn topbar-email-btn" type="button" id="copyEmailBtn" data-copy-email="zahsan9@uw.edu" data-cursor-link="⧉ copy email" aria-label="Copy email address zahsan9@uw.edu">
           <span class="email-glyphs" aria-hidden="true">
@@ -6315,8 +6288,20 @@
         <a class="topbar-social-btn" aria-label="LinkedIn" data-cursor-link="↗ linkedin" href="https://www.linkedin.com/in/ahsanzainab" target="_blank" rel="noopener noreferrer">
           <span class="social-glyph" aria-hidden="true">in</span>
         </a>
+        <a class="topbar-social-btn" aria-label="View resume (PDF)" data-cursor-link="↗ resume" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 3.5V8h4.5M9 12.5h6M9 16h4"/>
+          </svg>
+        </a>
         <span class="topbar-divider" aria-hidden="true">|</span>
-        <span class="topbar-updated">Updated Nov 2026</span>
+        <!-- After the divider: the feed shows when the site was last updated;
+             every other page swaps in the way back (setRoute). -->
+        <span class="topbar-updated" id="topbarUpdated">Updated Nov 2026</span>
+        <button class="page-back" type="button" id="topbarBack" data-back-to-feed hidden>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>
+          Back to Work
+        </button>
       </div>
     </header>
 
@@ -10023,9 +10008,8 @@
   const feedView        = document.getElementById('feedView');
   const aboutView       = document.getElementById('aboutView');
   const expView         = document.getElementById('expView');
-  const topbarPageActions = document.getElementById('topbarPageActions');
-  const topbarSocial = document.getElementById('topbarSocial');
-  const topbarResume = document.getElementById('topbarResume');
+  const topbarUpdated = document.getElementById('topbarUpdated');
+  const topbarBack = document.getElementById('topbarBack');
 const expScroll   = document.getElementById('expScroll');
   const expTrack    = document.getElementById('expTrack');
   let expFrame = 0;
@@ -10231,10 +10215,10 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       b.classList.toggle('active', isActive);
       b.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
-    if (topbarPageActions) topbarPageActions.hidden = name === 'feed';
-    if (topbarSocial) topbarSocial.hidden = name !== 'feed';
-    // The resume pill lives on the Experience page, next to Back to Work.
-    if (topbarResume) topbarResume.hidden = name !== 'experience';
+    // One header everywhere (email, LinkedIn, resume | ...). After the
+    // divider, the feed shows the Updated tag; other pages show Back to Work.
+    if (topbarUpdated) topbarUpdated.hidden = name !== 'feed';
+    if (topbarBack) topbarBack.hidden = name === 'feed';
 
     const viewMap = { feed: feedView, about: aboutView, experience: expView };
     const leaving  = viewMap[currentRouteName];
