@@ -198,7 +198,7 @@ Do not make every sheet visually identical. Consistency comes from the canvas, s
 
 ### Shared visual foundation
 
-- **Case-study canvas**: all finished case studies use the same mode-aware sheet background. It uses the lighter neutral gray `oklch(0.29 0 0)`. Keep the shared selector centralized so case-study backgrounds cannot drift apart.
+- **Case-study canvas**: every case study uses the same sheet background, brew's gray `oklch(0.29 0 0)`, set once on `html[data-theme="dark"] .sheet[data-page]` for any slug. GoDaddy was missing from the old per-slug list and sat on the darker page gray. Don't override `--paper` per study.
 - **Section rhythm**: use `66px` of top spacing between major `.cs-section` blocks. The space belongs before the next text section, not as extra space after a figure. Every major section should use the same rhythm, including Impact/Current Outcome. The one exception is the Overview that opens every study: it takes GoDaddy's wider step, `112px` above and below (`72px` at 640px and under), with its label `20px` from the lead, so the summary stands apart from the sections it introduces.
 - **Section labels**: title case, bold sans, compact rounded rectangle, and visually smaller than the content heading. Labels are not all-caps mono pills. Current size is `15px` for Brew and `16px` for Neutral.
 - **Structural boxes**: use a subtle fill with no outline and no shadow. Neutral and Brew section containers should not look like bordered cards. Borders are reserved for true content boundaries, such as figures, tables, version controls, or input-like elements.
