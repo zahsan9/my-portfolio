@@ -6312,13 +6312,14 @@
     <!-- Top bar -->
     <header class="topbar">
       <div class="page-actions topbar-social" id="topbarSocial">
-        <button class="topbar-social-btn topbar-email-btn" type="button" id="copyEmailBtn" data-copy-email="zahsan9@uw.edu" data-cursor-link="⧉ copy email" aria-label="Copy email address zahsan9@uw.edu">
+        <button class="topbar-social-btn topbar-email-btn" type="button" id="copyEmailBtn" data-copy-email="zahsan9@uw.edu" data-cursor-link="copy email" aria-label="Copy email address zahsan9@uw.edu">
           <span class="email-glyphs" aria-hidden="true">
             <svg class="email-glyph email-glyph--idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="5.5" width="18" height="13" rx="2.2"/>
               <path d="m3.6 6.4 8.4 6.6 8.4-6.6"/>
             </svg>
-            <!-- The ⧉ the cursor pill is showing at the same moment, drawn to
+            <!-- The copy mark (it's on the button itself, so the cursor pill
+                 just says "copy email" without one), drawn to
                  match its neighbours: front sheet as a rect, back
                  sheet as an open L behind it, on the 1.8 stroke and round
                  joins the LinkedIn and GitHub marks use. Squared on 12,12 so
@@ -6432,7 +6433,7 @@
               <div class="contact-content">
                 <h3 class="social-intro">Find me elsewhere</h3>
                 <div class="social-tiles">
-                  <div class="social-tile social-tile--email" role="button" tabindex="0" aria-label="Copy email address zahsan9@uw.edu" data-cursor-link="⧉ copy email" data-copy-email="zahsan9@uw.edu">
+                  <div class="social-tile social-tile--email" role="button" tabindex="0" aria-label="Copy email address zahsan9@uw.edu" data-cursor-link="copy email" data-copy-email="zahsan9@uw.edu">
                     <span class="email-glyphs" aria-hidden="true">
                     <svg class="email-glyph email-glyph--idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <rect x="3" y="5.5" width="18" height="13" rx="2.2"/>
@@ -10573,11 +10574,11 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     // soft ease, while the new words fade up through a slight blur. Instant
     // under reduced motion.
     const PILL_EASE = 'cubic-bezier(0.19, 1, 0.22, 1)';
-    document.addEventListener('cursor:label', e => {
+    function retitle(text) {
       const morph = cursor.classList.contains('is-pill') && !prefersReducedMotion();
       const w0 = cursor.getBoundingClientRect().width;
       cursor.getAnimations().forEach(a => a.cancel());
-      setPillText(e.detail);
+      setPillText(text);
       cursor.classList.add('is-pill');
       cursor.classList.remove('is-hover');
       if (!morph) return;
@@ -10591,17 +10592,37 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
         { opacity: 0, filter: 'blur(3px)', transform: 'translateY(3px)' },
         { opacity: 1, filter: 'blur(0)', transform: 'none' },
       ], { duration: 380, delay: 60, easing: PILL_EASE, fill: 'backwards' });
+    }
+    // A toast is a label that rides the cursor for a set time wherever it
+    // goes, e.g. "Copied, talk soon :)" after a copy. Hover changes wait
+    // while it's up; when it ends, the cursor settles into whatever it's
+    // over now: that control's own pill, or the plain dot.
+    let toastOn = false, toastTimer = 0, hoverCard = null;
+    document.addEventListener('cursor:toast', e => {
+      retitle(e.detail.text);
+      toastOn = true;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toastOn = false;
+        if (hoverCard) retitle(hoverCard.dataset.cursorLink);
+        else { cursor.textContent = ''; cursor.classList.remove('is-pill'); }
+      }, e.detail.ms);
     });
+    document.addEventListener('cursor:label', e => { if (!toastOn) retitle(e.detail); });
 
 
     // Pill cards
     document.querySelectorAll('[data-cursor-link]').forEach(card => {
       card.addEventListener('mouseenter', () => {
+        hoverCard = card;
+        if (toastOn) return;
         setPillText(card.dataset.cursorLink);
         cursor.classList.add('is-pill');
         cursor.classList.remove('is-hover');
       });
       card.addEventListener('mouseleave', () => {
+        if (hoverCard === card) hoverCard = null;
+        if (toastOn) return;
         cursor.textContent = '';
         cursor.classList.remove('is-pill');
       });
@@ -10952,6 +10973,14 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
           document.dispatchEvent(new CustomEvent('cursor:label', { detail }));
         }
       };
+      // The confirmation (and the rare failure) rides the cursor for the
+      // hold even if the pointer moves on, so it reads as a message rather
+      // than a hover state. Same guard: a keyboard press has no cursor.
+      const toast = text => {
+        if (idlePill && control.matches(':hover')) {
+          document.dispatchEvent(new CustomEvent('cursor:toast', { detail: { text, ms: HOLD } }));
+        }
+      };
       /* Every press takes a ticket. A result whose ticket is stale — because
          a newer press superseded it, or because the hold already expired —
          is dropped, so a burst of clicks can never let an old answer paint
@@ -10982,7 +11011,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
         /* The pill says it with a little warmth, a small hidden detail
            for whoever actually copies the address. rest() puts the idle
            pill back at the end of the hold if the pointer is still here. */
-        pill(COPIED_PILL);
+        toast(COPIED_PILL);
         revert = setTimeout(() => {
           if (ticket !== seq) return;
           seq += 1;
@@ -11000,7 +11029,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
         control.classList.add('is-failed');
         if (doneWord) doneWord.textContent = address;
         announce('Could not copy. The address is ' + address);
-        pill(address);
+        toast(address);
       }
 
       control.addEventListener('click', copy);
