@@ -10923,6 +10923,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
   (() => {
     const HOLD = 1900;
     const COPIED_PILL = 'Copied, talk soon :)';
+    const TOAST_MS = 1100; // how long the confirmation rides the cursor
     /* The live region sits after this script in the document, so it cannot be
        resolved at parse time — look it up when there is something to say. */
     const announce = message => {
@@ -10978,7 +10979,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       // than a hover state. Same guard: a keyboard press has no cursor.
       const toast = text => {
         if (idlePill && control.matches(':hover')) {
-          document.dispatchEvent(new CustomEvent('cursor:toast', { detail: { text, ms: HOLD } }));
+          document.dispatchEvent(new CustomEvent('cursor:toast', { detail: { text, ms: TOAST_MS } }));
         }
       };
       /* Every press takes a ticket. A result whose ticket is stale — because
