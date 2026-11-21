@@ -302,3 +302,9 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 - **Settle.** The timer is `motionDelay(total + 20)`. It hides the leavers, cancels the filter's animations and runs `lockFeedHeight()`.
 - **Height and view glide (`glideFeed`).** When a filter changes the feed's height, `.feed` height and `main.scrollTop` move together on one rAF ease-in-out (720ms). Otherwise a shorter page snaps the view up to its new bottom in one frame. The target scroll is read with the leavers set to `display:none`, because they're out of flow but still add scrollable overflow. Height and scroll are driven from the same loop, so the scroll never gets clamped. Wheel, touch or key input stops the scroll steering. `.feed.is-filtered` has `align-content: start` so the grid rows don't stretch while the height glides.
 - Never use the `translate` property in the FLIP: it belongs to the `--feed-lag` scroll spring.
+
+**Hidden details** (keep them few, small, and never in the way of the main scan):
+- After a successful copy, the email copy controls show the cursor pill "Copied, talk soon :)" (`COPIED_PILL`) for the hold. The Experience outro email pill's check state uses the same words.
+- Hovering the sign-off ("© 2026 Zainab Ahsan") crossfades it in place to "designed & built by hand, no templates" (`.copyright-swap`: both lines in one grid cell, so nothing reflows; hover-capable pointers only; only the text takes the pointer).
+- The resume nudge on Experience (see Topbar).
+

@@ -238,6 +238,20 @@
     pointer-events: none;
     user-select: none;
   }
+  /* Hidden detail: hovering the sign-off swaps it, in place, for a quiet
+     note that the site is hand-made. Both lines stack in one grid cell, so
+     nothing reflows. Only the text takes the pointer; the footer's padding
+     stays click-through. */
+  .copyright-swap { display: inline-grid; justify-items: center; pointer-events: auto; }
+  .copyright-swap > span {
+    grid-area: 1 / 1; white-space: nowrap;
+    transition: opacity 0.35s var(--ease-out), translate 0.45s var(--ease-out), filter 0.35s var(--ease-out);
+  }
+  .copyright-alt { opacity: 0; translate: 0 4px; filter: blur(2px); }
+  @media (hover: hover) {
+    .copyright-swap:hover .copyright-main { opacity: 0; translate: 0 -4px; filter: blur(2px); }
+    .copyright-swap:hover .copyright-alt  { opacity: 1; translate: 0 0; filter: none; }
+  }
   /* The same sign-off closes About and Experience. About is one centred
      screen on desktop, so the line pins to its foot there without moving
      the stack; on phones it simply follows the cards. */
@@ -6565,7 +6579,7 @@
 
       </div>
       <div class="feed-empty" id="feedEmpty" aria-live="polite">Nothing in this board yet.</div>
-      <footer class="copyright">© 2026 Zainab Ahsan</footer>
+      <footer class="copyright"><span class="copyright-swap"><span class="copyright-main">© 2026 Zainab Ahsan</span><span class="copyright-alt" aria-hidden="true">designed &amp; built by hand, no templates</span></span></footer>
     </section>
 
     <!-- ═══ ABOUT PAGE ═══ -->
@@ -6661,7 +6675,7 @@
       </div>
       </div>
 
-      <footer class="copyright">© 2026 Zainab Ahsan</footer>
+      <footer class="copyright"><span class="copyright-swap"><span class="copyright-main">© 2026 Zainab Ahsan</span><span class="copyright-alt" aria-hidden="true">designed &amp; built by hand, no templates</span></span></footer>
     </section>
 
 
@@ -6752,11 +6766,11 @@
               <span class="exp-email-states" aria-hidden="true">
                 <span class="exp-email-state exp-email-state--idle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="m3.6 6.4 8.4 6.6 8.4-6.6"/></svg>zahsan9@uw.edu</span>
                 <span class="exp-email-state exp-email-state--copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2.4"/><path d="M14.5 4.5H6.3A1.8 1.8 0 0 0 4.5 6.3v8.2"/></svg>Copy email</span>
-                <span class="exp-email-state exp-email-state--check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>Copied</span>
+                <span class="exp-email-state exp-email-state--check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>Copied, talk soon :)</span>
               </span>
             </button>
           </div>
-          <footer class="copyright">© 2026 Zainab Ahsan</footer>
+          <footer class="copyright"><span class="copyright-swap"><span class="copyright-main">© 2026 Zainab Ahsan</span><span class="copyright-alt" aria-hidden="true">designed &amp; built by hand, no templates</span></span></footer>
         </div>
       </div>
     </section>
@@ -10881,6 +10895,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
      the cursor pill and the live region. */
   (() => {
     const HOLD = 1900;
+    const COPIED_PILL = 'Copied, talk soon :)';
     /* The live region sits after this script in the document, so it cannot be
        resolved at parse time — look it up when there is something to say. */
     const announce = message => {
@@ -10931,14 +10946,6 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
           document.dispatchEvent(new CustomEvent('cursor:label', { detail }));
         }
       };
-      /* Same guard: only stand down a cursor that is actually over this
-         control. A keyboard press leaves the pointer wherever it was, quite
-         possibly on some other control holding a pill of its own. */
-      const dismissPill = () => {
-        if (idlePill && control.matches(':hover')) {
-          document.dispatchEvent(new CustomEvent('cursor:dismiss'));
-        }
-      };
       /* Every press takes a ticket. A result whose ticket is stale — because
          a newer press superseded it, or because the hold already expired —
          is dropped, so a burst of clicks can never let an old answer paint
@@ -10966,12 +10973,10 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
         rest();
         control.classList.add('is-copied');
         announce('Email address copied: ' + address);
-        /* The pill goes away rather than being retitled: the glyph carries
-           the confirmation, and the pill was covering it. rest() brings it
-           back at the end of the hold if the pointer is still here. Failure
-           still speaks up below, because there the visitor needs the address
-           itself and nothing else on screen is holding it. */
-        dismissPill();
+        /* The pill says it with a little warmth, a small hidden detail
+           for whoever actually copies the address. rest() puts the idle
+           pill back at the end of the hold if the pointer is still here. */
+        pill(COPIED_PILL);
         revert = setTimeout(() => {
           if (ticket !== seq) return;
           seq += 1;
