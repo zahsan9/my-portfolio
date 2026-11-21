@@ -1959,8 +1959,8 @@
   .topbar-swap { position: relative; display: flex; align-items: center; }
   /* Resume nudge (Experience page only): every few seconds the resume icon
      gives a small double hop with a tilt,
-     so the eye finds it without a banner or a pop-up. Most of each 6s cycle
-     is rest. It pauses on hover and stops for the session once the resume
+     so the eye finds it without a banner or a pop-up. Most of each cycle
+     is rest. It rests on hover and stops for the session once the resume
      has been opened (.is-seen). */
   #topbarResumeBtn {
     position: relative;
@@ -1974,7 +1974,8 @@
   .topbar.is-exp #topbarResumeBtn:not(.is-seen) .resume-glyph {
     animation: resume-nudge 4s cubic-bezier(0.3, 0, 0.3, 1) 2s infinite;
   }
-  #topbarResumeBtn:hover svg { animation-play-state: paused; }
+  /* Under the pointer it simply rests: no hop, and no freezing mid-tilt. */
+  .topbar.is-exp #topbarResumeBtn:hover .resume-glyph { animation: none; }
   /* Every 4s; the hop itself still lasts ~780ms (19.5% of the cycle). */
   @keyframes resume-nudge {
     0%, 19.5%, 100% { transform: none; }
