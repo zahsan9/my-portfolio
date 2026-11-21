@@ -10401,10 +10401,36 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     // Keyboard activation (e.detail === 0) keeps focus for the next Tab stop.
     if (e.detail !== 0) b.blur();
   }));
-  // Experience's "Back to top": glide the page back to the timeline heading
-  // (instant under reduced motion). The scroll snap lands it on the intro.
+  // Experience's "Back to top": a custom glide back to the timeline heading.
+  // The browser's smooth scroll is short and flat over a page this long, so
+  // this eases in gently, travels, and lands softly (ease-in-out quint, time
+  // scaled by distance). The page's scroll snap would grab every frame of a
+  // scripted scroll, so it's lifted for the glide and restored at the top,
+  // where the heading is a snap point anyway. The timeline cards' own scroll
+  // spring adds the give as they pass. Any wheel, touch or key input hands
+  // control straight back. Instant under reduced motion.
   document.getElementById('expBackTop')?.addEventListener('click', () => {
-    document.querySelector('.main').scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+    const scroller = document.querySelector('.main');
+    if (prefersReducedMotion()) { scroller.scrollTop = 0; return; }
+    const from = scroller.scrollTop;
+    if (from < 2) return;
+    const duration = Math.min(1500, 700 + from * 0.18);
+    const ease = k => k < 0.5 ? 16 * k ** 5 : 1 - Math.pow(-2 * k + 2, 5) / 2;
+    const t0 = performance.now();
+    let frame = 0;
+    const finish = () => {
+      cancelAnimationFrame(frame);
+      scroller.style.scrollSnapType = '';
+      ['wheel', 'touchstart', 'keydown'].forEach(t => scroller.removeEventListener(t, finish));
+    };
+    ['wheel', 'touchstart', 'keydown'].forEach(t => scroller.addEventListener(t, finish, { passive: true }));
+    scroller.style.scrollSnapType = 'none';
+    const step = now => {
+      const k = Math.min(1, (now - t0) / duration);
+      scroller.scrollTop = from * (1 - ease(k));
+      if (k < 1) frame = requestAnimationFrame(step); else finish();
+    };
+    frame = requestAnimationFrame(step);
   });
 
   document.querySelectorAll('[data-back-to-feed]').forEach(button => {
