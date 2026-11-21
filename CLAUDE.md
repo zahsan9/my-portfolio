@@ -282,8 +282,6 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 - **2-3 finished case studies, not more** — everything else stays `wip: true` (renders the "Coming soon" state). A placeholder reads better than a rushed write-up.
 - **Reads as a talk** — the section order above is the talk order: hook, question, decisions with reasoning, impact, reflection. Amazon-style loops expect this to work presented out loud, not just skimmed.
 
-**Experience cards are debossed cutouts too** (`.exp-track .exp-card[class*="art-"]`): same size, layout and scroll fade reveal, with the same inset surface as the noir cards. The role line stays plain (the user rejected tinting it in each card's old colour). Colour comes only from the brand logos: `tesla-icon-red.svg` (#E82127) and the teal `godaddy-icon.svg`. WIIRED and UW have no logo asset; don't recreate UW's trademark W.
-
 **Debossed component cards.** The noir cards (In the overlap, Find me elsewhere) read as pressed into the page. `.pin .art-noir` uses a fill of 90% `--paper` mixed with black, plus four inset shadows: a 1px rim at 28%, a 3px top shadow at 42%, an 18px top falloff at 34%, and a 1px bottom highlight at 9% white. The selector needs `.pin`, because `.pin .art`'s own box-shadow outranks a plain `.art-noir` rule.
 
 **Dark page tones.** `--paper` is oklch 0.215 (lifted from 0.20 to be easier on the eyes) and `--paper-2` is 0.26. The rest moved with them to keep contrast: `--ink-mid` 0.60, `--ink-soft` 0.71, `--ink-low` 0.45, `--line` 0.295, `--control-soft` 0.315. Debossed surfaces mix from `--paper`, so they follow automatically. Earlier tries at 0.17/0.185 were rejected as too dark.
