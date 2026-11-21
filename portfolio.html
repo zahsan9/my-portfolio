@@ -1113,7 +1113,9 @@
   .app.sheet-open .banner { opacity: 0; pointer-events: none; }
   .banner .avatar {
     width: 140px; height: 140px; min-height: 140px; max-height: 140px; border-radius: 999px;
-    margin: 0 auto 36px;
+    /* ~30px of visible space to the name's cap height: a clear step from the
+       photo, wider than the name-to-bio gap so the name groups with its text. */
+    margin: 0 auto 27px;
     background: var(--paper-2);
     color: var(--ink);
     position: relative; overflow: hidden;
@@ -1133,7 +1135,7 @@
   .banner h1 {
     font-family: var(--serif); font-weight: 600;
     font-size: 44px; line-height: 0.98; letter-spacing: 0;
-    margin-bottom: 16px;
+    margin-bottom: 8px; /* ~22px visible from baseline to the bio's caps */
   }
   .banner h1 em { margin-left: 0.16em; font-style: normal; }
   .banner .bio { font-size: 16px; line-height: 1.65; max-width: 520px; margin: 0 auto; color: var(--ink-soft); }
