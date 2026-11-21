@@ -1957,6 +1957,37 @@
      occupants crossfade (swapTopbarSlot). The leaving label is pinned in
      place out of flow while it fades. */
   .topbar-swap { position: relative; display: flex; align-items: center; }
+  /* Resume nudge (Experience page only): every few seconds the resume icon
+     gives a small double hop with a tilt, and a soft ring pings out from it,
+     so the eye finds it without a banner or a pop-up. Most of each 6s cycle
+     is rest. It pauses on hover and stops for the session once the resume
+     has been opened (.is-seen). */
+  #topbarResumeBtn { position: relative; }
+  .topbar.is-exp #topbarResumeBtn:not(.is-seen) svg {
+    animation: resume-nudge 6s cubic-bezier(0.3, 0, 0.3, 1) 2.5s infinite;
+  }
+  .topbar.is-exp #topbarResumeBtn:not(.is-seen)::after {
+    content: ''; position: absolute; inset: 8px; border-radius: 50%;
+    border: 1.5px solid currentColor; opacity: 0; pointer-events: none;
+    animation: resume-ping 6s ease-out 2.5s infinite;
+  }
+  #topbarResumeBtn:hover svg,
+  #topbarResumeBtn:hover::after { animation-play-state: paused; }
+  @keyframes resume-nudge {
+    0%, 13%, 100% { transform: none; }
+    3%   { transform: translateY(-4px) rotate(-7deg); }
+    6%   { transform: none; }
+    8.5% { transform: translateY(-2px) rotate(4deg); }
+    11%  { transform: none; }
+  }
+  @keyframes resume-ping {
+    0%       { opacity: 0.45; scale: 0.8; }
+    16%, 100% { opacity: 0; scale: 1.4; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .topbar.is-exp #topbarResumeBtn svg,
+    .topbar.is-exp #topbarResumeBtn::after { animation: none; }
+  }
   /* Phones hide the Updated tag, so the slot only reserves width above that. */
   @media (min-width: 601px) { .topbar-swap { min-width: var(--slot-w, auto); } }
   .topbar-swap > .is-leaving-slot {
@@ -6306,7 +6337,7 @@
         <a class="topbar-social-btn" aria-label="LinkedIn" data-cursor-link="↗ linkedin" href="https://www.linkedin.com/in/ahsanzainab" target="_blank" rel="noopener noreferrer">
           <span class="social-glyph" aria-hidden="true">in</span>
         </a>
-        <a class="topbar-social-btn" aria-label="View resume (PDF)" data-cursor-link="↗ resume" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer">
+        <a class="topbar-social-btn" id="topbarResumeBtn" aria-label="View resume (PDF)" data-cursor-link="↗ resume" href="assets/Resume_ZainabAhsan.pdf" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M14 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/>
             <path d="M14 3.5V8h4.5M9 12.5h6M9 16h4"/>
@@ -10049,6 +10080,17 @@
   sizeTopbarSlot();
   if (document.fonts) document.fonts.ready.then(sizeTopbarSlot);
 
+  // Once the resume has been opened, the Experience nudge has done its job:
+  // stop it for the rest of the session.
+  const topbarResumeBtn = document.getElementById('topbarResumeBtn');
+  if (topbarResumeBtn) {
+    try { if (sessionStorage.getItem('resumeSeen')) topbarResumeBtn.classList.add('is-seen'); } catch (e) {}
+    topbarResumeBtn.addEventListener('click', () => {
+      topbarResumeBtn.classList.add('is-seen');
+      try { sessionStorage.setItem('resumeSeen', '1'); } catch (e) {}
+    });
+  }
+
   // Swap the label after the header's divider (Updated on the feed, Back to
   // Work elsewhere) with the same soft motion as the page change: the old
   // label fades out where it stood and the new one fades up through a light
@@ -10290,6 +10332,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     // One header everywhere (email, LinkedIn, resume | ...). After the
     // divider, the feed shows the Updated tag; other pages show Back to Work.
     swapTopbarSlot(name === 'feed' ? topbarUpdated : topbarBack);
+    topbar.classList.toggle('is-exp', name === 'experience');
 
     const viewMap = { feed: feedView, about: aboutView, experience: expView };
     const leaving  = viewMap[currentRouteName];
