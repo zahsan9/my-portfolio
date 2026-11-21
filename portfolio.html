@@ -2768,6 +2768,7 @@
     margin-right: 5px;
   }
 
+  #site-cursor .cursor-words { display: inline-block; }
   @media (pointer: coarse) { #site-cursor { display: none; } }
   .exp-card.art-charcoal { color: oklch(0.94 0.005 80); }
 
@@ -10566,11 +10567,30 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     });
 
     // A copy confirmation retitles the pill where it stands, so the cursor
-    // stops offering an action that has already happened.
+    // stops offering an action that has already happened. When the pill is
+    // already showing, the retitle morphs instead of snapping: the pill
+    // stretches from its old width to the new label's on the cursor's own
+    // soft ease, while the new words fade up through a slight blur. Instant
+    // under reduced motion.
+    const PILL_EASE = 'cubic-bezier(0.19, 1, 0.22, 1)';
     document.addEventListener('cursor:label', e => {
+      const morph = cursor.classList.contains('is-pill') && !prefersReducedMotion();
+      const w0 = cursor.getBoundingClientRect().width;
+      cursor.getAnimations().forEach(a => a.cancel());
       setPillText(e.detail);
       cursor.classList.add('is-pill');
       cursor.classList.remove('is-hover');
+      if (!morph) return;
+      const words = document.createElement('span');
+      words.className = 'cursor-words';
+      words.append(...cursor.childNodes);
+      cursor.append(words);
+      const w1 = cursor.getBoundingClientRect().width;
+      cursor.animate([{ width: w0 + 'px' }, { width: w1 + 'px' }], { duration: 480, easing: PILL_EASE });
+      words.animate([
+        { opacity: 0, filter: 'blur(3px)', transform: 'translateY(3px)' },
+        { opacity: 1, filter: 'blur(0)', transform: 'none' },
+      ], { duration: 380, delay: 60, easing: PILL_EASE, fill: 'backwards' });
     });
 
 
