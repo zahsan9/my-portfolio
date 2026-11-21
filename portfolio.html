@@ -1972,15 +1972,16 @@
   .topbar.is-exp #topbarResumeBtn .resume-glyph path:first-child { fill: currentColor; }
   .topbar.is-exp #topbarResumeBtn .resume-glyph path:last-child { stroke: var(--paper); }
   .topbar.is-exp #topbarResumeBtn:not(.is-seen) .resume-glyph {
-    animation: resume-nudge 6s cubic-bezier(0.3, 0, 0.3, 1) 2.5s infinite;
+    animation: resume-nudge 4s cubic-bezier(0.3, 0, 0.3, 1) 2s infinite;
   }
   #topbarResumeBtn:hover svg { animation-play-state: paused; }
+  /* Every 4s; the hop itself still lasts ~780ms (19.5% of the cycle). */
   @keyframes resume-nudge {
-    0%, 13%, 100% { transform: none; }
-    3%   { transform: translateY(-4px) rotate(-7deg); }
-    6%   { transform: none; }
-    8.5% { transform: translateY(-2px) rotate(4deg); }
-    11%  { transform: none; }
+    0%, 19.5%, 100% { transform: none; }
+    4.5%   { transform: translateY(-4px) rotate(-7deg); }
+    9%     { transform: none; }
+    12.75% { transform: translateY(-2px) rotate(4deg); }
+    16.5%  { transform: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .topbar.is-exp #topbarResumeBtn svg { animation: none; }
