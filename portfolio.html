@@ -2769,6 +2769,11 @@
   }
 
   #site-cursor .cursor-words { display: inline-block; }
+  /* While showPill/hidePill drive the size with WAAPI, the CSS size
+     transitions stand down so the two don't fight. */
+  #site-cursor.is-morphing {
+    transition: opacity 120ms var(--ease-out), background 180ms var(--ease-out), color 320ms var(--ease-soft);
+  }
   @media (pointer: coarse) { #site-cursor { display: none; } }
   .exp-card.art-charcoal { color: oklch(0.94 0.005 80); }
 
@@ -10556,75 +10561,118 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       }
     };
 
-    /* A copy dismisses the pill instead of retitling it. The pill is centred
-       on the pointer, which over either copy control means squarely on top of
-       the glyph — so the tick was firing behind the very thing the visitor is
-       looking at. Standing the cursor down uncovers it. .is-hover goes with
-       it, dropping the cursor to its smallest resting dot rather than leaving
-       a 24px one parked on the tick. */
-    document.addEventListener('cursor:dismiss', () => {
-      cursor.textContent = '';
-      cursor.classList.remove('is-pill', 'is-hover');
-    });
-
-    // A copy confirmation retitles the pill where it stands, so the cursor
-    // stops offering an action that has already happened. When the pill is
-    // already showing, the retitle morphs instead of snapping: the pill
-    // stretches from its old width to the new label's on the cursor's own
-    // soft ease, while the new words fade up through a slight blur. Instant
-    // under reduced motion.
+    /* Pill open / close / retitle, all on real width + height.
+       The CSS used to grow the pill by transitioning max-width (14px -> 200px)
+       on a front-loaded ease: the pill hit its real width in the first few
+       frames (abrupt open), and closing spent most of its time shrinking
+       slack nobody could see before snapping shut. Here the actual size is
+       measured at both ends and animated on a gentle spring, so it opens
+       with a little give, closes softly, and the words fade in and out on
+       their own beat. While it runs, .is-morphing drops the CSS size
+       transitions so the two don't fight. Instant under reduced motion. */
     const PILL_EASE = 'cubic-bezier(0.19, 1, 0.22, 1)';
-    function retitle(text) {
-      const morph = cursor.classList.contains('is-pill') && !prefersReducedMotion();
-      const w0 = cursor.getBoundingClientRect().width;
-      cursor.getAnimations().forEach(a => a.cancel());
-      setPillText(text);
-      cursor.classList.add('is-pill');
-      cursor.classList.remove('is-hover');
-      if (!morph) return;
+    const springOK = CSS.supports('animation-timing-function', 'linear(0, 1)');
+    const PILL_OPEN  = springOK ? springEasing(230, 21) : { easing: PILL_EASE, duration: 560 };
+    const PILL_CLOSE = springOK ? springEasing(260, 27) : { easing: PILL_EASE, duration: 420 };
+    let pillSettle = 0;
+    const sizeOf = () => { const r = cursor.getBoundingClientRect(); return { w: r.width, h: r.height }; };
+    const wrapWords = () => {
       const words = document.createElement('span');
       words.className = 'cursor-words';
       words.append(...cursor.childNodes);
       cursor.append(words);
-      const w1 = cursor.getBoundingClientRect().width;
-      cursor.animate([{ width: w0 + 'px' }, { width: w1 + 'px' }], { duration: 480, easing: PILL_EASE });
+      return words;
+    };
+    // Stand the CSS size transitions down BEFORE changing classes, so the
+    // target size is read as the real end state, not a transition's start.
+    const freeze = () => { clearTimeout(pillSettle); cursor.classList.add('is-morphing'); };
+    function resize(from, to, timing) {
+      clearTimeout(pillSettle);
+      cursor.animate([
+        { width: from.w + 'px', height: from.h + 'px', minWidth: '0px', maxWidth: 'none' },
+        { width: to.w + 'px', height: to.h + 'px', minWidth: '0px', maxWidth: 'none' },
+      ], { duration: timing.duration, easing: timing.easing });
+      pillSettle = setTimeout(() => cursor.classList.remove('is-morphing'), timing.duration);
+    }
+    function showPill(text) {
+      const still = prefersReducedMotion();
+      const wasPill = cursor.classList.contains('is-pill');
+      const from = sizeOf();
+      cursor.getAnimations({ subtree: true }).forEach(a => a.cancel());
+      if (!still) freeze();
+      setPillText(text);
+      cursor.classList.add('is-pill');
+      cursor.classList.remove('is-hover');
+      if (still) return;
+      const words = wrapWords();
+      const to = sizeOf();
+      resize(from, to, wasPill ? { duration: 480, easing: PILL_EASE } : PILL_OPEN);
       words.animate([
         { opacity: 0, filter: 'blur(3px)', transform: 'translateY(3px)' },
         { opacity: 1, filter: 'blur(0)', transform: 'none' },
-      ], { duration: 380, delay: 60, easing: PILL_EASE, fill: 'backwards' });
+      ], { duration: 380, delay: wasPill ? 60 : 110, easing: PILL_EASE, fill: 'backwards' });
     }
+    function hidePill({ dropHover = false } = {}) {
+      if (!cursor.classList.contains('is-pill')) {
+        if (dropHover) cursor.classList.remove('is-hover');
+        return;
+      }
+      const from = sizeOf();
+      cursor.getAnimations({ subtree: true }).forEach(a => a.cancel());
+      const still = prefersReducedMotion();
+      if (!still) freeze();
+      cursor.classList.remove('is-pill');
+      if (dropHover) cursor.classList.remove('is-hover');
+      if (still) { cursor.textContent = ''; return; }
+      // The words stay in while the pill closes around them (it clips), and
+      // the text colour has already gone transparent with .is-pill off.
+      const to = sizeOf();
+      resize(from, to, PILL_CLOSE);
+      setTimeout(() => {
+        if (!cursor.classList.contains('is-pill')) cursor.textContent = '';
+      }, PILL_CLOSE.duration);
+    }
+
+    /* On leaving a pill control, close one frame later, once the generic
+       hover listener has also had its say, so the pill closes to the dot
+       size the cursor will actually rest at (14px, or 24px over another
+       control) instead of shrinking to 24 and then snapping to 14. Skipped if
+       the pointer has already entered another pill control. */
+    const closeAfterHover = () => requestAnimationFrame(() => {
+      if (!hoverCard && !toastOn) hidePill();
+    });
+
+    /* A dismiss closes the pill instead of retitling it, and drops .is-hover
+       so the cursor rests at its smallest dot. */
+    document.addEventListener('cursor:dismiss', () => hidePill({ dropHover: true }));
+
     // A toast is a label that rides the cursor for a set time wherever it
     // goes, e.g. "Copied, talk soon :)" after a copy. Hover changes wait
     // while it's up; when it ends, the cursor settles into whatever it's
     // over now: that control's own pill, or the plain dot.
     let toastOn = false, toastTimer = 0, hoverCard = null;
     document.addEventListener('cursor:toast', e => {
-      retitle(e.detail.text);
+      showPill(e.detail.text);
       toastOn = true;
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => {
         toastOn = false;
-        if (hoverCard) retitle(hoverCard.dataset.cursorLink);
-        else { cursor.textContent = ''; cursor.classList.remove('is-pill'); }
+        if (hoverCard) showPill(hoverCard.dataset.cursorLink || hoverCard.dataset.cursorLabel);
+        else hidePill();
       }, e.detail.ms);
     });
-    document.addEventListener('cursor:label', e => { if (!toastOn) retitle(e.detail); });
-
+    // A retitle in place (a copy reverting, a card's TL;DR handing back).
+    document.addEventListener('cursor:label', e => { if (!toastOn) showPill(e.detail); });
 
     // Pill cards
     document.querySelectorAll('[data-cursor-link]').forEach(card => {
       card.addEventListener('mouseenter', () => {
         hoverCard = card;
-        if (toastOn) return;
-        setPillText(card.dataset.cursorLink);
-        cursor.classList.add('is-pill');
-        cursor.classList.remove('is-hover');
+        if (!toastOn) showPill(card.dataset.cursorLink);
       });
       card.addEventListener('mouseleave', () => {
         if (hoverCard === card) hoverCard = null;
-        if (toastOn) return;
-        cursor.textContent = '';
-        cursor.classList.remove('is-pill');
+        if (!toastOn) closeAfterHover();
       });
       // Copy actions carry a pill but no destination — they wire their own click.
       if (!card.dataset.href) return;
@@ -10639,13 +10687,12 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     // Coming soon cards
     document.querySelectorAll('[data-cursor-label]').forEach(el => {
       el.addEventListener('mouseenter', () => {
-        setPillText(el.dataset.cursorLabel);
-        cursor.classList.add('is-pill');
-        cursor.classList.remove('is-hover');
+        hoverCard = el;
+        if (!toastOn) showPill(el.dataset.cursorLabel);
       });
       el.addEventListener('mouseleave', () => {
-        cursor.textContent = '';
-        cursor.classList.remove('is-pill');
+        if (hoverCard === el) hoverCard = null;
+        if (!toastOn) closeAfterHover();
       });
     });
 
