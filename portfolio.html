@@ -10650,15 +10650,27 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     // goes, e.g. "Copied, talk soon :)" after a copy. Hover changes wait
     // while it's up; when it ends, the cursor settles into whatever it's
     // over now: that control's own pill, or the plain dot.
+    //
+    // While the pointer stays on the control that raised it, the toast
+    // stays up: it's that control's state now. Off the control it lasts at
+    // least its minimum time, then ends. A fresh copy restarts it.
     let toastOn = false, toastTimer = 0, hoverCard = null;
+    let toastSource = null, toastMinDone = false;
+    function endToast() {
+      toastOn = false; toastSource = null; toastMinDone = false;
+      clearTimeout(toastTimer);
+      if (hoverCard) showPill(hoverCard.dataset.cursorLink || hoverCard.dataset.cursorLabel);
+      else hidePill();
+    }
     document.addEventListener('cursor:toast', e => {
       showPill(e.detail.text);
       toastOn = true;
+      toastSource = e.detail.source || null;
+      toastMinDone = false;
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => {
-        toastOn = false;
-        if (hoverCard) showPill(hoverCard.dataset.cursorLink || hoverCard.dataset.cursorLabel);
-        else hidePill();
+        toastMinDone = true;
+        if (!toastSource || hoverCard !== toastSource) endToast();
       }, e.detail.ms);
     });
     // A retitle in place (a copy reverting, a card's TL;DR handing back).
@@ -10672,6 +10684,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       });
       card.addEventListener('mouseleave', () => {
         if (hoverCard === card) hoverCard = null;
+        if (toastOn && card === toastSource && toastMinDone) { requestAnimationFrame(endToast); return; }
         if (!toastOn) closeAfterHover();
       });
       // Copy actions carry a pill but no destination — they wire their own click.
@@ -10970,7 +10983,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
   (() => {
     const HOLD = 1900;
     const COPIED_PILL = 'Copied, talk soon :)';
-    const TOAST_MS = 1100; // how long the confirmation rides the cursor
+    const TOAST_MS = 1100; // minimum time the confirmation rides the cursor once the pointer leaves
     /* The live region sits after this script in the document, so it cannot be
        resolved at parse time — look it up when there is something to say. */
     const announce = message => {
@@ -11026,7 +11039,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
       // than a hover state. Same guard: a keyboard press has no cursor.
       const toast = text => {
         if (idlePill && control.matches(':hover')) {
-          document.dispatchEvent(new CustomEvent('cursor:toast', { detail: { text, ms: TOAST_MS } }));
+          document.dispatchEvent(new CustomEvent('cursor:toast', { detail: { text, ms: TOAST_MS, source: control } }));
         }
       };
       /* Every press takes a ticket. A result whose ticket is stale — because
