@@ -1964,15 +1964,13 @@
      has been opened (.is-seen). */
   #topbarResumeBtn {
     position: relative;
-    transition: background 0.35s var(--ease-out), color 0.35s var(--ease-out);
   }
-  /* On Experience the resume is the page's call to action, so its bubble
-     inverts (ink fill, paper glyph), the same treatment as the active rail
-     button. It eases in and out with the page change. */
-  .topbar.is-exp #topbarResumeBtn { background: var(--ink); color: var(--paper); }
-  @media (hover: hover) {
-    .topbar.is-exp #topbarResumeBtn:hover { background: var(--ink); opacity: 0.85; }
-  }
+  /* On Experience the resume is the page's call to action, so the glyph
+     itself inverts: the page fills solid ink and its fold and text lines
+     cut out in the page colour. The bubble stays as it is. */
+  #topbarResumeBtn .resume-glyph path { transition: fill 0.35s var(--ease-out), stroke 0.35s var(--ease-out); }
+  .topbar.is-exp #topbarResumeBtn .resume-glyph path:first-child { fill: currentColor; }
+  .topbar.is-exp #topbarResumeBtn .resume-glyph path:last-child { stroke: var(--paper); }
   .topbar.is-exp #topbarResumeBtn:not(.is-seen) .resume-glyph {
     animation: resume-nudge 6s cubic-bezier(0.3, 0, 0.3, 1) 2.5s infinite;
   }
