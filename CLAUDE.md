@@ -282,7 +282,7 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 - **2-3 finished case studies, not more** — everything else stays `wip: true` (renders the "Coming soon" state). A placeholder reads better than a rushed write-up.
 - **Reads as a talk** — the section order above is the talk order: hook, question, decisions with reasoning, impact, reflection. Amazon-style loops expect this to work presented out loud, not just skimmed.
 
-**Experience cards are debossed cutouts too** (`.exp-track .exp-card[class*="art-"]`): same size, layout and scroll fade reveal, with the same inset surface as the noir cards. Identity comes from two things. The role line takes the card's old colour (`--exp-accent`: cream, yellow, sage, plum for UW). The logos use brand colour: `tesla-icon-red.svg` (#E82127) and the teal `godaddy-icon.svg`. WIIRED and UW have no logo asset; don't recreate UW's trademark W.
+**Experience cards are debossed cutouts too** (`.exp-track .exp-card[class*="art-"]`): same size, layout and scroll fade reveal, with the same inset surface as the noir cards. The role line stays plain (the user rejected tinting it in each card's old colour). Colour comes only from the brand logos: `tesla-icon-red.svg` (#E82127) and the teal `godaddy-icon.svg`. WIIRED and UW have no logo asset; don't recreate UW's trademark W.
 
 **Debossed component cards.** The noir cards (In the overlap, Find me elsewhere) read as pressed into the page. `.pin .art-noir` uses a fill of 90% `--paper` mixed with black, plus four inset shadows: a 1px rim at 28%, a 3px top shadow at 42%, an 18px top falloff at 34%, and a 1px bottom highlight at 9% white. The selector needs `.pin`, because `.pin .art`'s own box-shadow outranks a plain `.art-noir` rule.
 

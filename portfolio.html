@@ -2746,8 +2746,8 @@
   .exp-card.art-charcoal { color: oklch(0.94 0.005 80); }
   /* Experience cards are records, not things to open, so they take the
      same debossed "cutout" surface as the feed's component cards (see
-     .pin .art-noir). Size and layout are untouched. Each card keeps its
-     original colour as an accent on the role line. .exp-track raises the
+     .pin .art-noir). Size and layout are untouched. Colour comes only from
+     the brand logos below. .exp-track raises the
      specificity over the .art-* fills and the dark charcoal override. */
   .exp-track .exp-card[class*="art-"] {
     background: color-mix(in oklch, var(--paper) 90%, black);
@@ -2758,11 +2758,6 @@
       inset 0 18px 32px -12px oklch(0 0 0 / 0.34),
       inset 0 -1px 0 oklch(1 0 0 / 0.09);
   }
-  .exp-track .exp-card.art-cream    { --exp-accent: var(--c-cream); }
-  .exp-track .exp-card.art-yellow   { --exp-accent: var(--c-yellow); }
-  .exp-track .exp-card.art-sage     { --exp-accent: var(--c-sage); }
-  .exp-track .exp-card.art-charcoal { --exp-accent: var(--c-plum); }
-  .exp-track .exp-card h3 span { color: var(--exp-accent, currentColor); }
   .exp-track .exp-card ul { border-top-color: color-mix(in oklch, currentColor 22%, transparent); border-top-width: 1px; }
   /* The logos carry each company's real colour (Tesla red, GoDaddy teal),
      the one bright, recognisable anchor on an otherwise calm card. */
