@@ -238,47 +238,16 @@
     pointer-events: none;
     user-select: none;
   }
-  /* The same sign-off closes About and Experience. About is one centred
-     screen on desktop, so the line pins to its foot there without moving
-     the stack; on phones it simply follows the cards. */
-  .about-page .copyright { margin-top: 0; padding: 32px 24px 44px; }
-  @media (min-width: 801px) {
-    .about-page.active { position: relative; }
-    .about-page .copyright { position: absolute; left: 0; bottom: 0; padding: 0 24px 44px; }
-  }
+  /* Only the feed carries the sign-off; About and Experience end without it. */
   /* Experience has no sign-off: its closing screen ends on the Back to top
-     cue instead (.exp-top-cue), positioned against this. */
+     pill instead (.exp-back-top), positioned against this. */
   .exp-outro { position: relative; }
-  /* Back to top: the timeline's opening "Scroll" cue, mirrored. Same mono
-     label and hairline, with the pulse running up instead of down. It
-     closes the page in place of the sign-off. Phones: in flow under the
+  /* Back to top: the same quiet pill as Back to Work, with an up arrow.
+     It closes the page in place of a sign-off. Phones: in flow under the
      email pill. Desktop: pinned to the foot of the snapped closing screen. */
-  .exp-top-cue {
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
-    margin-top: 84px; padding: 6px 12px;
-    border: 0; background: none; cursor: pointer;
-    font-family: var(--mono); font-size: 11px; text-transform: uppercase;
-    letter-spacing: var(--tracking-label); color: var(--ink-mid);
-    transition: color 0.2s var(--ease-out);
-  }
-  @media (hover: hover) { .exp-top-cue:hover { color: var(--ink); } }
-  .exp-top-cue:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 6px; }
-  .exp-top-cue-line {
-    position: relative; width: 1px; height: 56px; overflow: hidden;
-    background: color-mix(in oklch, var(--ink) 22%, transparent);
-  }
-  .exp-top-cue-line::after {
-    content: ''; position: absolute; inset: auto 0 0; height: 40%;
-    background: currentColor;
-    animation: exp-cue-rise 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-  }
-  @keyframes exp-cue-rise {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(-250%); }
-  }
-  @media (prefers-reduced-motion: reduce) { .exp-top-cue-line::after { animation: none; } }
+  .exp-back-top { margin-top: 84px; }
   @media (min-width: 801px) {
-    .exp-top-cue { position: absolute; left: 50%; bottom: 36px; translate: -50% 0; margin: 0; }
+    .exp-back-top { position: absolute; left: 50%; bottom: 32px; translate: -50% 0; margin: 0; }
   }
   /* Custom feed scrollbar */
   .feed-scroll-track {
@@ -545,7 +514,9 @@
     color: var(--ink); overflow: hidden;
     transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
   }
-  .app:has(.page-back:focus-visible)
+  /* Hovering a pill that leads back to Work previews it on the rail.
+     Back to top also wears .page-back but stays on the page, so it's out. */
+  .app:has(.page-back:not(.exp-back-top):focus-visible)
     .rail-btn[data-route="feed"]:not(.active) {
     background: var(--control-soft);
   }
@@ -553,7 +524,7 @@
      keeps winning while these stay above it. */
   @media (hover: hover) {
     .rail-btn:hover { background: var(--control-soft); }
-    .app:has(.page-back:hover)
+    .app:has(.page-back:not(.exp-back-top):hover)
       .rail-btn[data-route="feed"]:not(.active) {
       background: var(--control-soft);
     }
@@ -6696,8 +6667,6 @@
 
       </div>
       </div>
-
-      <footer class="copyright">© 2026 Zainab Ahsan</footer>
     </section>
 
 
@@ -6792,9 +6761,9 @@
               </span>
             </button>
           </div>
-          <button class="exp-top-cue" type="button" id="expBackTop">
-            <span class="exp-top-cue-line" aria-hidden="true"></span>
-            <span>Back to top</span>
+          <button class="page-back exp-back-top" type="button" id="expBackTop">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M3 7l5-4 5 4"/></svg>
+            Back to top
           </button>
         </div>
       </div>
