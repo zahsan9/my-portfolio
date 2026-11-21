@@ -1939,11 +1939,29 @@
   .topbar-social-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
   /* Quiet metadata, not a control: same mono the rail's section labels use,
      one hairline divider away from the icon row. */
+  /* Optical spacing: the icons' glyphs (not their 48px bubbles) sit ~38px
+     apart, so the divider sits 38px past the last glyph, and the Updated
+     tag / Back to Work arrow 38px past the divider. That reads as one
+     even rhythm across the whole row. */
   .topbar-divider {
     color: var(--line);
     font-size: 15px;
     line-height: 1;
     user-select: none;
+    margin-left: 12px;
+  }
+  .topbar-social .topbar-updated { margin-left: 26px; }
+  .topbar-social .page-back { margin-left: 5px; }
+  /* The slot after the divider. It's held at the wider label's width
+     (sizeTopbarSlot), so the icons never shift, and on a route change its two
+     occupants crossfade (swapTopbarSlot). The leaving label is pinned in
+     place out of flow while it fades. */
+  .topbar-swap { position: relative; display: flex; align-items: center; }
+  /* Phones hide the Updated tag, so the slot only reserves width above that. */
+  @media (min-width: 601px) { .topbar-swap { min-width: var(--slot-w, auto); } }
+  .topbar-swap > .is-leaving-slot {
+    position: absolute; left: 0; top: 50%; translate: 0 -50%;
+    pointer-events: none;
   }
   .topbar-updated {
     font-family: var(--mono);
@@ -6297,11 +6315,13 @@
         <span class="topbar-divider" aria-hidden="true">|</span>
         <!-- After the divider: the feed shows when the site was last updated;
              every other page swaps in the way back (setRoute). -->
-        <span class="topbar-updated" id="topbarUpdated">Updated Nov 2026</span>
-        <button class="page-back" type="button" id="topbarBack" data-back-to-feed hidden>
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>
-          Back to Work
-        </button>
+        <span class="topbar-swap" id="topbarSwap">
+          <span class="topbar-updated" id="topbarUpdated">Updated Nov 2026</span>
+          <button class="page-back" type="button" id="topbarBack" data-back-to-feed hidden>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 3 3 8l4 5"/></svg>
+            Back to Work
+          </button>
+        </span>
       </div>
     </header>
 
@@ -10010,6 +10030,58 @@
   const expView         = document.getElementById('expView');
   const topbarUpdated = document.getElementById('topbarUpdated');
   const topbarBack = document.getElementById('topbarBack');
+  const topbarSwap = document.getElementById('topbarSwap');
+
+  // The slot after the divider is held at the wider label's width, so the
+  // icons and divider never move between pages: only the label changes.
+  // Re-measured once the web fonts land, since they change the text width.
+  function sizeTopbarSlot() {
+    if (!topbarSwap) return;
+    topbarSwap.style.removeProperty('--slot-w');
+    const shown = [topbarUpdated, topbarBack].map(el => el.hidden);
+    topbarUpdated.hidden = false; topbarBack.hidden = true;
+    const wUpdated = topbarSwap.getBoundingClientRect().width;
+    topbarUpdated.hidden = true; topbarBack.hidden = false;
+    const wBack = topbarSwap.getBoundingClientRect().width;
+    topbarUpdated.hidden = shown[0]; topbarBack.hidden = shown[1];
+    topbarSwap.style.setProperty('--slot-w', Math.ceil(Math.max(wUpdated, wBack)) + 'px');
+  }
+  sizeTopbarSlot();
+  if (document.fonts) document.fonts.ready.then(sizeTopbarSlot);
+
+  // Swap the label after the header's divider (Updated on the feed, Back to
+  // Work elsewhere) with the same soft motion as the page change: the old
+  // label fades out where it stood and the new one fades up through a light
+  // blur. Instant on the opening load (a deep link) and under reduced
+  // motion.
+  function swapTopbarSlot(show) {
+    if (!topbarSwap || !show) return;
+    // Already showing (and not mid fade-out from a faster click): nothing to do.
+    if (!show.hidden && !show.classList.contains('is-leaving-slot')) return;
+    const hide = show === topbarBack ? topbarUpdated : topbarBack;
+    const animate = document.readyState === 'complete' && !prefersReducedMotion();
+    topbarSwap.getAnimations().forEach(a => a.cancel());
+    [show, hide].forEach(el => {
+      el.getAnimations().forEach(a => a.cancel());
+      el.classList.remove('is-leaving-slot');
+    });
+    if (!animate) { hide.hidden = true; show.hidden = false; return; }
+
+    hide.classList.add('is-leaving-slot');
+    show.hidden = false;
+    const ease = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    hide.animate([{ opacity: 1, filter: 'blur(0)' }, { opacity: 0, filter: 'blur(3px)' }],
+      { duration: 180, easing: 'ease-out', fill: 'forwards' })
+      .finished.then(() => {
+        hide.hidden = true;
+        hide.classList.remove('is-leaving-slot');
+        hide.getAnimations().forEach(a => a.cancel());
+      }, () => {});
+    show.animate([
+      { opacity: 0, filter: 'blur(4px)', transform: 'translateY(3px)' },
+      { opacity: 1, filter: 'blur(0)', transform: 'none' },
+    ], { duration: 420, delay: 120, easing: ease, fill: 'backwards' });
+  }
 const expScroll   = document.getElementById('expScroll');
   const expTrack    = document.getElementById('expTrack');
   let expFrame = 0;
@@ -10217,8 +10289,7 @@ function setRoute(name, { history: historyMode = 'push' } = {}) {
     });
     // One header everywhere (email, LinkedIn, resume | ...). After the
     // divider, the feed shows the Updated tag; other pages show Back to Work.
-    if (topbarUpdated) topbarUpdated.hidden = name !== 'feed';
-    if (topbarBack) topbarBack.hidden = name === 'feed';
+    swapTopbarSlot(name === 'feed' ? topbarUpdated : topbarBack);
 
     const viewMap = { feed: feedView, about: aboutView, experience: expView };
     const leaving  = viewMap[currentRouteName];
