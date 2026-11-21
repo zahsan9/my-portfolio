@@ -286,6 +286,8 @@ Applies to any `PAGES[key].custom` write-up (the `cs-` component system). Choose
 
 **Debossed component cards.** The noir cards (In the overlap, Find me elsewhere) read as pressed into the page. `.pin .art-noir` uses a fill of 90% `--paper` mixed with black, plus four inset shadows: a 1px rim at 28%, a 3px top shadow at 42%, an 18px top falloff at 34%, and a 1px bottom highlight at 9% white. The selector needs `.pin`, because `.pin .art`'s own box-shadow outranks a plain `.art-noir` rule.
 
+**Dark page tones.** `--paper` is oklch 0.215 (lifted from 0.20 to be easier on the eyes) and `--paper-2` is 0.26. The rest moved with them to keep contrast: `--ink-mid` 0.60, `--ink-soft` 0.71, `--ink-low` 0.45, `--line` 0.295, `--control-soft` 0.315. Debossed surfaces mix from `--paper`, so they follow automatically. Earlier tries at 0.17/0.185 were rejected as too dark.
+
 **Gray bio, no rule under the topbar.** Only the name and titles use full `--ink`. The feed bio uses `--ink-soft` (oklch 0.70 in dark mode, 0.40 in light) so it sits a step back. The topbar has no `border-bottom` and the rail has no `border-right`: the rail and the page share `--paper`, and the topbar's blur backdrop is what separates it from content on scroll. The sheet head's `border-bottom` stays.
 
 **Feed filters** are All · Product · Software · Data (`data-filter` ux / swe / viz). WIIRED Studio is not a filter. Its card shows only under All. The rail index's section headings (`CAT_LABELS`) use the same names.
