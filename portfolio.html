@@ -1192,6 +1192,7 @@
   /* Desktop line 1 is the roles (.bio-role); phones swap in the school
      line instead (.bio-school), since the roles don't fit. */
   .banner .bio-school { display: none; }
+  .banner .bio-company { color: var(--ink); }
   /* Same divider as the header's before "Updated" (.topbar-divider): a
      plain bar in the faint line colour. */
   .banner .bio-divider { color: var(--line); margin: 0 10px; user-select: none; }
@@ -1236,7 +1237,7 @@
   /* Same voice as the rail's nav labels (regular, --tracking-ui): the
      filters are navigation too, so they shouldn't outweigh the page. */
   .tab {
-    font-family: var(--sans); font-size: 14px; font-weight: 500;
+    font-family: var(--sans); font-size: 14px; font-weight: 400;
     letter-spacing: var(--tracking-ui);
     padding: 6px 0 10px; background: transparent; color: var(--control-muted);
     position: relative; line-height: 1;
@@ -1250,14 +1251,15 @@
     opacity: 0;
   }
   .tab:hover { color: var(--ink); }
-  .tab.active { color: var(--ink); font-weight: 600; }
-  /* The active tab goes bold. Every tab reserves its bold width with an
-     invisible zero-height copy (data-text), so switching filters never
-     nudges its neighbours sideways. */
+  .tab.active { color: var(--ink); font-weight: 700; }
   .tab { display: inline-flex; flex-direction: column; align-items: center; }
+  /* Reserve the bold label width so selecting a filter doesn't shift its neighbors. */
   .tab::before {
-    content: attr(data-text); font-weight: 600;
-    height: 0; overflow: hidden; visibility: hidden; pointer-events: none;
+    content: attr(data-text);
+    font-weight: 700;
+    height: 0;
+    visibility: hidden;
+    overflow: hidden;
   }
   .tab.active::after {
     transform: scaleX(1); opacity: 1;
@@ -1493,6 +1495,7 @@
     box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.28), 0 -3px 10px oklch(0.2 0.03 40 / 0.22);
   }
   .pin.frame-folder .pin-meta,
+  .pin.frame-folder .studio-caption,
   .pin.frame-folder h3 { position: relative; z-index: 1; }
 
   /* Habitat: one bold three-step pixel staircase in the top-right corner,
@@ -1670,11 +1673,15 @@
     margin-top: auto; margin-bottom: 0;
     display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
   }
-  .art-dreamcatcher .dream-caption {
-    font-family: var(--mono); font-size: 9px; line-height: 1.5;
+  .art-dreamcatcher .dream-caption,
+  .frame-folder .studio-caption,
+  .art-crow .crow-caption {
+    font-family: var(--mono); font-size: var(--fs-xs); line-height: 1.5;
     text-transform: uppercase; letter-spacing: var(--tracking-label);
     color: currentColor; opacity: 0.7;
   }
+  .art-crow .crow-caption,
+  .frame-folder .studio-caption { margin-top: 10px; }
   /* Two crops from the FigBuild "1st Year / Creative" badge artwork, their
      flat background keyed out to transparent — no card/shadow treatment,
      no rotation. sticker-2 sits below the meta label on the left; sticker-1
@@ -5971,7 +5978,7 @@
       width: 88px; height: 88px; min-height: 88px; max-height: 88px;
       margin-bottom: 24px;
     }
-    .banner h1 { font-size: 32px; margin-bottom: 10px; }
+    .banner h1 { font-size: 30px; margin-bottom: 10px; }
     .banner .bio { max-width: 400px; font-size: 14px; line-height: 1.55; text-wrap: pretty; }
     .banner .bio-role { display: none; }
     .banner .bio-school { display: inline; }
@@ -6168,7 +6175,7 @@
     .ab-stack-list.is-lined li { padding-top: 12px; padding-bottom: 12px; }
     .ab-stack-list.is-compact li { font-size: 12.5px; line-height: 1.5; }
     .ab-stack-narrative { font-size: 12.5px; line-height: 1.55; }
-    .ab-about-copy .ab-stack-narrative { font-size: 13px; }
+    .ab-about-copy .ab-stack-narrative { font-size: var(--fs-md); line-height: 1.5; }
     .ab-stack-item-label { font-size: 10px; margin-bottom: 5px; opacity: 0.85; }
     /* No room for the off-card photo on a flat card — drop it. */
     .ab-about-photo { display: none !important; }
@@ -6183,10 +6190,10 @@
     }
     .banner .avatar.is-open,
     .banner .avatar:has(.em-btn:focus-visible) { width: 240px; }
-    .banner h1 { font-size: 30px; margin-bottom: 8px; }
+    .banner h1 { font-size: 28px; margin-bottom: 8px; }
     .banner .bio { max-width: 292px; font-size: 13px; line-height: 1.55; }
     .tabs { width: min(292px, 100% - 36px); padding: 14px 0 16px; }
-    .tab { font-size: 12px; padding: 12px 0; }
+    .tab { padding: 12px 0; }
 .cs-two-col,
     .cs-artifact-grid,
     .cs-viz-grid,
@@ -6312,7 +6319,7 @@
      tracking tokens above. Keep role assignments here so component rules
      don't quietly introduce another scale.
        --fs-4xl 48  page statements
-       --fs-3xl 40  portfolio name
+       --fs-3xl 36  portfolio name
        --fs-2xl 36  case-study heroes
        --fs-xl  28  page/card titles and case-study questions
        --fs-lg  20  ledes and section heads
@@ -6321,7 +6328,7 @@
        --fs-sm  13  secondary copy and metadata values
        --fs-xs  11  labels and captions */
   :root {
-    --fs-4xl: 48px; --fs-3xl: 40px; --fs-2xl: 36px; --fs-xl: 28px; --fs-lg: 20px;
+    --fs-4xl: 48px; --fs-3xl: 36px; --fs-2xl: 36px; --fs-xl: 28px; --fs-lg: 20px;
     --fs-base: 16px; --fs-md: 15px; --fs-sm: 13px; --fs-xs: 11px;
   }
   /* XS */
@@ -6329,9 +6336,10 @@
     .exp-card .yr, .exp-card .place, .cs-hero-meta dt, .ab-stack-item-label, .ab-card-eyebrow, .sheet-meta) { font-size: var(--fs-xs); }
   /* Older case-study modules used scattered 8–10px sizes for metadata.
      Bring label-like roles onto the same 11px floor without changing prose. */
-  :root .sheet[data-page] :is([class*="eyebrow"], [class*="caption"], [class*="badge"], [class*="index"],
-    [class*="meta"], [class*="label"], [class*="tag"], [class*="pill"], [class*="scope-hd"],
-    [class*="stat-l"], [class*="ci-bot"], .cs-feature h3, .cs-copy th, .cs-product-principle span) {
+  :root .sheet[data-page] :is(.eyebrow, .cs-iteration-eyebrow, .cs-caption, .cs-badge,
+    .cs-fig-index, .cs-flow-placeholder-meta, .cs-filmstrip-label, .cs-anno-strip-tag,
+    .cs-tag, .cs-table-tag, .cs-role-pill, .cs-link-pill, .cs-scope-hd, .cs-hstat-l,
+    .cs-stat-l, .cs-ci-bot, .cs-copy th, .cs-product-principle > span) {
     font-size: var(--fs-xs);
   }
   :root :is(.climate-caption, .ab-focus-cred, .rail-index-wip, .pg-eyebrow, .ab-stack-detail,
@@ -6375,10 +6383,18 @@
     font-size: clamp(1.375rem, 7.37cqi, 1.875rem);
     line-height: 1.1;
   }
+  .feed .pin .art h3.skills-intro,
+  .feed .pin .art h3.social-intro {
+    font-size: 28px !important;
+  }
   @media (max-width: 800px) {
     /* The mobile Experience cards are 286px wide. */
     :root .feed .pin :is(h3, .climate-title, .art-book .title) {
       font-size: clamp(1.375rem, 9.8cqi, 1.75rem);
+    }
+    .feed .pin .art h3.skills-intro,
+    .feed .pin .art h3.social-intro {
+      font-size: 26px !important;
     }
   }
 </style>
@@ -6515,8 +6531,8 @@
           <img class="avatar-photo" src="assets/images/profile.jpg" alt="Portrait of Zainab Ahsan" />
         </div>
         <h1 id="nameTitle">Zainab <em>Ahsan</em></h1>
-        <p class="bio"><span class="bio-role">Incoming @ Tesla<span class="bio-divider" aria-hidden="true">|</span>Analytics @ GoDaddy<span class="bio-divider" aria-hidden="true">|</span>CS @ UW &rsquo;28</span><span class="bio-school">CS @ UW &rsquo;28</span><br>I design, build, and overthink the <span class="bio-details">details in between :)</span></p>
-        <div class="meta">Seattle, WA<span class="meta-sep" aria-hidden="true">|</span>5 Boards, 7 Pins</div>
+        <p class="bio"><span class="bio-role">Incoming <span class="bio-company">@Tesla</span><span class="bio-divider" aria-hidden="true">|</span>Analytics Intern <span class="bio-company">@GoDaddy</span></span><span class="bio-school">CS @ UW &rsquo;28</span><br>I design and build products through code, data, and design.</p>
+        <div class="meta">Seattle, WA<span class="meta-sep" aria-hidden="true">|</span>CS @ UW &rsquo;28</div>
       </div>
 
       <nav class="tabs" aria-label="Filter work">
@@ -6649,13 +6665,14 @@
           <!-- DreamCatcher -->
           <article class="pin" data-cat="ux" data-page="dreamcatcher" data-title="DreamCatcher" data-year="2026" data-cursor-label="Under construction" aria-label="DreamCatcher, work in progress">
             <div class="art art-charcoal art-dreamcatcher ar-1">
-              <div class="pin-meta">WIP · FigBuild 2026</div>
+              <div class="pin-meta">WIP</div>
               <div class="dream-stickers" aria-hidden="true">
                 <img class="dream-sticker dream-sticker-1" src="assets/images/dreamcatcher-sticker-1.png" alt="">
                 <img class="dream-sticker dream-sticker-2" src="assets/images/dreamcatcher-sticker-2.png" alt="">
               </div>
               <div class="dream-mark">
                 <h3>Dream<br>Catcher</h3>
+                <span class="dream-caption">FigBuild 2026</span>
               </div>
             </div>
           </article>
@@ -6700,6 +6717,7 @@
               <span class="folder-front" aria-hidden="true"></span>
               <div class="pin-meta">WIP</div>
               <h3 style="margin-top:auto;">WIIRED<br>Studio</h3>
+              <span class="studio-caption">Design eng studio</span>
             </div>
           </article>
 
@@ -6708,6 +6726,7 @@
             <div class="art art-plum art-crow ar-45">
               <div class="pin-meta">WIP</div>
               <h3>The<br>CROW</h3>
+              <span class="crow-caption">Research journal</span>
             </div>
           </article>
         </div>

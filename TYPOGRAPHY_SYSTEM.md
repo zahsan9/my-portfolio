@@ -16,7 +16,7 @@ The final type-scale block in `portfolio.html` owns shared sizes. Change these t
 | Token | Size | Use |
 | --- | ---: | --- |
 | `--fs-4xl` | 48px | About and Experience page statements |
-| `--fs-3xl` | 40px | Portfolio name |
+| `--fs-3xl` | 36px | Portfolio name |
 | `--fs-2xl` | 36px | Case-study hero titles |
 | `--fs-xl` | 28px | Desktop card/page titles and case-study questions |
 | `--fs-lg` | 20px | Case-study ledes and section heads |
