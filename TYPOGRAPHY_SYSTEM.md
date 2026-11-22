@@ -1,95 +1,43 @@
-# Typography System
+# Portfolio Typography System
 
-## Three-Face Hierarchy
+The portfolio uses **Alte Haas Grotesk** throughout. A single family keeps the visual language cohesive; hierarchy comes from size, weight, line height, and tracking. `--sans`, `--serif`, `--serif-display`, `--mono`, and `--card-title` are compatibility aliases for existing component rules and all resolve to this face.
 
-### 1. Instrument Serif (Primary Editorial)
-**Role:** Heroes, main case study titles, authoritative moments  
-**Character:** Refined, elegant, confident  
-**Usage:**
-- Hero titles (`.cs-hero-title`)
-- Page headlines
-- Primary case study headings
+## Typeface and weights
 
-**Weights:** Regular, Italic
+- Local regular face: `AlteHaasGroteskRegular.ttf`, weight 400.
+- Local bold face: `AlteHaasGroteskBold.ttf`, weight 700.
+- Use 400 for prose and quiet labels; use 700 for titles and emphasis. The font has no separate 500 or 600 face, so avoid relying on intermediate weights or synthetic bolding.
+- Inter is a fallback only, not a second typographic voice.
 
----
+## Size roles
 
-### 2. Fraunces (Expressive Editorial) ✨ NEW
-**Role:** Questions, reflections, warm editorial moments  
-**Character:** Soft, wonky, characterful - brings warmth and personality  
-**Usage:**
-- Case study questions (`.cs-question`) - opsz 72, weight 300
-- About page principles (`.ab-principle`) - opsz 16, weight 300, italic
-- Editorial section headings
+The final type-scale block in `portfolio.html` owns shared sizes. Change these tokens rather than adding another one-off size for the same role.
 
-**Weights:** Light 300 (primary), Semibold 600 (accent)  
-**Variable axes:** Optical size (opsz) 9-144  
-**Settings:** Lower optical sizes (9-72) for softer, editorial quality
+| Token | Size | Use |
+| --- | ---: | --- |
+| `--fs-4xl` | 48px | About and Experience page statements |
+| `--fs-3xl` | 40px | Portfolio name |
+| `--fs-2xl` | 36px | Case-study hero titles |
+| `--fs-xl` | 28px | Desktop card/page titles and case-study questions |
+| `--fs-lg` | 20px | Case-study ledes and section heads |
+| `--fs-base` | 16px | Body copy and primary compact-card headings |
+| `--fs-md` | 15px | Compact supporting copy and figure titles |
+| `--fs-sm` | 13px | Secondary copy and metadata values |
+| `--fs-xs` | 11px | Labels, dates, captions, and eyebrows |
 
-**Why Fraunces:**
-- Complements Instrument's refinement with warmth
-- Variable font with optical sizing for typographic nuance
-- Distinctive without being trendy (not in top-10 portfolio fonts)
-- Soft serifs fit visual/Pinterest aesthetic (not blocky like Space Mono)
-- Brings personality to reflective, question-driven moments
+Mobile sizes are tuned in the existing responsive rules. Keep body copy at or above 15px where space allows; 11px is reserved for short metadata, never paragraphs.
 
----
+## Line height and tracking
 
-### 3. Inter (Structure & UI)
-**Role:** Body text, navigation, metadata, UI elements  
-**Character:** Clean, geometric, highly legible  
-**Usage:**
-- Body copy (`.cs-copy`, `.ab-bio`)
-- Navigation labels
-- Case study metadata
-- Section labels (`.cs-label`) - uppercase, tracked
-- Facts, stats, captions
-- Buttons, controls
+- Body copy: 1.5–1.65, with long case-study text near 1.5 and a readable measure.
+- Display headlines: about 1–1.05; card titles: about 1.1; section headings: 1.2–1.35.
+- Tighten display tracking modestly (around -0.04em), titles around -0.03em, and keep small headings close to neutral. Avoid a single tracking value across every size.
+- Labels use `--tracking-label`; compact UI uses `--tracking-ui`.
 
-**Weights:** 400 (regular), 500 (medium), 600 (semibold), 700 (bold)
+## Maintenance
 
----
-
-## Typographic Voice
-
-**Instrument Serif** says: "Authoritative, polished, confident"  
-**Fraunces** says: "Thoughtful, warm, human"  
-**Inter** says: "Clear, structured, modern"
-
-Together they create a **layered editorial system** rather than a flat utility stack.
-
----
-
-## Application Rules
-
-1. **Reserve Instrument for heroes only** - don't overuse it in every heading
-2. **Use Fraunces for questions and reflections** - moments that invite pause
-3. **Use Inter for everything structural** - it's your workhorse
-4. **Optical sizing matters** - Fraunces at opsz 72 for large text, 16 for small
-5. **Weight contrast** - Fraunces Light (300) makes it feel editorial, not heavy
-
----
-
-## What Changed (2026-09-10)
-
-**Before:**
-- Instrument Serif (editorial)
-- Inter (everything else)
-- `--mono` token pointed to Inter (wasted opportunity)
-
-**After:**
-- Instrument Serif (heroes)
-- **Fraunces (expressive moments)** ← NEW
-- Inter (structure)
-- `--mono` stays Inter for now (metadata, small caps work fine with Inter)
-
-**Why not Space Mono:** Too blocky/technical for a visual portfolio with Pinterest feel. Fraunces brings the unexpected character without sacrificing refinement.
-
----
-
-## Future Considerations
-
-- If case study data tables need true monospace, consider **IBM Plex Mono** or **Recursive**
-- Could use Fraunces Semibold (600) for accent pull-quotes or impact callouts
-- Explore Fraunces' goofy/wonk axis if more personality is needed
+1. Reuse the existing role token for typography with the same purpose.
+2. Use explicit component exceptions only when the content or available space requires them, and keep the exception in the responsive/component rules next to that component.
+3. Preserve the local face and its licensed files; do not add a second editorial or monospaced family without intentionally revising this system.
+4. Use tabular numerals for changing values and `text-wrap: balance` for headlines or `text-wrap: pretty` for longer copy where supported.
 

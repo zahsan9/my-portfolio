@@ -199,7 +199,10 @@
     background: var(--paper);
     color: var(--ink);
     font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    font-synthesis: none;
     overscroll-behavior: none;
   }
   a { color: inherit; text-decoration: none; }
@@ -1177,9 +1180,8 @@
   /* No faux italic: the face has no italic, so emphasis in a case-study
      hero title stays upright. */
   :root .cs-hero-title :is(em, i) { font-style: normal; }
-  /* Feed card titles take the event-card style from the type system:
-     Bold 22px at -0.06em. Small labels, so the cards and their art carry
-     the board, not the titles. One size for every card. */
+  /* Compact card-title size before the shared desktop scale is applied;
+     mobile rules retain their narrower, tuned sizes. */
   :root :is(.pin h3, .climate-title, .pin .skills-intro) {
     font-size: 22px; line-height: 1.1; letter-spacing: -0.06em; font-weight: 700;
   }
@@ -1231,7 +1233,7 @@
     transition: opacity var(--motion-med) ease;
   }
   .tabs-scroll { display: contents; }
-  /* Same voice as the rail's nav labels (Inter, 500, --tracking-ui): the
+  /* Same voice as the rail's nav labels (regular, --tracking-ui): the
      filters are navigation too, so they shouldn't outweigh the page. */
   .tab {
     font-family: var(--sans); font-size: 14px; font-weight: 500;
@@ -1328,6 +1330,7 @@
   }
 
   .pin {
+    container-type: inline-size;
     cursor: pointer;
     position: relative;
     transition: opacity var(--motion-med) ease;
@@ -1518,6 +1521,7 @@
   }
   .climate-mark {
     position: absolute;
+    z-index: 1;
     top: 50%;
     left: 24px;
     right: 24px;
@@ -1533,11 +1537,8 @@
     line-height: 0.98;
     letter-spacing: -0.01em;
   }
-  /* Sits at the foot of the card, over the etched chart, in the same spot
-     the other cards keep their captions. */
   .climate-caption {
-    position: absolute; left: 24px; right: 24px; bottom: 20px;
-    z-index: 1; text-align: center;
+    margin-top: 8px;
     display: block;
     font-family: var(--mono);
     font-size: 9px;
@@ -6115,7 +6116,7 @@
        the top bar and the 76px bottom nav); the cards follow below. */
     .about-page.active { padding-top: 0; }
     .ab-intro-panel { min-height: calc(100dvh - var(--chrome-size) - 76px); justify-content: center; }
-    /* Intro panel: "A little about me" over a down arrow, whole row centred,
+    /* Intro heading over a down arrow, whole row centred,
        with even breathing room above and below the arrow. */
     .ab-page-row { flex-direction: column; gap: 44px; align-items: center; }
     .ab-intro-panel { flex-direction: column; gap: 18px; margin-right: 0; align-items: center; }
@@ -6306,19 +6307,19 @@
 
 
   /* ── Type scale ───────────────────────────────────────────────────────
-     One size per role, on an 8-step scale modelled on Design Meetup's
-     (13/15/16/20/40). This block sits last so it settles ties with the
-     per-component rules above; the large steps are desktop-only, phones
-     keep their own tuned sizes. Change a role here, not in its component.
-       --fs-4xl 48  page headlines (About, Experience, closing note)
-       --fs-3xl 40  the name
-       --fs-2xl 36  case-study hero titles
-       --fs-xl  28  every card title (feed, About, Experience), case-study questions
-       --fs-lg  20  case-study subheads, ledes
-       --fs-base 16 body prose (bold 16 = compact-card headings)
-       --fs-md  15  compact-card text, figure titles
-       --fs-sm  13  secondary: roles, bullets, meta values
-       --fs-xs  11  labels, dates, captions, eyebrows (9-10px floor raised) */
+     Alte Haas Grotesk is the only voice. Size and weight create hierarchy;
+     tracking tightens display text by tier, while labels use the shared
+     tracking tokens above. Keep role assignments here so component rules
+     don't quietly introduce another scale.
+       --fs-4xl 48  page statements
+       --fs-3xl 40  portfolio name
+       --fs-2xl 36  case-study heroes
+       --fs-xl  28  page/card titles and case-study questions
+       --fs-lg  20  ledes and section heads
+       --fs-base 16 body copy and primary card headings
+       --fs-md  15  compact supporting copy
+       --fs-sm  13  secondary copy and metadata values
+       --fs-xs  11  labels and captions */
   :root {
     --fs-4xl: 48px; --fs-3xl: 40px; --fs-2xl: 36px; --fs-xl: 28px; --fs-lg: 20px;
     --fs-base: 16px; --fs-md: 15px; --fs-sm: 13px; --fs-xs: 11px;
@@ -6326,6 +6327,15 @@
   /* XS */
   :root :is(.banner .meta, .pin .pin-meta, .godaddy-caption, .brew-caption, .dream-caption, .habitat-caption, .climate-caption,
     .exp-card .yr, .exp-card .place, .cs-hero-meta dt, .ab-stack-item-label, .ab-card-eyebrow, .sheet-meta) { font-size: var(--fs-xs); }
+  /* Older case-study modules used scattered 8–10px sizes for metadata.
+     Bring label-like roles onto the same 11px floor without changing prose. */
+  :root .sheet[data-page] :is([class*="eyebrow"], [class*="caption"], [class*="badge"], [class*="index"],
+    [class*="meta"], [class*="label"], [class*="tag"], [class*="pill"], [class*="scope-hd"],
+    [class*="stat-l"], [class*="ci-bot"], .cs-feature h3, .cs-copy th, .cs-product-principle span) {
+    font-size: var(--fs-xs);
+  }
+  :root :is(.climate-caption, .ab-focus-cred, .rail-index-wip, .pg-eyebrow, .ab-stack-detail,
+    .cs-hero-meta dt, .pin .pin-meta, .pin .pill) { font-size: var(--fs-xs); }
   /* SM */
   :root :is(.exp-card li, .exp-reveal-text, .cs-hero-meta dd) { font-size: var(--fs-sm); }
   :root .exp-card h3 span { font-size: var(--fs-sm); }
@@ -6335,15 +6345,12 @@
   /* BASE: prose, and bold compact-card headings */
   :root .sheet-body :is(.cs-copy p, .cs-gd-project p, .cs-copy li) { font-size: var(--fs-base); line-height: 1.5; }
   :root .sheet-body :is(.cs-gd-now-item h3, .cs-feature h3, .cs-product-principle h3) { font-size: var(--fs-base); }
-  /* One tracking for every heading, at every size (the system's -6%):
-     that's what makes headings of different sizes read as one family.
-     Small bold labels (compact-card heads, 15-16px) keep a light -1%,
-     like the system's name list. Line heights: headlines 1.05, titles
-     1.15, subheads 1.35, body 1.5. */
-  :root :is(.banner h1, .pin h3, .climate-title, .pin .skills-intro, .exp-card h3, .ab-stack-title,
-    .ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text, .page-intro-copy h3,
-    .sheet .cs-hero-title, .sheet-body .cs-question,
-    .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3)) { letter-spacing: -0.06em; }
+  /* Tracking follows size: display headlines tightest, titles moderately
+     tight, and small card headings nearly neutral for legibility. */
+  :root :is(.banner h1, .ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text,
+    .page-intro-copy h3, .sheet .cs-hero-title) { letter-spacing: -0.04em; }
+  :root :is(.pin h3, .climate-title, .pin .skills-intro, .exp-card h3, .ab-stack-title,
+    .sheet-body .cs-question, .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3)) { letter-spacing: -0.03em; }
   :root .sheet-body :is(.cs-gd-now-item h3, .cs-feature h3, .cs-product-principle h3, .cs-fig-title) { letter-spacing: -0.01em; }
   :root .exp-card h3 span { letter-spacing: 0; }
   /* The name and the component cards (In the overlap, Find me elsewhere)
@@ -6355,7 +6362,7 @@
     :root .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3) { font-size: var(--fs-lg); line-height: 1.35; }
     :root .sheet-body .cs-copy.cs-overview p { font-size: var(--fs-lg); line-height: 1.5; }
     /* XL */
-    :root :is(.ab-stack-title, .exp-card h3, .pin h3, .climate-title, .pin .skills-intro) { font-size: var(--fs-xl); line-height: 1.1; }
+    :root :is(.ab-stack-title, .exp-card h3) { font-size: var(--fs-xl); line-height: 1.1; }
     :root .sheet-body .cs-question { font-size: var(--fs-xl); line-height: 1.15; }
     /* 2XL */
     :root :is(.ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text) { font-size: var(--fs-4xl); line-height: 1.05; }
@@ -6363,6 +6370,18 @@
     /* 3XL */
     :root .banner h1 { font-size: var(--fs-3xl); }
   }
+  /* Experience uses a 28px title on a 380px desktop card. */
+  :root .feed .pin :is(h3, .climate-title, .art-book .title) {
+    font-size: clamp(1.375rem, 7.37cqi, 1.875rem);
+    line-height: 1.1;
+  }
+  @media (max-width: 800px) {
+    /* The mobile Experience cards are 286px wide. */
+    :root .feed .pin :is(h3, .climate-title, .art-book .title) {
+      font-size: clamp(1.375rem, 9.8cqi, 1.75rem);
+    }
+  }
+  .intro-phrase { font-weight: 400; }
 </style>
 </head>
 <body>
@@ -6541,6 +6560,7 @@
                 <h3>
                   <span class="climate-title">The Neutral<br>Response</span>
                 </h3>
+                <span class="climate-caption">ESD Family Survey</span>
               </div>
               <div class="climate-etched-graphic" aria-hidden="true">
                 <svg viewBox="0 0 320 82" preserveAspectRatio="none">
@@ -6555,7 +6575,6 @@
                   </g>
                 </svg>
               </div>
-              <span class="climate-caption">ESD Family Survey Analysis</span>
             </div>
           </article>
 
@@ -6631,7 +6650,7 @@
           <!-- DreamCatcher -->
           <article class="pin" data-cat="ux" data-page="dreamcatcher" data-title="DreamCatcher" data-year="2026" data-cursor-label="Under construction" aria-label="DreamCatcher, work in progress">
             <div class="art art-charcoal art-dreamcatcher ar-1">
-              <div class="pin-meta">FigBuild 2026</div>
+              <div class="pin-meta">WIP · FigBuild 2026</div>
               <div class="dream-stickers" aria-hidden="true">
                 <img class="dream-sticker dream-sticker-1" src="assets/images/dreamcatcher-sticker-1.png" alt="">
                 <img class="dream-sticker dream-sticker-2" src="assets/images/dreamcatcher-sticker-2.png" alt="">
@@ -6680,6 +6699,7 @@
               <span class="folder-sheet folder-sheet-back" aria-hidden="true"></span>
               <span class="folder-sheet" aria-hidden="true"></span>
               <span class="folder-front" aria-hidden="true"></span>
+              <div class="pin-meta">WIP</div>
               <h3 style="margin-top:auto;">WIIRED<br>Studio</h3>
             </div>
           </article>
@@ -6687,6 +6707,7 @@
           <!-- The CROW redesign -->
           <article class="pin" data-cat="ux studio" data-page="crow" data-title="The CROW" data-year="2026" data-cursor-label="Under construction" aria-label="The CROW, work in progress">
             <div class="art art-plum art-crow ar-45">
+              <div class="pin-meta">WIP</div>
               <h3>The<br>CROW</h3>
             </div>
           </article>
@@ -6746,7 +6767,7 @@
               <img src="assets/images/about-me.jpg" alt="Zainab Ahsan" style="width:100%;height:100%;object-fit:cover;object-position:50% 18%;transform:scale(1.45);">
             </div>
             <div class="ab-about-copy" style="margin-top:auto;">
-              <div class="ab-stack-title">Hi, I'm<br><em style="font-size:1.15em;">Zainab!</em></div>
+              <div class="ab-stack-title"><span class="intro-phrase">Hi, I'm</span><br><em style="font-size:1.15em;">Zainab!</em></div>
               <p class="ab-stack-narrative" style="margin-top:14px;">I'm studying <strong>computer science</strong> at the <strong>University of Washington</strong> and am drawn to the space between <strong>creativity and technology</strong>.</p>
               <p class="ab-stack-narrative">Whether it's thinking through an <strong>interaction</strong>, making sense of <strong>data</strong>, or figuring out how a <strong>product</strong> could work better, I enjoy exploring problems from different angles and <strong>bringing ideas to life</strong>.</p>
             </div>
@@ -6874,7 +6895,7 @@
         </div>
         <div class="exp-outro">
           <div class="exp-outro-inner">
-            <p class="exp-outro-text">If you've scrolled this far,<br><em>let's work together</em> :)</p>
+            <p class="exp-outro-text"><span class="intro-phrase">If you've scrolled this far,</span><br><em>let's work together</em> :)</p>
             <button class="exp-outro-email" type="button" data-copy-email="zahsan9@uw.edu" aria-label="Copy email address zahsan9@uw.edu">
               <span class="exp-email-states" aria-hidden="true">
                 <span class="exp-email-state exp-email-state--idle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="m3.6 6.4 8.4 6.6 8.4-6.6"/></svg>zahsan9@uw.edu</span>
