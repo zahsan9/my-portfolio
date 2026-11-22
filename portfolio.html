@@ -6304,6 +6304,61 @@
   }
 
 
+
+  /* ── Type scale ───────────────────────────────────────────────────────
+     One size per role, on an 8-step scale modelled on Design Meetup's
+     (13/15/16/20/40). This block sits last so it settles ties with the
+     per-component rules above; the large steps are desktop-only, phones
+     keep their own tuned sizes. Change a role here, not in its component.
+       --fs-3xl 44  the name, the single biggest thing
+       --fs-2xl 36  page headlines, case-study hero titles
+       --fs-xl  28  About/Experience card titles, case-study questions
+       --fs-lg  20  feed card titles, case-study subheads, ledes
+       --fs-base 16 body prose (bold 16 = compact-card headings)
+       --fs-md  15  compact-card text, figure titles
+       --fs-sm  13  secondary: roles, bullets, meta values
+       --fs-xs  11  labels, dates, captions, eyebrows (9-10px floor raised) */
+  :root {
+    --fs-3xl: 44px; --fs-2xl: 36px; --fs-xl: 28px; --fs-lg: 20px;
+    --fs-base: 16px; --fs-md: 15px; --fs-sm: 13px; --fs-xs: 11px;
+  }
+  /* XS */
+  :root :is(.banner .meta, .pin .pin-meta, .godaddy-caption, .brew-caption, .dream-caption, .habitat-caption, .climate-caption,
+    .exp-card .yr, .exp-card .place, .cs-hero-meta dt, .ab-stack-item-label, .ab-card-eyebrow, .sheet-meta) { font-size: var(--fs-xs); }
+  /* SM */
+  :root :is(.exp-card li, .exp-reveal-text, .cs-hero-meta dd) { font-size: var(--fs-sm); }
+  :root .exp-card h3 span { font-size: var(--fs-sm); }
+  /* MD: compact-card text and figure titles in case studies */
+  :root .sheet-body :is(.cs-gd-now-item p, .cs-feature p, .cs-product-principle p, .cs-decision-block p, .cs-gd-contact p) { font-size: var(--fs-md); line-height: 1.55; }
+  :root .sheet-body .cs-fig-title { font-size: var(--fs-md); }
+  /* BASE: prose, and bold compact-card headings */
+  :root .sheet-body :is(.cs-copy p, .cs-gd-project p, .cs-copy li) { font-size: var(--fs-base); line-height: 1.5; }
+  :root .sheet-body :is(.cs-gd-now-item h3, .cs-feature h3, .cs-product-principle h3) { font-size: var(--fs-base); }
+  /* One tracking for every heading, at every size (the system's -6%):
+     that's what makes headings of different sizes read as one family.
+     Small bold labels (compact-card heads, 15-16px) keep a light -1%,
+     like the system's name list. Line heights: headlines 1.05, titles
+     1.15, subheads 1.35, body 1.5. */
+  :root :is(.banner h1, .pin h3, .climate-title, .pin .skills-intro, .exp-card h3, .ab-stack-title,
+    .ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text, .page-intro-copy h3,
+    .sheet .cs-hero-title, .sheet-body .cs-question,
+    .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3)) { letter-spacing: -0.06em; }
+  :root .sheet-body :is(.cs-gd-now-item h3, .cs-feature h3, .cs-product-principle h3, .cs-fig-title) { letter-spacing: -0.01em; }
+  :root .exp-card h3 span { letter-spacing: 0; }
+  @media (min-width: 801px) {
+    /* LG */
+    :root :is(.pin h3, .climate-title, .pin .skills-intro) { font-size: var(--fs-lg); }
+    :root .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3) { font-size: var(--fs-lg); line-height: 1.35; }
+    :root .sheet-body .cs-copy.cs-overview p { font-size: var(--fs-lg); line-height: 1.5; }
+    /* XL */
+    :root :is(.ab-stack-title, .exp-card h3) { font-size: var(--fs-xl); line-height: 1.15; }
+    :root .sheet-body .cs-question { font-size: var(--fs-xl); line-height: 1.15; }
+    /* 2XL */
+    :root :is(.ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text) { font-size: var(--fs-2xl); line-height: 1.05; }
+    :root .sheet .cs-hero-title, :root .sheet[data-page] .cs-hero .cs-hero-title { font-size: var(--fs-2xl); line-height: 1.04; }
+    /* 3XL */
+    :root .banner h1 { font-size: var(--fs-3xl); }
+  }
 </style>
 </head>
 <body>
@@ -6663,7 +6718,7 @@
             <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding-top:32px;">
               <img src="assets/images/brew-mug-icon.svg" alt="brew." style="width:88px;height:88px;opacity:0.95;filter:brightness(0) invert(1);object-fit:contain;object-position:center;">
               <div style="max-width:440px;">
-                <div class="ab-stack-title" style="font-size:26px;margin-bottom:14px;">Currently Building <a href="#" data-open-case="brew" data-cursor-link="↗ brew. case study" style="text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;color:inherit;">Brew.</a></div>
+                <div class="ab-stack-title" style="margin-bottom:14px;">Currently Building <a href="#" data-open-case="brew" data-cursor-link="↗ brew. case study" style="text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;color:inherit;">Brew.</a></div>
                 <p style="font-size:14px;line-height:1.65;opacity:0.9;">For finding your third space—whether you need a quiet spot to work, a photo-worthy café, or just great coffee.</p>
               </div>
             </div>
