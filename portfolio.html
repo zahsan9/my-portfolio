@@ -17,7 +17,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 6 7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M1.692 6.276C1.188 6.276 0.780001 6.152 0.468001 5.904C0.156001 5.656 7.37607e-07 5.316 7.37607e-07 4.884C7.37607e-07 4.444 0.112001 4.116 0.336001 3.9C0.560001 3.684 0.804001 3.528 1.068 3.432L3.84 2.4V2.352H1.404C1.044 2.352 0.744001 2.256 0.504001 2.064C0.272001 1.864 0.156001 1.568 0.156001 1.176C0.156001 0.776001 0.272001 0.480001 0.504001 0.288001C0.744001 0.0960009 1.044 9.53674e-07 1.404 9.53674e-07H4.344C4.728 9.53674e-07 5.052 0.092001 5.316 0.276001C5.588 0.460001 5.724 0.788001 5.724 1.26C5.724 1.62 5.612 1.924 5.388 2.172C5.172 2.42 4.856 2.624 4.44 2.784L2.16 3.648V3.696H4.608C5 3.696 5.324 3.804 5.58 4.02C5.836 4.236 5.964 4.56 5.964 4.992C5.964 5.432 5.836 5.756 5.58 5.964C5.324 6.172 5 6.276 4.608 6.276H1.692Z'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Public+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet" />
 <script>
   /* Runs before first paint: pin the dark theme (the site is dark-only; an
      old stored 'theme' from the removed toggle is cleared) and decide
@@ -73,16 +73,14 @@
     --c-noir-2:  oklch(0.235 0.007 240);
 
     /* ── Typography ──
-       Two voices. The display face (--serif, kept as the token name) is
-       Public Sans: a calm, neutral grotesk, soft but structured, picked over
-       Helvetica Neue, Archivo and Barlow. It renders the same on every
-       device. It carries everything with a name: the banner, card titles,
-       page and card headings. Inter carries everything functional.
-       --serif-display (once Fraunces) points at the same face, so the site
-       has exactly one display voice. */
-    --serif: 'Public Sans', -apple-system, sans-serif;
+       Three-face system: Instrument Serif (primary editorial/heroes), Inter
+       (structure, UI), Fraunces (expressive moments, warmth).
+       Fraunces is a soft-serif superfamily with optical sizing—wonky, warm,
+       characterful. Used for case study questions, reflections, About principles.
+       Set at lower optical sizes (9–72) for that softer, editorial quality. */
+    --serif: 'Instrument Serif', Georgia, serif;
     --sans:  'Inter', -apple-system, sans-serif;
-    --serif-display: var(--serif);
+    --serif-display: 'Fraunces', Georgia, serif;
     --mono:  'Inter', -apple-system, sans-serif;
     /* Small-type tracking, sitewide. Two roles, one value each: quiet
        uppercase metadata (badges, eyebrows, section labels) vs. sentence-case
@@ -1125,20 +1123,11 @@
     transition-duration: 0.76s, 0.28s, 0.15s;
   }
   .banner h1 {
-    font-family: var(--serif); font-weight: 500;
-    font-size: 36px; line-height: 1; letter-spacing: -0.02em;
+    font-family: var(--serif); font-weight: 600;
+    font-size: 44px; line-height: 0.98; letter-spacing: 0;
     margin-bottom: 8px; /* ~22px visible from baseline to the bio's caps */
   }
   .banner h1 em { margin-left: 0.16em; font-style: normal; }
-  /* Display-face tuning: Medium with tight tracking for every
-     named title. The old serif ran at 400 in most of these; the grotesk
-     needs the extra weight to hold its own against the card colours. */
-  /* :root raises this above the per-component rules further down, which
-     still carry the old serif's 400. */
-  :root :is(.pin h3, .climate-title, .pin .skills-intro, .exp-card h3, .exp-intro-panel h3,
-  .exp-outro-text, .ab-intro-panel h3, .ab-stack-title, .ab-stack-empty-label) {
-    font-weight: 500; letter-spacing: -0.025em;
-  }
   .banner .bio { font-size: 16px; line-height: 1.65; max-width: 520px; margin: 0 auto; color: var(--ink-soft); }
   .banner .bio em { font-style: italic; color: var(--accent); }
   /* Desktop line 1 is the roles (.bio-role); phones swap in the school
