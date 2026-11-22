@@ -1136,6 +1136,8 @@
   :root :is(.pin h3, .climate-title, .pin .skills-intro, .art-book .title) {
     font-family: var(--card-title); font-weight: 500; letter-spacing: -0.025em;
   }
+  /* No italic accents in the grotesk card titles. */
+  :root :is(.pin h3, .climate-title, .pin .skills-intro, .art-book .title) :is(em, i) { font-style: normal; }
   .banner .bio { font-size: 16px; line-height: 1.65; max-width: 520px; margin: 0 auto; color: var(--ink-soft); }
   .banner .bio em { font-style: italic; color: var(--accent); }
   /* Desktop line 1 is the roles (.bio-role); phones swap in the school
@@ -6430,7 +6432,7 @@
               <div class="pin-meta">Data</div>
               <div class="climate-mark">
                 <h3>
-                  <span class="climate-title">The Neutral Response</span>
+                  <span class="climate-title">The Neutral<br>Response</span>
                 </h3>
                 <span class="climate-caption">ESD Family Survey Analysis</span>
               </div>
@@ -6575,7 +6577,7 @@
               <span class="folder-sheet" aria-hidden="true"></span>
               <span class="folder-front" aria-hidden="true"></span>
               <div class="pin-meta">WIP · WIIRED Studio</div>
-              <h3 style="font-size:36px; margin-top:auto;">WIIRED<br><em style="font-style:italic;">Studio</em></h3>
+              <h3 style="font-size:36px; margin-top:auto;">WIIRED<br>Studio</h3>
             </div>
           </article>
 
