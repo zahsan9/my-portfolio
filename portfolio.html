@@ -1136,6 +1136,9 @@
   :root :is(.pin h3, .climate-title, .pin .skills-intro, .art-book .title) {
     font-family: var(--card-title); font-weight: 500; letter-spacing: -0.025em;
   }
+  /* One title size for every feed card, the same as "In the overlap" and
+     "Find me elsewhere", so no card shouts louder than another. */
+  :root :is(.pin h3, .climate-title) { font-size: clamp(24px, 2.1vw, 30px); line-height: 1.02; }
   /* No italic accents in the grotesk card titles. */
   :root :is(.pin h3, .climate-title, .pin .skills-intro, .art-book .title) :is(em, i) { font-style: normal; }
   .banner .bio { font-size: 16px; line-height: 1.65; max-width: 520px; margin: 0 auto; color: var(--ink-soft); }
@@ -1481,14 +1484,17 @@
   .climate-title {
     display: block;
     font-family: var(--serif);
-    font-size: 28px;
+    font-size: clamp(24px, 2.1vw, 30px);
     font-weight: 700;
     line-height: 0.98;
     letter-spacing: -0.01em;
   }
+  /* Sits at the foot of the card, over the etched chart, in the same spot
+     the other cards keep their captions. */
   .climate-caption {
+    position: absolute; left: 24px; right: 24px; bottom: 20px;
+    z-index: 1; text-align: center;
     display: block;
-    margin-top: 14px;
     font-family: var(--mono);
     font-size: 9px;
     line-height: 1.5;
@@ -1588,7 +1594,7 @@
   }
 
   /* The CROW pin */
-  .art-crow h3 { font-size: 36px; }
+  .art-crow h3 { font-size: clamp(24px, 2.1vw, 30px); }
 
   /* GoDaddy pin — mirrors the brew pin's illustration + wordmark layout
      (big mark bleeding off one edge, wordmark opposite corner), flipped so
@@ -1602,7 +1608,7 @@
     width: 49px; height: auto; display: block;
     opacity: 0.95;
   }
-  .art-godaddy h3 { font-size: 36px; }
+  .art-godaddy h3 { font-size: clamp(24px, 2.1vw, 30px); }
   .art-godaddy .godaddy-mark {
     margin-top: auto; margin-bottom: 0; width: 100%;
     display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
@@ -1614,7 +1620,7 @@
   }
 
   /* DreamCatcher pin */
-  .art-dreamcatcher h3 { font-size: 36px; }
+  .art-dreamcatcher h3 { font-size: clamp(24px, 2.1vw, 30px); }
   .art-dreamcatcher .dream-mark {
     margin-top: auto; margin-bottom: 0;
     display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
@@ -1665,7 +1671,7 @@
   .art-book small { display: block; margin-top: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: var(--tracking-label); color: var(--card-muted); }
 
   /* Charcoal feature card */
-  .art-charcoal h3 { font-size: 36px; }
+  .art-charcoal h3 { font-size: clamp(24px, 2.1vw, 30px); }
 
   /* Folder card */
   .art-folder { background: var(--c-cream); padding: 0; align-items: stretch; }
@@ -6417,7 +6423,6 @@
           <!-- GoDaddy -->
           <article class="pin" data-cat="viz" data-page="godaddy" data-title="GoDaddy" data-year="2026" aria-label="Open the GoDaddy agent evaluation case study">
             <div class="art art-charcoal art-godaddy ar-45">
-              <div class="pin-meta">Data · AI Eval</div>
               <img class="godaddy-illustration" src="assets/images/godaddy-icon.svg" alt="">
               <div class="godaddy-mark">
                 <h3>GoDaddy</h3>
@@ -6429,12 +6434,10 @@
           <!-- ESD climate survey case study -->
           <article class="pin" data-cat="viz" data-page="climate" data-title="The Neutral Response" data-year="2026">
             <div class="art art-yellow ar-45">
-              <div class="pin-meta">Data</div>
               <div class="climate-mark">
                 <h3>
                   <span class="climate-title">The Neutral<br>Response</span>
                 </h3>
-                <span class="climate-caption">ESD Family Survey Analysis</span>
               </div>
               <div class="climate-etched-graphic" aria-hidden="true">
                 <svg viewBox="0 0 320 82" preserveAspectRatio="none">
@@ -6449,6 +6452,7 @@
                   </g>
                 </svg>
               </div>
+              <span class="climate-caption">ESD Family Survey Analysis</span>
             </div>
           </article>
 
@@ -6503,7 +6507,6 @@
           <!-- brew. -->
           <article class="pin" data-cat="ux swe" data-page="brew" data-title="brew." data-year="2026" aria-label="Open the brew product case study">
             <div class="art art-cream art-brew ar-45">
-              <div class="pin-meta">Product / UX · SWE</div>
               <img class="brew-illustration" src="assets/images/brew-mug-icon.svg" alt="">
               <div class="brew-mark">
                 <img class="brew-logo" src="assets/images/brew-logo.png" alt="brew.">
@@ -6515,7 +6518,6 @@
           <!-- Habitat -->
           <article class="pin frame-pixel" data-cat="ux swe" data-page="habitat" data-title="Habitat" data-year="2026" aria-label="Open the Habitat habit-tracker case study">
             <div class="art art-blue art-habitat ar-45">
-              <div class="pin-meta">Product / UX · SWE</div>
               <div class="habitat-mark">
                 <img class="habitat-logo-mark" src="assets/images/habitat-logo.png" alt="HABITAT">
                 <span class="habitat-caption">Habit Tracker /<br>Pixel World</span>
@@ -6577,7 +6579,7 @@
               <span class="folder-sheet" aria-hidden="true"></span>
               <span class="folder-front" aria-hidden="true"></span>
               <div class="pin-meta">WIP · WIIRED Studio</div>
-              <h3 style="font-size:36px; margin-top:auto;">WIIRED<br>Studio</h3>
+              <h3 style="margin-top:auto;">WIIRED<br>Studio</h3>
             </div>
           </article>
 
