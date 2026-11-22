@@ -1154,6 +1154,19 @@
   .ab-stack-title, .ab-stack-empty-label, .page-intro-copy h3, .cs-question, .ab-principle) {
     font-weight: 700; letter-spacing: -0.04em;
   }
+  /* Case-study text, in the system's people-card pattern: a Bold, dark,
+     slightly tight subheading over Regular body in a soft gray, so weight
+     and colour carry the hierarchy. Hero titles and section labels keep
+     their own styles. The gray is the study's own --ink-mid, mixed toward
+     --ink a little so long paragraphs stay comfortable on a dark canvas. */
+  .sheet-body :is(h3, h4, .cs-fig-title, .cs-decision-name, .cs-feature-title, .cs-gd-now-item h3, .cs-gd-project h3):not(.cs-hero-title) {
+    font-weight: 700; letter-spacing: -0.01em; color: var(--ink);
+  }
+  .sheet-body :is(p, li, dd):not(.cs-hero *) {
+    font-weight: 400;
+    color: color-mix(in oklch, var(--ink-mid) 80%, var(--ink));
+  }
+  .sheet-body :is(p, li) :is(strong, b) { font-weight: 700; color: var(--ink); }
   /* Section-level headlines get the system's tightest tracking. */
   :root :is(.exp-intro-panel h3, .ab-intro-panel h3, .page-intro-copy h3, .exp-outro-text) { letter-spacing: -0.06em; }
   :root :is(.banner h1, .exp-card h3, .exp-intro-panel h3, .exp-outro-text, .ab-intro-panel h3,
