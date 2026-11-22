@@ -6312,8 +6312,8 @@
      keep their own tuned sizes. Change a role here, not in its component.
        --fs-3xl 44  the name, the single biggest thing
        --fs-2xl 36  page headlines, case-study hero titles
-       --fs-xl  28  About/Experience card titles, case-study questions
-       --fs-lg  20  feed card titles, case-study subheads, ledes
+       --fs-xl  28  every card title (feed, About, Experience), case-study questions
+       --fs-lg  20  case-study subheads, ledes
        --fs-base 16 body prose (bold 16 = compact-card headings)
        --fs-md  15  compact-card text, figure titles
        --fs-sm  13  secondary: roles, bullets, meta values
@@ -6347,11 +6347,10 @@
   :root .exp-card h3 span { letter-spacing: 0; }
   @media (min-width: 801px) {
     /* LG */
-    :root :is(.pin h3, .climate-title, .pin .skills-intro) { font-size: var(--fs-lg); }
     :root .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3) { font-size: var(--fs-lg); line-height: 1.35; }
     :root .sheet-body .cs-copy.cs-overview p { font-size: var(--fs-lg); line-height: 1.5; }
     /* XL */
-    :root :is(.ab-stack-title, .exp-card h3) { font-size: var(--fs-xl); line-height: 1.15; }
+    :root :is(.ab-stack-title, .exp-card h3, .pin h3, .climate-title, .pin .skills-intro) { font-size: var(--fs-xl); line-height: 1.1; }
     :root .sheet-body .cs-question { font-size: var(--fs-xl); line-height: 1.15; }
     /* 2XL */
     :root :is(.ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text) { font-size: var(--fs-2xl); line-height: 1.05; }
