@@ -125,7 +125,7 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 
 **Motion:** `--motion-fast` (180ms), `--motion-med` (420ms), `--motion-slow` (480ms), `--ease-out` (cubic-bezier 0.22,1,0.36,1), `--ease-soft` (cubic-bezier 0.19,1,0.22,1)
 
-**Fonts:** `--serif` (Instrument Serif), `--sans` / `--mono` (Inter)
+**Fonts:** `--card-title` (feed card titles only: `'Helvetica Neue', Helvetica, 'Schibsted Grotesk'`, Medium 500, -0.025em, applied via a `:root :is(...)` rule; "In the overlap" is `clamp(24px, 2.1vw, 30px)`), `--serif` (Instrument Serif, for the name and page headings), `--sans` / `--mono` (Inter)
 
 **Motion:** `--rail-motion` (the rail's box geometry — width, `flex-grow`, heights, paddings) and `--rail-item-motion` (the index rows' own fade + slide, `--motion-med` by default so the rows trail the box slightly). Both, plus `--rail-ease`, are remapped by `.app.sheet-closing`; that is the whole point of them being separate from `--motion-med`/`--ease-out`, which the remap cannot reach. Nothing in the rail should carry a literal duration — see the reduced-motion note above.
 
