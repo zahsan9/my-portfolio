@@ -6345,6 +6345,10 @@
     .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3)) { letter-spacing: -0.06em; }
   :root .sheet-body :is(.cs-gd-now-item h3, .cs-feature h3, .cs-product-principle h3, .cs-fig-title) { letter-spacing: -0.01em; }
   :root .exp-card h3 span { letter-spacing: 0; }
+  /* Component cards (In the overlap, Find me elsewhere) aren't projects, so
+     their titles drop to Regular: same size as the project titles, quieter
+     voice. Regular wants a little less squeeze than Bold. */
+  :root :is(.pin .skills-intro, .pin .social-intro) { font-weight: 400; letter-spacing: -0.035em; }
   @media (min-width: 801px) {
     /* LG */
     :root .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3) { font-size: var(--fs-lg); line-height: 1.35; }
