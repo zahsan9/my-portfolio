@@ -125,7 +125,7 @@ The "In the overlap" feed card's pills (`.skill-cloud .skill-pill`) rest at thei
 
 **Motion:** `--motion-fast` (180ms), `--motion-med` (420ms), `--motion-slow` (480ms), `--ease-out` (cubic-bezier 0.22,1,0.36,1), `--ease-soft` (cubic-bezier 0.19,1,0.22,1)
 
-**Fonts:** `--serif` (the display face: `'Helvetica Neue', Helvetica, 'Schibsted Grotesk'`, so real Helvetica on Apple devices and Schibsted Grotesk elsewhere; tuned to 500 with -0.025em tracking on titles), `--serif-display` (same face; Fraunces was retired), `--sans` / `--mono` (Inter). Instrument Serif was dropped for reading as AI-templated; high-contrast display serifs and near-duplicate sans pairings (Figtree + Inter) were also rejected
+**Fonts:** `--serif` (the display face: Public Sans, picked over Helvetica Neue, Archivo and Barlow; Medium 500 with -0.025em tracking on titles, name 44px), `--serif-display` (same face; Fraunces was retired), `--sans` / `--mono` (Inter). Instrument Serif was dropped for reading as AI-templated; high-contrast display serifs and near-duplicate sans pairings (Figtree + Inter) were also rejected
 
 **Motion:** `--rail-motion` (the rail's box geometry — width, `flex-grow`, heights, paddings) and `--rail-item-motion` (the index rows' own fade + slide, `--motion-med` by default so the rows trail the box slightly). Both, plus `--rail-ease`, are remapped by `.app.sheet-closing`; that is the whole point of them being separate from `--motion-med`/`--ease-out`, which the remap cannot reach. Nothing in the rail should carry a literal duration — see the reduced-motion note above.
 
