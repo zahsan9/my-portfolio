@@ -1140,7 +1140,7 @@
   }
   .banner h1 {
     font-family: var(--serif); font-weight: 700;
-    font-size: 44px; line-height: 1; letter-spacing: -0.045em;
+    font-size: 44px; line-height: 1; letter-spacing: -0.055em;
     margin-bottom: 8px; /* ~22px visible from baseline to the bio's caps */
   }
   .banner h1 em { margin-left: 0; font-style: normal; }
@@ -1154,6 +1154,8 @@
   .ab-stack-title, .ab-stack-empty-label, .page-intro-copy h3, .cs-question, .ab-principle) {
     font-weight: 700; letter-spacing: -0.04em;
   }
+  /* Section-level headlines get the system's tightest tracking. */
+  :root :is(.exp-intro-panel h3, .ab-intro-panel h3, .page-intro-copy h3, .exp-outro-text) { letter-spacing: -0.06em; }
   :root :is(.banner h1, .exp-card h3, .exp-intro-panel h3, .exp-outro-text, .ab-intro-panel h3,
   .ab-stack-title, .page-intro-copy h3) :is(em, i) { font-style: normal; }
   /* The small role line inside an Experience card title keeps normal
@@ -1162,9 +1164,12 @@
   /* No faux italic: the face has no italic, so emphasis in a case-study
      hero title stays upright. */
   :root .cs-hero-title :is(em, i) { font-style: normal; }
-  /* One title size for every feed card, the same as "In the overlap" and
-     "Find me elsewhere", so no card shouts louder than another. */
-  :root :is(.pin h3, .climate-title) { font-size: clamp(24px, 2.1vw, 30px); line-height: 1.02; }
+  /* Feed card titles take the event-card style from the type system:
+     Bold 22px at -0.06em. Small labels, so the cards and their art carry
+     the board, not the titles. One size for every card. */
+  :root :is(.pin h3, .climate-title, .pin .skills-intro) {
+    font-size: 22px; line-height: 1.1; letter-spacing: -0.06em; font-weight: 700;
+  }
   /* No italic accents in the grotesk card titles. */
   :root :is(.pin h3, .climate-title, .pin .skills-intro, .art-book .title) :is(em, i) { font-style: normal; }
   .banner .bio { font-size: 16px; line-height: 1.65; max-width: 520px; margin: 0 auto; color: var(--ink-soft); }
