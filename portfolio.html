@@ -5978,7 +5978,7 @@
       width: 88px; height: 88px; min-height: 88px; max-height: 88px;
       margin-bottom: 24px;
     }
-    .banner h1 { font-size: 30px; margin-bottom: 10px; }
+    .banner h1 { font-size: 24px; margin-bottom: 10px; }
     .banner .bio { max-width: 400px; font-size: 14px; line-height: 1.55; text-wrap: pretty; }
     .banner .bio-role { display: none; }
     .banner .bio-school { display: inline; }
@@ -6190,7 +6190,7 @@
     }
     .banner .avatar.is-open,
     .banner .avatar:has(.em-btn:focus-visible) { width: 240px; }
-    .banner h1 { font-size: 28px; margin-bottom: 8px; }
+    .banner h1 { font-size: 22px; margin-bottom: 8px; }
     .banner .bio { max-width: 292px; font-size: 13px; line-height: 1.55; }
     .tabs { width: min(292px, 100% - 36px); padding: 14px 0 16px; }
     .tab { padding: 12px 0; }
@@ -6319,8 +6319,8 @@
      tracking tokens above. Keep role assignments here so component rules
      don't quietly introduce another scale.
        --fs-4xl 48  page statements
-       --fs-2xl 36  portfolio name and case-study heroes
-       --fs-xl  28  page/card titles and case-study questions
+       --fs-2xl 36  case-study heroes
+       --fs-xl  28  portfolio name, page/card titles and case-study questions
        --fs-lg  20  ledes and section heads
        --fs-base 16 body copy and primary card headings
        --fs-md  15  compact supporting copy
@@ -6354,20 +6354,21 @@
   :root .sheet-body :is(.cs-gd-now-item h3, .cs-feature h3, .cs-product-principle h3) { font-size: var(--fs-base); }
   /* Tracking follows size: display headlines tightest, titles moderately
      tight, and small card headings nearly neutral for legibility. */
-  :root :is(.banner h1, .ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text,
+  :root :is(.ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text,
     .page-intro-copy h3, .sheet .cs-hero-title) { letter-spacing: -0.04em; }
-  :root :is(.pin h3, .climate-title, .pin .skills-intro, .exp-card h3, .ab-stack-title,
+  :root :is(.banner h1, .pin h3, .climate-title, .pin .skills-intro, .exp-card h3, .ab-stack-title,
     .sheet-body .cs-question, .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3)) { letter-spacing: -0.03em; }
   :root .sheet-body :is(.cs-gd-now-item h3, .cs-feature h3, .cs-product-principle h3, .cs-fig-title) { letter-spacing: -0.01em; }
   :root .exp-card h3 span { letter-spacing: 0; }
-  /* The name and the component cards (In the overlap, Find me elsewhere)
-     are set in Regular, the calm about-you voice; project, About and
-     Experience card titles stay Bold. Regular wants a little less squeeze than Bold. */
-  :root :is(.pin .skills-intro, .pin .social-intro, .banner h1) { font-weight: 400; letter-spacing: -0.035em; }
-  /* Negative tracking narrows the word space too, so "Zainab Ahsan" began
-     to read as one word. Give the space back; 0.08em was tested against
-     0.04 (no visible change) and 0.12 (the name splits in two). */
-  :root .banner h1 { word-spacing: 0.08em; }
+  /* The component cards (In the overlap, Find me elsewhere) are set in
+     Regular, the calm about-you voice; project, About and Experience card
+     titles stay Bold. Regular wants a little less squeeze than Bold. */
+  :root :is(.pin .skills-intro, .pin .social-intro) { font-weight: 400; letter-spacing: -0.035em; }
+  /* The name is Bold at the card-title size rather than Regular at 36:
+     weight carries it, so it doesn't need the extra size. Negative
+     tracking narrows the word space too, so "Zainab Ahsan" began to read
+     as one word; 0.08em gives it back (0.04 was invisible, 0.12 split it). */
+  :root .banner h1 { font-weight: 700; word-spacing: 0.08em; }
   @media (min-width: 801px) {
     /* LG */
     :root .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3) { font-size: var(--fs-lg); line-height: 1.35; }
@@ -6375,9 +6376,9 @@
     /* XL */
     :root :is(.ab-stack-title, .exp-card h3) { font-size: var(--fs-xl); line-height: 1.1; }
     :root .sheet-body .cs-question { font-size: var(--fs-xl); line-height: 1.15; }
+    :root .banner h1 { font-size: var(--fs-xl); }
     /* 2XL */
     :root .sheet .cs-hero-title, :root .sheet[data-page] .cs-hero .cs-hero-title { font-size: var(--fs-2xl); line-height: 1.04; }
-    :root .banner h1 { font-size: var(--fs-2xl); }
     /* 4XL */
     :root :is(.ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text) { font-size: var(--fs-4xl); line-height: 1.05; }
   }
