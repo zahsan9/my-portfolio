@@ -1142,9 +1142,9 @@
     transition-duration: 0.76s, 0.28s, 0.15s;
   }
   .banner h1 {
-    font-family: var(--serif); font-weight: 700;
-    font-size: 44px; line-height: 1; letter-spacing: -0.055em;
-    margin-bottom: 8px; /* ~22px visible from baseline to the bio's caps */
+    /* Size, weight, tracking and word spacing come from the Type scale block. */
+    font-family: var(--serif); line-height: 1;
+    margin-bottom: 8px;
   }
   .banner h1 em { margin-left: 0; font-style: normal; }
   /* :root lifts this above the per-card title rules further down. */
@@ -6319,8 +6319,7 @@
      tracking tokens above. Keep role assignments here so component rules
      don't quietly introduce another scale.
        --fs-4xl 48  page statements
-       --fs-3xl 36  portfolio name
-       --fs-2xl 36  case-study heroes
+       --fs-2xl 36  portfolio name and case-study heroes
        --fs-xl  28  page/card titles and case-study questions
        --fs-lg  20  ledes and section heads
        --fs-base 16 body copy and primary card headings
@@ -6328,7 +6327,7 @@
        --fs-sm  13  secondary copy and metadata values
        --fs-xs  11  labels and captions */
   :root {
-    --fs-4xl: 48px; --fs-3xl: 36px; --fs-2xl: 36px; --fs-xl: 28px; --fs-lg: 20px;
+    --fs-4xl: 48px; --fs-2xl: 36px; --fs-xl: 28px; --fs-lg: 20px;
     --fs-base: 16px; --fs-md: 15px; --fs-sm: 13px; --fs-xs: 11px;
   }
   /* XS */
@@ -6365,6 +6364,10 @@
      are set in Regular, the calm about-you voice; project, About and
      Experience card titles stay Bold. Regular wants a little less squeeze than Bold. */
   :root :is(.pin .skills-intro, .pin .social-intro, .banner h1) { font-weight: 400; letter-spacing: -0.035em; }
+  /* Negative tracking narrows the word space too, so "Zainab Ahsan" began
+     to read as one word. Give the space back; 0.08em was tested against
+     0.04 (no visible change) and 0.12 (the name splits in two). */
+  :root .banner h1 { word-spacing: 0.08em; }
   @media (min-width: 801px) {
     /* LG */
     :root .sheet-body :is(.cs-gd-project h3, .cs-iteration-copy h3, .cs-decision-block h3) { font-size: var(--fs-lg); line-height: 1.35; }
@@ -6373,10 +6376,10 @@
     :root :is(.ab-stack-title, .exp-card h3) { font-size: var(--fs-xl); line-height: 1.1; }
     :root .sheet-body .cs-question { font-size: var(--fs-xl); line-height: 1.15; }
     /* 2XL */
-    :root :is(.ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text) { font-size: var(--fs-4xl); line-height: 1.05; }
     :root .sheet .cs-hero-title, :root .sheet[data-page] .cs-hero .cs-hero-title { font-size: var(--fs-2xl); line-height: 1.04; }
-    /* 3XL */
-    :root .banner h1 { font-size: var(--fs-3xl); }
+    :root .banner h1 { font-size: var(--fs-2xl); }
+    /* 4XL */
+    :root :is(.ab-intro-panel h3, .exp-intro-panel h3, .exp-outro-text) { font-size: var(--fs-4xl); line-height: 1.05; }
   }
   /* Experience uses a 28px title on a 380px desktop card. */
   :root .feed .pin :is(h3, .climate-title, .art-book .title) {
