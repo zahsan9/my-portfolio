@@ -2699,7 +2699,7 @@
   .exp-card .yr-span {
     display: block;
     margin-top: 3px;
-    font-size: 10px;
+    font-size: var(--fs-xs);
     color: color-mix(in oklch, var(--ink) 50%, transparent);
   }
   .exp-card:nth-of-type(odd) .yr { bottom: calc(100% + 14px); }
@@ -3617,7 +3617,7 @@
     border-radius: 6px;
   }
   .ab-stack-list.is-lined li:first-child { padding-top: 14px; border-top: none; }
-  .ab-stack-list.is-compact li { font-size: 12px; line-height: 1.4; }
+  .ab-stack-list.is-compact li { font-size: var(--fs-sm); line-height: 1.4; }
   /* The pill row these cards used to end on is gone, so the rows take the
      freed height as extra air instead of leaving a gap at the bottom. */
   @media (min-width: 801px) {
@@ -3710,9 +3710,9 @@
     writing-mode: vertical-rl;
     transform: rotate(180deg);
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: 0.13em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -6760,12 +6760,12 @@
               <img src="assets/images/brew-mug-icon.svg" alt="brew." style="width:88px;height:88px;opacity:0.95;filter:brightness(0) invert(1);object-fit:contain;object-position:center;">
               <div style="max-width:440px;">
                 <div class="ab-stack-title" style="margin-bottom:14px;">Currently Building <a href="#" data-open-case="brew" data-cursor-link="↗ brew. case study" style="text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;color:inherit;">Brew.</a></div>
-                <p style="font-size:14px;line-height:1.65;opacity:0.9;">For finding your third space—whether you need a quiet spot to work, a photo-worthy café, or just great coffee.</p>
+                <p style="font-size:var(--fs-md);line-height:1.5;opacity:0.9;">For finding your third space—whether you need a quiet spot to work, a photo-worthy café, or just great coffee.</p>
               </div>
             </div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:440px;padding-bottom:24px;">
               <div class="ab-card-eyebrow">Features</div>
-              <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:10px;opacity:0.85;justify-content:center;">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:var(--fs-xs);opacity:0.85;justify-content:center;">
                 <span style="background:oklch(1 0 0 / 1);color:var(--c-blue);padding:5px 10px;border-radius:11px;font-weight:600;">Personalized recommendations</span>
                 <span style="background:oklch(1 0 0 / 1);color:var(--c-blue);padding:5px 10px;border-radius:11px;font-weight:600;">Custom mug onboarding</span>
                 <span style="background:oklch(1 0 0 / 1);color:var(--c-blue);padding:5px 10px;border-radius:11px;font-weight:600;">Maps & directions</span>
@@ -6783,7 +6783,7 @@
               <img src="assets/images/about-me.jpg" alt="Zainab Ahsan" style="width:100%;height:100%;object-fit:cover;object-position:50% 18%;transform:scale(1.45);">
             </div>
             <div class="ab-about-copy" style="margin-top:auto;">
-              <div class="ab-stack-title">Hi, I'm<br><em style="font-size:1.15em;">Zainab!</em></div>
+              <div class="ab-stack-title">Hi, I'm<br><em>Zainab!</em></div>
               <p class="ab-stack-narrative" style="margin-top:14px;">I'm studying <strong>computer science</strong> at the <strong>University of Washington</strong> and am drawn to the space between <strong>creativity and technology</strong>.</p>
               <p class="ab-stack-narrative">Whether it's thinking through an <strong>interaction</strong>, making sense of <strong>data</strong>, or figuring out how a <strong>product</strong> could work better, I enjoy exploring problems from different angles and <strong>bringing ideas to life</strong>.</p>
             </div>
